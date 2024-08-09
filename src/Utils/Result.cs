@@ -1,28 +1,35 @@
-﻿namespace Muzonia.Utils;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
+namespace Muzonia.Utils;
+
+public class UnwrapException<E>(E err) : Exception 
+{
+    E Err => err;
+}
+
+[StructLayout(LayoutKind.Auto)]
 public readonly struct Res<T,E>
 {
     private readonly T val;
     private readonly E err;
     private readonly bool isval;
 
-    public Res(T val)
+    private Res(T val, E err, bool isval)
     {
         this.val = val;
-        err = default!;
-        isval = true;
-    }
-
-    public Res(E err)
-    {
         this.err = err;
-        val = default!;
-        isval = false;
+        this.isval = isval;
     }
-    public T Val => val;
+    public Res(T ok) : this(ok, default!, true) { }
+    public Res(E err) : this(default!,err,false) { }
+    public static Res<T, E> Ok(T ok)
+        => new(ok, default!, true);
+    public T Val => isval ? val : throw new UnwrapException<E>(err);
     public E Err => err;
     public bool IsVal => isval;
     public bool IsErr => !isval;
+    public T? ValOrDefault => val;
 
     public static implicit operator Res<T, E>(T val) =>
         new(val);
@@ -60,4 +67,7 @@ public readonly struct Res<T,E>
         }
         return this;
     }
+
+    public Res<T, E> Map(Func<T, T> func)
+        => isval ? new(func(val)) : this;
 }

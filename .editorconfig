@@ -9,7 +9,8 @@ root = true
 # Indentation and spacing
 indent_size = 4
 indent_style = space
-tab_width = 4
+tab_width = 
+max_line_length = 80
 
 # New line preferences
 end_of_line = crlf

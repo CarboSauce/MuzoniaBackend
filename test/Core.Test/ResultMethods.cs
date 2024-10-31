@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Muzonia.Utils;
-
-namespace Utils.Test;
+﻿namespace Muzonia.Core.Test;
 
 public class ResultMethods
 {
-    // Todo
     [Fact]
     public void MatchingShouldWork_OnValueCase()
     {
-        Assert.True(false);
         var res = new Res<int, string>(1);
 
         int val = res switch

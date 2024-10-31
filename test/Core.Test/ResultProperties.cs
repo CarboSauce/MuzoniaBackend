@@ -1,6 +1,4 @@
-using Muzonia.Utils;
-
-namespace Utils.Test;
+namespace Muzonia.Core.Test;
 
 public class ResultProperties
 {

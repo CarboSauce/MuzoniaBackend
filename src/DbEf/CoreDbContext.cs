@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
-namespace DbEf;
+namespace Muzonia.DbEf;
 
 public class CoreDbContext(DbContextOptions<CoreDbContext> options)
-    : DbContext(options);
+    : IdentityDbContext<AppUser, IdentityRole<Ulid>, Ulid>(options);

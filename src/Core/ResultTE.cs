@@ -1,8 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
-namespace Muzonia.Utils;
+namespace Muzonia.Core;
 
 public interface IResultException
 {
@@ -37,10 +38,18 @@ public readonly struct Res<T, E>
     }
 
     public Res(T ok)
-        : this(ok, default!, true) { }
+    {
+        val = ok;
+        isval = true;
+        Unsafe.SkipInit(out err);
+    }
 
     public Res(E err)
-        : this(default!, err, false) { }
+    {
+        this.err = err;
+        isval = false;
+        Unsafe.SkipInit(out val);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Res<T, E> Value(T value) => new(value, default!, true);
@@ -50,13 +59,7 @@ public readonly struct Res<T, E>
 
     public T Val => isval ? val : throw new NoValueException<E>(err);
     public E Err => !isval ? err : throw new NoErrorException<T>(val);
-
-    [MemberNotNullWhen(true, nameof(val))]
-    [MemberNotNullWhen(false, nameof(err))]
     public bool IsVal => isval;
-
-    [MemberNotNullWhen(false, nameof(val))]
-    [MemberNotNullWhen(true, nameof(err))]
     public bool IsErr => !isval;
     public T? ValOrDefault => val;
     public E? ErrOrDefault => err;
@@ -80,7 +83,7 @@ public readonly struct Res<T, E>
         }
     }
 
-    public bool TryValue(out T? Val)
+    public bool TryGet(out T? Val)
     {
         if (isval)
         {
@@ -90,6 +93,13 @@ public readonly struct Res<T, E>
         Val = default;
         return false;
     }
+
+    public T Or(T value) => isval ? val : value;
+
+    public T OrInvoke(Func<T> func) => isval ? val : func();
+
+    public Task<T> OrInvokeAsync(Func<Task<T>> func) =>
+        isval ? Task.FromResult(val) : func();
 
     // Sync combinators
 
@@ -191,7 +201,7 @@ public readonly struct Res<T, E>
     ) => isval ? this : await errFunc(err);
 }
 
-public static class XDeconstructResultExt1
+public static class XDeconstructResultTErrExt
 {
     public static void Deconstruct<T, E>(
         this Res<T, E> res,
@@ -212,10 +222,7 @@ public static class XDeconstructResultExt1
             err = res.err;
         }
     }
-}
 
-public static class XDeconstructResultExt2
-{
     public static void Deconstruct<T, E>(
         this Res<T, E> res,
         out T? val,
@@ -235,10 +242,7 @@ public static class XDeconstructResultExt2
             err = res.err;
         }
     }
-}
 
-public static class XDeconstructResultExt3
-{
     public static void Deconstruct<T, E>(
         this Res<T, E> res,
         out T? val,
@@ -258,10 +262,7 @@ public static class XDeconstructResultExt3
             err = res.err;
         }
     }
-}
 
-public static class XDeconstructResultExt4
-{
     public static void Deconstruct<T, E>(
         this Res<T, E> res,
         out T? val,

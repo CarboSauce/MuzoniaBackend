@@ -68,6 +68,19 @@ void ConfigureExternalServices(WebApplicationBuilder builder)
             return ConnectionMultiplexer.Connect(redis);
         });
     }
+
+    if (useAspirePostgres)
+    {
+        builder.AddNpgsqlDbContext<ApiDbContext>("postgres");
+    }
+    else
+    {
+        builder.Services.AddDbContext<ApiDbContext>(o =>
+        {
+            var conn = builder.Configuration.GetConnectionString("postgres");
+            o.UseNpgsql(conn, o => o.MigrationsAssembly("DbEf.Postgresql"));
+        });
+    }
 }
 void ConfigureServices(
     IServiceCollection services,

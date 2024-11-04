@@ -3,33 +3,37 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Muzonia.DbEf.Entities;
 
-public class Song
+public class Track
 {
-    public Ulid Id { get; set; } = Ulid.NewUlid();
+    public Guid Id { get; set; } = Guid.NewGuid();
     public required Uri DataUri { get; set; }
-    public required DateTime CreationDate { get; set; }
+    public DateTime CreationDate { get; set; } = DateTime.UtcNow;
     public required string Title { get; set; }
-    public Ulid AlbumId { get; set; }
-    public required Album Album { get; set; }
-    public Ulid PrimaryArtistId { get; set; }
-    public required Artist PrimaryArtist { get; set; }
+    public required string Genre { get; set; }
+    public required Guid AlbumId { get; set; }
+    public Album Album { get; set; } = null!;
+    public required Guid PrimaryArtistId { get; set; }
+    public Artist PrimaryArtist { get; set; } = null!;
     public virtual ICollection<Artist> Artists { get; } = null!;
     public virtual ICollection<Playlist> Playlists { get; } = null!;
 }
 
-public class SongConfig : IEntityTypeConfiguration<Song>
+public class SongConfig : IEntityTypeConfiguration<Track>
 {
-    public void Configure(EntityTypeBuilder<Song> builder)
+    public void Configure(EntityTypeBuilder<Track> builder)
     {
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Title).HasMaxLength(128);
+        builder.Property(e => e.Genre).HasMaxLength(128);
         builder
             .HasOne(e => e.PrimaryArtist)
             .WithMany(e => e.PrimarySongs)
             .HasForeignKey(e => e.PrimaryArtistId);
+
         builder
             .HasMany(e => e.Artists)
             .WithMany(e => e.Songs)
-            .UsingEntity<SongArtist>();
+            .UsingEntity<TrackArtist>();
 
         builder
             .HasMany(e => e.Playlists)
@@ -38,7 +42,7 @@ public class SongConfig : IEntityTypeConfiguration<Song>
 
         builder
             .HasOne(e => e.Album)
-            .WithMany(e => e.Songs)
+            .WithMany(e => e.Tracks)
             .HasForeignKey(e => e.AlbumId);
 
         builder.Property(e => e.DataUri).IsRequired();

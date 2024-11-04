@@ -4,13 +4,20 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Muzonia.DbEf.Entities;
 
-public class AppUser : IdentityUser<Ulid>
+public sealed class AppUser : IdentityUser<Guid>
 {
-    public required Uri? AvatarUri { get; set; }
-    public required DateTime CreationDate { get; set; }
+    public Uri? AvatarUri { get; set; }
+    public DateTime CreationDate { get; set; }
 
-    public virtual ICollection<Playlist> Playlists { get; } = null!;
-    public virtual Artist? Artist { get; set; }
+    public ICollection<Playlist> Playlists { get; } = null!;
+    public Artist? Artist { get; set; }
+
+    public AppUser()
+    {
+        CreationDate = DateTime.UtcNow;
+        Id = Guid.NewGuid();
+        SecurityStamp = Guid.NewGuid().ToString();
+    }
 }
 
 public class AppUserConfig : IEntityTypeConfiguration<AppUser>

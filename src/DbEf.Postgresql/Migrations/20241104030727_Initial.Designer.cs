@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Muzonia.DbEf.Postgresql.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20241102043240_Initial")]
+    [Migration("20241104030727_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -25,10 +25,11 @@ namespace Muzonia.DbEf.Postgresql.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Ulid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
-                    b.Property<byte[]>("Id")
-                        .HasColumnType("bytea");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("character varying(36)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -49,9 +50,25 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "ccf2a9b4-e60a-4dc3-9195-67a067fd0add",
+                            ConcurrencyStamp = "1",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "8b46361d-d806-4403-bc0b-f96d6057b369",
+                            ConcurrencyStamp = "2",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Ulid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -65,9 +82,9 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("text");
 
-                    b.Property<byte[]>("RoleId")
+                    b.Property<string>("RoleId")
                         .IsRequired()
-                        .HasColumnType("bytea");
+                        .HasColumnType("character varying(36)");
 
                     b.HasKey("Id");
 
@@ -76,7 +93,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Ulid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -90,9 +107,9 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("text");
 
-                    b.Property<byte[]>("UserId")
+                    b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("bytea");
+                        .HasColumnType("character varying(36)");
 
                     b.HasKey("Id");
 
@@ -101,7 +118,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     b.ToTable("AspNetUserClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Ulid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("text");
@@ -112,9 +129,9 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("text");
 
-                    b.Property<byte[]>("UserId")
+                    b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("bytea");
+                        .HasColumnType("character varying(36)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -123,13 +140,13 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Ulid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.Property<byte[]>("UserId")
-                        .HasColumnType("bytea");
+                    b.Property<string>("UserId")
+                        .HasColumnType("character varying(36)");
 
-                    b.Property<byte[]>("RoleId")
-                        .HasColumnType("bytea");
+                    b.Property<string>("RoleId")
+                        .HasColumnType("character varying(36)");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -138,10 +155,10 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Ulid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.Property<byte[]>("UserId")
-                        .HasColumnType("bytea");
+                    b.Property<string>("UserId")
+                        .HasColumnType("character varying(36)");
 
                     b.Property<string>("LoginProvider")
                         .HasColumnType("text");
@@ -159,20 +176,21 @@ namespace Muzonia.DbEf.Postgresql.Migrations
 
             modelBuilder.Entity("Muzonia.DbEf.Entities.Album", b =>
                 {
-                    b.Property<byte[]>("Id")
-                        .HasColumnType("bytea");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("character varying(36)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ImageUri")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<byte[]>("SongsId")
-                        .IsRequired()
-                        .HasColumnType("bytea");
-
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
 
@@ -181,8 +199,9 @@ namespace Muzonia.DbEf.Postgresql.Migrations
 
             modelBuilder.Entity("Muzonia.DbEf.Entities.AppUser", b =>
                 {
-                    b.Property<byte[]>("Id")
-                        .HasColumnType("bytea");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("character varying(36)");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
@@ -251,15 +270,17 @@ namespace Muzonia.DbEf.Postgresql.Migrations
 
             modelBuilder.Entity("Muzonia.DbEf.Entities.Artist", b =>
                 {
-                    b.Property<byte[]>("Id")
-                        .HasColumnType("bytea");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("character varying(36)");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
 
                     b.Property<string>("ImageUri")
                         .IsRequired()
@@ -267,11 +288,12 @@ namespace Muzonia.DbEf.Postgresql.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
-                    b.Property<byte[]>("UserId")
+                    b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("bytea");
+                        .HasColumnType("character varying(36)");
 
                     b.HasKey("Id");
 
@@ -283,11 +305,11 @@ namespace Muzonia.DbEf.Postgresql.Migrations
 
             modelBuilder.Entity("Muzonia.DbEf.Entities.ArtistAlbum", b =>
                 {
-                    b.Property<byte[]>("AlbumId")
-                        .HasColumnType("bytea");
+                    b.Property<string>("AlbumId")
+                        .HasColumnType("character varying(36)");
 
-                    b.Property<byte[]>("ArtistId")
-                        .HasColumnType("bytea");
+                    b.Property<string>("ArtistId")
+                        .HasColumnType("character varying(36)");
 
                     b.HasKey("AlbumId", "ArtistId");
 
@@ -296,28 +318,60 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     b.ToTable("ArtistAlbums");
                 });
 
+            modelBuilder.Entity("Muzonia.DbEf.Entities.History", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("character varying(36)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SongId")
+                        .IsRequired()
+                        .HasColumnType("character varying(36)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("character varying(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SongId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("History");
+                });
+
             modelBuilder.Entity("Muzonia.DbEf.Entities.Playlist", b =>
                 {
-                    b.Property<byte[]>("Id")
-                        .HasColumnType("bytea");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("character varying(36)");
 
-                    b.Property<byte[]>("AppUserId")
-                        .HasColumnType("bytea");
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("character varying(36)");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
-                    b.Property<byte[]>("UserId")
+                    b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("bytea");
+                        .HasColumnType("character varying(36)");
 
                     b.HasKey("Id");
 
@@ -330,11 +384,11 @@ namespace Muzonia.DbEf.Postgresql.Migrations
 
             modelBuilder.Entity("Muzonia.DbEf.Entities.PlaylistSong", b =>
                 {
-                    b.Property<byte[]>("PlaylistId")
-                        .HasColumnType("bytea");
+                    b.Property<string>("PlaylistId")
+                        .HasColumnType("character varying(36)");
 
-                    b.Property<byte[]>("SongId")
-                        .HasColumnType("bytea");
+                    b.Property<string>("SongId")
+                        .HasColumnType("character varying(36)");
 
                     b.HasKey("PlaylistId", "SongId");
 
@@ -343,14 +397,41 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     b.ToTable("PlaylistSong");
                 });
 
-            modelBuilder.Entity("Muzonia.DbEf.Entities.Song", b =>
+            modelBuilder.Entity("Muzonia.DbEf.Entities.Queue", b =>
                 {
-                    b.Property<byte[]>("Id")
-                        .HasColumnType("bytea");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("character varying(36)");
 
-                    b.Property<byte[]>("AlbumId")
+                    b.Property<long>("Index")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("SongId")
                         .IsRequired()
-                        .HasColumnType("bytea");
+                        .HasColumnType("character varying(36)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("character varying(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SongId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Queue");
+                });
+
+            modelBuilder.Entity("Muzonia.DbEf.Entities.Track", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("character varying(36)");
+
+                    b.Property<string>("AlbumId")
+                        .IsRequired()
+                        .HasColumnType("character varying(36)");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
@@ -359,13 +440,19 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<byte[]>("PrimaryArtistId")
+                    b.Property<string>("Genre")
                         .IsRequired()
-                        .HasColumnType("bytea");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("PrimaryArtistId")
+                        .IsRequired()
+                        .HasColumnType("character varying(36)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.HasKey("Id");
 
@@ -376,31 +463,35 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     b.ToTable("Songs");
                 });
 
-            modelBuilder.Entity("Muzonia.DbEf.Entities.SongArtist", b =>
+            modelBuilder.Entity("Muzonia.DbEf.Entities.TrackArtist", b =>
                 {
-                    b.Property<byte[]>("ArtistId")
-                        .HasColumnType("bytea");
+                    b.Property<string>("ArtistId")
+                        .HasColumnType("character varying(36)");
 
-                    b.Property<byte[]>("SongId")
-                        .HasColumnType("bytea");
+                    b.Property<string>("TrackId")
+                        .HasColumnType("character varying(36)");
 
-                    b.HasKey("ArtistId", "SongId");
+                    b.Property<string>("SongId")
+                        .IsRequired()
+                        .HasColumnType("character varying(36)");
 
-                    b.HasIndex("SongId");
+                    b.HasKey("ArtistId", "TrackId");
+
+                    b.HasIndex("TrackId");
 
                     b.ToTable("SongArtists");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Ulid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Ulid>", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Ulid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.HasOne("Muzonia.DbEf.Entities.AppUser", null)
                         .WithMany()
@@ -409,7 +500,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Ulid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.HasOne("Muzonia.DbEf.Entities.AppUser", null)
                         .WithMany()
@@ -418,9 +509,9 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Ulid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Ulid>", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -433,7 +524,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Ulid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.HasOne("Muzonia.DbEf.Entities.AppUser", null)
                         .WithMany()
@@ -472,6 +563,25 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     b.Navigation("Artist");
                 });
 
+            modelBuilder.Entity("Muzonia.DbEf.Entities.History", b =>
+                {
+                    b.HasOne("Muzonia.DbEf.Entities.Track", "Song")
+                        .WithMany()
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Muzonia.DbEf.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Song");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Muzonia.DbEf.Entities.Playlist", b =>
                 {
                     b.HasOne("Muzonia.DbEf.Entities.AppUser", null)
@@ -495,7 +605,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Muzonia.DbEf.Entities.Song", "Song")
+                    b.HasOne("Muzonia.DbEf.Entities.Track", "Track")
                         .WithMany()
                         .HasForeignKey("SongId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -503,13 +613,32 @@ namespace Muzonia.DbEf.Postgresql.Migrations
 
                     b.Navigation("Playlist");
 
-                    b.Navigation("Song");
+                    b.Navigation("Track");
                 });
 
-            modelBuilder.Entity("Muzonia.DbEf.Entities.Song", b =>
+            modelBuilder.Entity("Muzonia.DbEf.Entities.Queue", b =>
+                {
+                    b.HasOne("Muzonia.DbEf.Entities.Track", "Song")
+                        .WithMany()
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Muzonia.DbEf.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Song");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Muzonia.DbEf.Entities.Track", b =>
                 {
                     b.HasOne("Muzonia.DbEf.Entities.Album", "Album")
-                        .WithMany("Songs")
+                        .WithMany("Tracks")
                         .HasForeignKey("AlbumId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -525,7 +654,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     b.Navigation("PrimaryArtist");
                 });
 
-            modelBuilder.Entity("Muzonia.DbEf.Entities.SongArtist", b =>
+            modelBuilder.Entity("Muzonia.DbEf.Entities.TrackArtist", b =>
                 {
                     b.HasOne("Muzonia.DbEf.Entities.Artist", "Artist")
                         .WithMany()
@@ -533,20 +662,20 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Muzonia.DbEf.Entities.Song", "Song")
+                    b.HasOne("Muzonia.DbEf.Entities.Track", "Track")
                         .WithMany()
-                        .HasForeignKey("SongId")
+                        .HasForeignKey("TrackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Artist");
 
-                    b.Navigation("Song");
+                    b.Navigation("Track");
                 });
 
             modelBuilder.Entity("Muzonia.DbEf.Entities.Album", b =>
                 {
-                    b.Navigation("Songs");
+                    b.Navigation("Tracks");
                 });
 
             modelBuilder.Entity("Muzonia.DbEf.Entities.AppUser", b =>

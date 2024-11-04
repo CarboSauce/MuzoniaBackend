@@ -2,11 +2,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Muzonia.DbEf.Entities;
 
-public class SongArtist
+public class TrackArtist
 {
-    public Ulid SongId { get; set; }
-    public Ulid ArtistId { get; set; }
-    public required Song Song { get; set; }
+    public Guid SongId { get; set; }
+    public Guid ArtistId { get; set; }
+    public required Track Track { get; set; }
     public required Artist Artist { get; set; }
 }
 

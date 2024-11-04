@@ -78,6 +78,30 @@ public readonly struct Res<T>
         return false;
     }
 
+    public static Res<T> Catch<U>(in U data, Func<U, T> func)
+    {
+        try
+        {
+            return Value(func(data));
+        }
+        catch (Exception ex)
+        {
+            return Error(ex);
+        }
+    }
+
+    public static Res<T> Catch(Func<T> func)
+    {
+        try
+        {
+            return Value(func());
+        }
+        catch (Exception ex)
+        {
+            return Error(ex);
+        }
+    }
+
     public void ThrowErr() => exception?.Throw();
 
     public T Or(T value) => IsVal ? val : value;

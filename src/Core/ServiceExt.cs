@@ -4,7 +4,7 @@ using Muzonia.Core.Services;
 
 namespace Muzonia.Core;
 
-public static class ServiceExt
+internal static class ServiceExt
 {
     public static void RegisterServices(this IServiceCollection services)
     {

@@ -11,7 +11,7 @@ public interface IFileWriter
 public sealed class StaticFileWriter(
     IWebHostEnvironment env,
     IHttpContextAccessor contextAccessor
-) : IFileWriter
+) : IFileWriter, IScoped
 {
     public async Task<Uri?> WriteAsync(IFormFile file, string prefix = "")
     {
@@ -30,4 +30,12 @@ public sealed class StaticFileWriter(
             $"{context.Request.Scheme}://{context.Request.Host}/static/{prefix}{uniqueFileName}"
         );
     }
+}
+
+public sealed class NoopFileWriter : IFileWriter, ISingleton
+{
+    public Task<Uri?> WriteAsync(IFormFile file, string prefix = "") =>
+        Task.FromResult<Uri?>(
+            new($"noop://{prefix}{{file.Name}}_{file.ContentType}")
+        );
 }

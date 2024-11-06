@@ -1,0 +1,48 @@
+﻿using Microsoft.AspNetCore.Identity;
+using Muzonia.DbEf;
+using Muzonia.DbEf.Entities;
+
+namespace Muzonia.Api.DepInjection;
+
+internal static class Auth
+{
+    public static IServiceCollection AddAuth(
+        this IServiceCollection services,
+        IConfiguration config,
+        IWebHostEnvironment env
+    )
+    {
+        services.AddAuthorization();
+        services
+            .AddAuthentication(IdentityConstants.ApplicationScheme)
+            .AddCookie(IdentityConstants.ApplicationScheme);
+
+        services
+            .AddIdentityCore<AppUser>(o =>
+            {
+                o.User.RequireUniqueEmail = true;
+                if (env.IsDevelopment())
+                {
+                    o.Password.RequireDigit = false;
+                    o.Password.RequireLowercase = false;
+                    o.Password.RequireUppercase = false;
+                    o.Password.RequireNonAlphanumeric = false;
+                    o.Password.RequiredLength = 0;
+                }
+                else
+                {
+                    o.Password.RequireDigit = true;
+                    o.Password.RequireLowercase = true;
+                    o.Password.RequireUppercase = true;
+                    o.Password.RequireNonAlphanumeric = true;
+                    o.Password.RequiredLength = 8;
+                }
+            })
+            .AddRoles<IdentityRole<Guid>>()
+            .AddEntityFrameworkStores<ApiDbContext>()
+            .AddDefaultTokenProviders()
+            .AddApiEndpoints();
+
+        return services;
+    }
+}

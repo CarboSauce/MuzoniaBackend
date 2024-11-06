@@ -15,6 +15,7 @@ public class ApiDbContext(DbContextOptions<ApiDbContext> options)
     public DbSet<Track> Songs { get; set; } = null!;
     public DbSet<TrackArtist> SongArtists { get; set; } = null!;
     public DbSet<ArtistAlbum> ArtistAlbums { get; set; } = null!;
+    public DbSet<Entities.FileModel> Files { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

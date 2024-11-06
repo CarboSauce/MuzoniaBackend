@@ -16,5 +16,6 @@ public static class InjectApiServices
             .Add<TrackService>()
             .Add<PlaylistService>()
             .Add<HistoryService>()
-            .Add<QueueService>();
+            .Add<QueueService>()
+            .Add<FileService>();
 }

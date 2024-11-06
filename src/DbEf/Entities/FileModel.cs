@@ -1,0 +1,34 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Muzonia.DbEf.Entities;
+
+public class FileModelMetadata
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public required string Name { get; set; }
+    public required string Path { get; set; }
+    public required string ContentType { get; set; }
+    public DateTime CreationDate { get; set; } = DateTime.UtcNow;
+}
+
+public sealed class FileModel : FileModelMetadata
+{
+    public required byte[] Data { get; set; }
+}
+
+public sealed class FileConfig : IEntityTypeConfiguration<FileModel>
+{
+    public void Configure(EntityTypeBuilder<FileModel> builder)
+    {
+        builder.HasKey(e => e.Id);
+        builder.Property(e => e.Name).HasMaxLength(255).IsRequired();
+        builder.Property(e => e.Path).HasMaxLength(255).IsRequired();
+        builder.Property(e => e.ContentType).HasMaxLength(255).IsRequired();
+        builder.Property(e => e.CreationDate).IsRequired();
+        // MaxLength is 30MiB
+        builder.Property(e => e.Data).IsRequired().HasMaxLength(31_457_280);
+        // Index
+        builder.HasIndex(e => e.Path).IsUnique();
+    }
+}

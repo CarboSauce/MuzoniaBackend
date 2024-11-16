@@ -17,7 +17,11 @@ public class HelloWorld(ILogger<HelloWorld> logger) : ControllerBase
     [HttpGet("{key}")]
     public Task<IActionResult> Read(string key)
     {
-        logger.LogInformation("Reading key: {key}", key);
+        // Log
+
+
+
+
 
         return Task.FromResult<IActionResult>(Ok(new { hello = key }));
     }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Muzonia.Core.Common;
 using Muzonia.DbEf;
 using Muzonia.DbEf.Entities;
 
@@ -9,6 +10,7 @@ internal static class Auth
     public static IServiceCollection AddAuth(
         this IServiceCollection services,
         IConfiguration config,
+        ApiConfig apiConfig,
         IWebHostEnvironment env
     )
     {
@@ -21,6 +23,9 @@ internal static class Auth
             .AddIdentityCore<AppUser>(o =>
             {
                 o.User.RequireUniqueEmail = true;
+
+                o.SignIn.RequireConfirmedEmail = !apiConfig.UseNoopEmail;
+
                 if (env.IsDevelopment())
                 {
                     o.Password.RequireDigit = false;
@@ -36,6 +41,7 @@ internal static class Auth
                     o.Password.RequireUppercase = true;
                     o.Password.RequireNonAlphanumeric = true;
                     o.Password.RequiredLength = 8;
+                    o.SignIn.RequireConfirmedEmail = true;
                 }
             })
             .AddRoles<IdentityRole<Guid>>()

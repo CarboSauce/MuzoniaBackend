@@ -121,8 +121,8 @@ void ConfigureServices(
 
     services
         .AddCors()
-        .AddServices(config)
-        .AddAuth(config, env)
+        .AddServices(apiConfig, config)
+        .AddAuth(config, apiConfig, env)
         .AddOpenApiServices(config, env)
         .AddFileWriter(apiConfig, env);
 

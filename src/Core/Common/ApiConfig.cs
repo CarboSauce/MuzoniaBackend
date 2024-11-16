@@ -9,6 +9,8 @@ public class ApiConfig
     public bool AllowLocalhost { get; set; } = false;
     public bool UseStaticFiles { get; set; } = true;
     public string? StaticContentRoot { get; set; } = null;
+    public bool UseNoopEmail { get; set; } = true;
+    public string SenderEmailAddress { get; set; } = "";
 
     public static ApiConfig? Configure(
         IServiceCollection services,

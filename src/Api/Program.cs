@@ -39,7 +39,8 @@ app.UseOpenApi(app, app.Configuration, appEnv)
     .UseHttpsRedirection()
     .UseCors()
     .UseAuthorization()
-    .AddStaticFiles(apiConfig, appEnv);
+    .AddStaticFiles(apiConfig, appEnv)
+    .AddHubs(app, appEnv);
 app.MapControllers();
 
 MapIdentityEndpoints();
@@ -103,18 +104,29 @@ void ConfigureServices(
 
     services.AddScoped<ClaimsPrincipal>(s =>
     {
-        var context = s.GetRequiredService<IHttpContextAccessor>().HttpContext;
+        var context = s.GetRequiredService<HttpContextAccessor>().HttpContext;
         ArgumentNullException.ThrowIfNull(context);
         return context.User;
     });
+    services.AddScoped(
+        typeof(CancellationToken),
+        sp =>
+        {
+            var context = sp.GetRequiredService<HttpContextAccessor>();
+            ArgumentNullException.ThrowIfNull(context);
+            return context.HttpContext?.RequestAborted
+                ?? CancellationToken.None;
+        }
+    );
 
     services
         .AddCors()
         .AddServices(config)
         .AddAuth(config, env)
-        .AddOpenApi(config, env)
+        .AddOpenApiServices(config, env)
         .AddFileWriter(apiConfig, env);
 
+    services.AddSignalR();
     services.AddRouting(o => o.LowercaseUrls = true);
     services.AddControllers(o =>
     {

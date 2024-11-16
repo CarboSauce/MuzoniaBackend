@@ -1,10 +1,10 @@
-﻿using Muzonia.Api.Utils;
+﻿using Scalar.AspNetCore;
 
 namespace Muzonia.Api.DepInjection;
 
 internal static class OpenApi
 {
-    public static IServiceCollection AddOpenApi(
+    public static IServiceCollection AddOpenApiServices(
         this IServiceCollection services,
         IConfiguration config,
         IWebHostEnvironment env
@@ -14,15 +14,18 @@ internal static class OpenApi
         if (env.IsDevelopment())
         {
             services.AddHttpLogging(o => { });
-            services.AddSwaggerGen(o =>
+            services.AddOpenApi(o =>
             {
-                //o.MapType<Ulid>(() => new OpenApiSchema { Type = "string" });
-                o.OperationFilter<HttpResultsOperationFilter>();
+                o.AddDocumentTransformer(
+                    (doc, _, _) =>
+                    {
+                        doc.Info.Title = "Muzonia Api";
+                        doc.Info.Version = "v1";
+                        doc.Info.Description = "Muzonia Api";
+                        return Task.CompletedTask;
+                    }
+                );
             });
-            // services.AddOpenApiDocument(o =>
-            // {
-            //     o.Title = "Muzonia API";
-            // });
         }
         return services;
     }
@@ -44,21 +47,14 @@ internal static class OpenApi
         //     options.Path = "/openapi/{documentName}.json";
         // });
 
-        app.UseSwagger(o =>
+        router.MapOpenApi();
+        router.MapScalarApiReference(o =>
         {
-            o.RouteTemplate = "/openapi/{documentName}.json";
+            o.Title = "Muzonia Api";
         });
-        app.UseSwaggerUI(o =>
-        {
-            o.SwaggerEndpoint("/openapi/v1.json", "Muzonia API");
-        });
-
-        router
-            .MapGet("/", () => Results.Redirect("/swagger"))
-            .ExcludeFromDescription();
-        router
-            .MapGet("/apiui", () => Results.Redirect("/swagger"))
-            .ExcludeFromDescription();
+        var reroute = () => Results.Redirect("/scalar/v1");
+        router.MapGet("/", reroute).ExcludeFromDescription();
+        router.MapGet("/apiui", reroute).ExcludeFromDescription();
 
         return app;
     }

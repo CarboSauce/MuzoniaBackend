@@ -1,0 +1,26 @@
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+.fleet
+.idea
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+# MSBuild from VS C#
+
+[Bb]in/
+[Oo]bj/
+[Pp]ackages/
+.vs/
+
+# User-specific files
+*.user
+*.suo
+.idea/
+_ReSharper*/

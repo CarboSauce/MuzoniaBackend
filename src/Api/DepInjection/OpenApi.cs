@@ -16,15 +16,15 @@ internal static class OpenApi
             services.AddHttpLogging(o => { });
             services.AddOpenApi(o =>
             {
-                o.AddDocumentTransformer(
-                    (doc, _, _) =>
-                    {
-                        doc.Info.Title = "Muzonia Api";
-                        doc.Info.Version = "v1";
-                        doc.Info.Description = "Muzonia Api";
-                        return Task.CompletedTask;
-                    }
-                );
+                // o.AddDocumentTransformer(
+                //     (doc, _, _) =>
+                //     {
+                //         doc.Info.Title = "Muzonia Api";
+                //         doc.Info.Version = "v1";
+                //         doc.Info.Description = "Muzonia Api";
+                //         return Task.CompletedTask;
+                //     }
+                // );
             });
         }
         return services;

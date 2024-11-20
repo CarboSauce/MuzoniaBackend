@@ -18,7 +18,7 @@ public class UserService(
         return user;
     }
 
-    public async Task<AppUser?> EditUserInfo(UserRequest request)
+    public async Task<AppUser?> EditUserInfo(EditUserRequest request)
     {
         var user = await userManager.GetUserAsync(claims);
 

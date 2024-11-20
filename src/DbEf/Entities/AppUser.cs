@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Muzonia.DbEf.Entities;
 
-public sealed class AppUser : IdentityUser<Guid>
+public sealed class AppUser : IdentityUser<EntityId>
 {
     public Uri? AvatarUri { get; set; }
     public DateTime CreationDate { get; set; }
@@ -15,8 +15,8 @@ public sealed class AppUser : IdentityUser<Guid>
     public AppUser()
     {
         CreationDate = DateTime.UtcNow;
-        Id = Guid.NewGuid();
-        SecurityStamp = Guid.NewGuid().ToString();
+        Id = EntityId.NewGuid();
+        SecurityStamp = EntityId.NewGuid().ToString();
     }
 }
 

@@ -3,19 +3,19 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Muzonia.DbEf.Entities;
 
-public class Queue
+public class QueueEntry
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-    public required Guid UserId { get; set; }
+    public EntityId Id { get; set; } = NewId.Create();
+    public required EntityId UserId { get; set; }
     public AppUser User { get; set; } = null!;
-    public required Guid SongId { get; set; }
+    public required EntityId SongId { get; set; }
     public Track Song { get; set; } = null!;
     public required long Index { get; set; }
 }
 
-public class QueueConfig : IEntityTypeConfiguration<Queue>
+public class QueueConfig : IEntityTypeConfiguration<QueueEntry>
 {
-    public void Configure(EntityTypeBuilder<Queue> builder)
+    public void Configure(EntityTypeBuilder<QueueEntry> builder)
     {
         builder.HasKey(e => e.Id);
         builder.HasOne(e => e.User).WithMany();

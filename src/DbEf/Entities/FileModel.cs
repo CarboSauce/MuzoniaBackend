@@ -3,13 +3,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Muzonia.DbEf.Entities;
 
-public class FileModelMetadata
+public class FileModelMetadata : Entity
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
     public required string Name { get; set; }
     public required string Path { get; set; }
     public required string ContentType { get; set; }
-    public DateTime CreationDate { get; set; } = DateTime.UtcNow;
 }
 
 public sealed class FileModel : FileModelMetadata

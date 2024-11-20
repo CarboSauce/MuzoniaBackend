@@ -3,14 +3,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Muzonia.DbEf.Entities;
 
-public class History
+public class History : Entity
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-    public required Guid UserId { get; set; }
-    public AppUser User { get; set; } = null!;
-    public required Guid SongId { get; set; }
-    public Track Song { get; set; } = null!;
-    public required DateTime Date { get; set; } = DateTime.UtcNow;
+    public required EntityId UserId { get; set; }
+    public AppUser User { get; } = null!;
+    public required EntityId SongId { get; set; }
+    public Track Song { get; } = null!;
 }
 
 public class HistoryConfig : IEntityTypeConfiguration<History>

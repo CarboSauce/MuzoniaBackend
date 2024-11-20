@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Muzonia.Api;
 using Muzonia.Api.DepInjection;
 using Muzonia.Api.Middleware;
 using Muzonia.Core.Common;
@@ -12,6 +13,8 @@ using Muzonia.DbEf.Entities;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddConfig();
 
 builder.Host.UseSerilog(
     (cfg, logCfg) =>
@@ -33,7 +36,10 @@ await RunServices(app.Services);
 
 var appEnv = app.Environment;
 
-app.UseSerilogRequestLogging();
+if (appEnv.IsDevelopment())
+{
+    app.UseSerilogRequestLogging();
+}
 
 app.UseOpenApi(app, app.Configuration, appEnv)
     .UseHttpsRedirection()
@@ -41,9 +47,9 @@ app.UseOpenApi(app, app.Configuration, appEnv)
     .UseAuthorization()
     .AddStaticFiles(apiConfig, appEnv)
     .AddHubs(app, appEnv);
-app.MapControllers();
 
-MapIdentityEndpoints();
+app.MapEndpoints();
+
 app.Run();
 return;
 
@@ -54,20 +60,6 @@ return;
     var globalConfig = builder.Services.AddConfig(builder.Configuration);
 
     return globalConfig;
-}
-
-void MapIdentityEndpoints()
-{
-    app.MapIdentityApi<AppUser>();
-    app.MapPost(
-            "/logout",
-            async ([FromServices] SignInManager<AppUser> signInManager) =>
-            {
-                await signInManager.SignOutAsync();
-                return Results.Ok();
-            }
-        )
-        .RequireAuthorization();
 }
 
 static void ConfigureExternalServices(
@@ -128,8 +120,4 @@ void ConfigureServices(
 
     services.AddSignalR();
     services.AddRouting(o => o.LowercaseUrls = true);
-    services.AddControllers(o =>
-    {
-        o.Filters.Add<ApiExceptionFilter>();
-    });
 }

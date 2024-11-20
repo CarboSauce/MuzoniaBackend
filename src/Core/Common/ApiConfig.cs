@@ -1,5 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Net.Mime;
+using System.Reflection;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Muzonia.Core.Common;
@@ -131,5 +135,30 @@ public static class ConfigExt
             adminConfig ?? new(),
             aspireConfig ?? new()
         );
+    }
+}
+
+public static class WebHostExtensions
+{
+    public static void AddConfig(this WebApplicationBuilder builder)
+    {
+        var cfg = builder.Configuration;
+        var context = builder.Environment.EnvironmentName;
+        cfg.Sources.Clear();
+
+        var curdir = Directory
+            .GetParent(Directory.GetCurrentDirectory())
+            ?.FullName;
+        ArgumentNullException.ThrowIfNull(curdir);
+
+        cfg.SetBasePath(curdir)
+            .AddJsonFile("appsettings.json")
+            .AddJsonFile(
+                $"appsettings.{context}.json",
+                optional: true,
+                reloadOnChange: true
+            )
+            .AddEnvironmentVariables()
+            .AddUserSecrets(Assembly.GetCallingAssembly());
     }
 }

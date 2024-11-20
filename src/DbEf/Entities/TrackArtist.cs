@@ -4,8 +4,8 @@ namespace Muzonia.DbEf.Entities;
 
 public class TrackArtist
 {
-    public Guid SongId { get; set; }
-    public Guid ArtistId { get; set; }
+    public EntityId SongId { get; set; }
+    public EntityId ArtistId { get; set; }
     public required Track Track { get; set; }
     public required Artist Artist { get; set; }
 }

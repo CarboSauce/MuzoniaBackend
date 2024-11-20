@@ -3,12 +3,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Muzonia.DbEf.Entities;
 
-public class Album
+public class Album : Entity
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
     public virtual ICollection<Track> Tracks { get; } = null!;
     public required string Title { get; set; }
-    public DateTime CreationDate { get; set; } = DateTime.UtcNow;
     public required Uri ImageUri { get; set; }
     public virtual ICollection<Artist> Artists { get; } = null!;
 }

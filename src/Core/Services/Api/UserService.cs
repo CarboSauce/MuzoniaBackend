@@ -18,6 +18,16 @@ public class UserService(
         return user;
     }
 
+    public async Task DeleteUser()
+    {
+        var user = await userManager.GetUserAsync(claims);
+
+        if (user is not null)
+        {
+            await userManager.DeleteAsync(user);
+        }
+    }
+
     public async Task<AppUser?> EditUserInfo(EditUserRequest request)
     {
         var user = await userManager.GetUserAsync(claims);

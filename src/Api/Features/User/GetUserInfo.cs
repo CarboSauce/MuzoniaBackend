@@ -8,7 +8,7 @@ public class GetUserInfo : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        app.MapGet("/userInfo", Handle)
+        app.MapGet("/", Handle)
             .WithName("GetUserInfo")
             .WithDescription("Get user info");
     }

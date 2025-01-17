@@ -14,7 +14,11 @@ public class ApiConfig
     public bool UseStaticFiles { get; set; } = true;
     public string? StaticContentRoot { get; set; } = null;
     public bool UseNoopEmail { get; set; } = true;
+    public string FfmpegPath { get; set; } = "ffmpeg";
     public string SenderEmailAddress { get; set; } = "";
+    public string ApiDomain { get; set; }
+    public string ApiPort { get; set; }
+    public string ApiProtocol { get; set; }
 
     public static ApiConfig? Configure(
         IServiceCollection services,

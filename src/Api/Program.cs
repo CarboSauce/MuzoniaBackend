@@ -30,7 +30,7 @@ ConfigureServices(builder.Services, builder.Environment, builder.Configuration);
 
 var app = builder.Build();
 
-await RunServices(app.Services);
+await RunServices(app.Services, app.Environment);
 
 //app.UseHttpLogging();
 
@@ -45,6 +45,7 @@ app.UseOpenApi(app, app.Configuration, appEnv)
     .UseHttpsRedirection()
     .UseCors()
     .UseAuthorization()
+    .UseHangfire(appEnv)
     .AddStaticFiles(apiConfig, appEnv)
     .AddHubs(app, appEnv);
 
@@ -72,18 +73,24 @@ static void ConfigureExternalServices(
         .AddRedis(aspireConfig);
 }
 
-async Task RunServices(IServiceProvider services)
+async Task RunServices(IServiceProvider services, IWebHostEnvironment env)
 {
     await using var scope = services.CreateAsyncScope();
 
     await scope.ServiceProvider.ApplyMigrations();
 
-    var seed = new SeedAdmin(
+    var seed = new DbSeed(
         scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>(),
+        scope.ServiceProvider.GetRequiredService<ApiDbContext>(),
         scope.ServiceProvider.GetRequiredService<IOptions<AdminConfig>>().Value
     );
 
-    await seed.SeedAsync();
+    await seed.SeedAdminAsync();
+
+    if (env.IsDevelopment())
+    {
+        await seed.SeedBasicDataAsync();
+    }
 }
 
 void ConfigureServices(
@@ -96,7 +103,7 @@ void ConfigureServices(
 
     services.AddScoped<ClaimsPrincipal>(s =>
     {
-        var context = s.GetRequiredService<HttpContextAccessor>().HttpContext;
+        var context = s.GetRequiredService<IHttpContextAccessor>().HttpContext;
         ArgumentNullException.ThrowIfNull(context);
         return context.User;
     });
@@ -104,7 +111,7 @@ void ConfigureServices(
         typeof(CancellationToken),
         sp =>
         {
-            var context = sp.GetRequiredService<HttpContextAccessor>();
+            var context = sp.GetRequiredService<IHttpContextAccessor>();
             ArgumentNullException.ThrowIfNull(context);
             return context.HttpContext?.RequestAborted
                 ?? CancellationToken.None;
@@ -116,7 +123,8 @@ void ConfigureServices(
         .AddServices(apiConfig, config)
         .AddAuth(config, apiConfig, env)
         .AddOpenApiServices(config, env)
-        .AddFileWriter(apiConfig, env);
+        .AddFileWriter(apiConfig, env)
+        .AddHangfireServices(config, apiConfig, env);
 
     services.AddSignalR();
     services.AddRouting(o => o.LowercaseUrls = true);

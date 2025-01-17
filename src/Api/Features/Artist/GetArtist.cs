@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
-namespace Muzonia.Api.Features.Arist;
+namespace Muzonia.Api.Features.Artist;
 
 public class GetArtist : IEndpoint
 {

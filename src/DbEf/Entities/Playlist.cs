@@ -8,7 +8,9 @@ public class Playlist : Entity
     public required string Name { get; set; }
     public required string Description { get; set; }
     public required bool IsPublic { get; set; }
+    public required Uri? ImageUri { get; set; }
     public required EntityId UserId { get; set; }
+    public required int TrackCount { get; set; }
     public AppUser User { get; set; } = null!;
     public virtual ICollection<Track> Tracks { get; } = null!;
 }
@@ -28,7 +30,7 @@ public class PlaylistConfig : IEntityTypeConfiguration<Playlist>
                 j =>
                     j.HasOne(ps => ps.Track)
                         .WithMany()
-                        .HasForeignKey(ps => ps.SongId),
+                        .HasForeignKey(ps => ps.TrackId),
                 j =>
                     j.HasOne(ps => ps.Playlist)
                         .WithMany()

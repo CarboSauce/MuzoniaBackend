@@ -6,10 +6,11 @@ namespace Muzonia.DbEf.Entities;
 public class Track
 {
     public EntityId Id { get; set; } = NewId.Create();
-    public required Uri DataUri { get; set; }
+    public required Uri? DataUri { get; set; }
     public DateTime CreationDate { get; set; } = DateTime.UtcNow;
     public required string Title { get; set; }
     public required string Genre { get; set; }
+    public long Duration { get; set; }
     public required EntityId AlbumId { get; set; }
     public Album Album { get; set; } = null!;
     public required EntityId PrimaryArtistId { get; set; }
@@ -45,7 +46,6 @@ public class SongConfig : IEntityTypeConfiguration<Track>
             .WithMany(e => e.Tracks)
             .HasForeignKey(e => e.AlbumId);
 
-        builder.Property(e => e.DataUri).IsRequired();
         builder.Property(e => e.Title).IsRequired();
         builder.Property(e => e.CreationDate).IsRequired();
     }

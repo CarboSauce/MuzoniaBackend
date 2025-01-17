@@ -22,10 +22,14 @@ public class EditUserInfo : IEndpoint
     {
         var user = await userService.EditUserInfo(request);
 
-        ArtistResponse? artist = user?.Artist is null ? null : new(user.Artist);
+        if (user is null)
+        {
+            return TypedResults.BadRequest();
+        }
 
-        return user is not null
-            ? TypedResults.Ok(UserResponse.From(user, artist))
-            : TypedResults.BadRequest();
+        ArtistResponse? artist = user.Artist is null ? null : new(user.Artist);
+        var isAdmin = await userService.IsUserAdmin(user);
+
+        return TypedResults.Ok(UserResponse.From(user, artist, isAdmin));
     }
 }

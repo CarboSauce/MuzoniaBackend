@@ -12,27 +12,34 @@ public class ApiDbContext(DbContextOptions<ApiDbContext> options)
 {
     public DbSet<Album> Albums { get; set; } = null!;
     public DbSet<Artist> Artists { get; set; } = null!;
-    public DbSet<Track> Songs { get; set; } = null!;
-    public DbSet<TrackArtist> SongArtists { get; set; } = null!;
+    public DbSet<Track> Tracks { get; set; } = null!;
+    public DbSet<TrackArtist> TrackArtists { get; set; } = null!;
     public DbSet<ArtistAlbum> ArtistAlbums { get; set; } = null!;
-    public DbSet<Entities.FileModel> Files { get; set; } = null!;
+    public DbSet<FileModel> Files { get; set; } = null!;
+    public DbSet<Playlist> Playlists { get; set; } = null!;
+    public DbSet<PlaylistTrack> PlaylistTracks { get; set; } = null!;
+    public DbSet<QueueEntry> QueueEntries { get; set; } = null!;
+    public DbSet<PlaybackQueue> PlaybackQueues { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
+        var adminId = EntityId.Parse("85deccaa-119d-4d43-abbc-c92f76bc22be");
+        var userId = EntityId.Parse("d4dd6c74-668f-4bd1-a74d-e6ad01175e76");
+
         IdentityRole<EntityId>[] roles =
         [
             new()
             {
-                Id = EntityId.NewGuid(),
+                Id = adminId,
                 ConcurrencyStamp = "1",
                 Name = "Admin",
                 NormalizedName = "ADMIN",
             },
             new()
             {
-                Id = EntityId.NewGuid(),
+                Id = userId,
                 ConcurrencyStamp = "2",
                 Name = "User",
                 NormalizedName = "USER",

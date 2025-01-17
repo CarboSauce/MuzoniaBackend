@@ -11,11 +11,42 @@ public class UserService(
     ClaimsPrincipal claims
 ) : ITransient
 {
-    public async Task<AppUser?> GetUserInfo()
+    public Task<AppUser?> GetUserInfo()
+    {
+        return userManager.GetUserAsync(claims);
+    }
+
+    public async Task<AppUser> GetUser()
     {
         var user = await userManager.GetUserAsync(claims);
 
+        if (user is null)
+        {
+            throw new UnauthorizedAccessException();
+        }
+
         return user;
+    }
+
+    public async Task<(AppUser user, bool isAdmin)> CurrentUser()
+    {
+        var user = await userManager.GetUserAsync(claims);
+        if (user is null)
+        {
+            throw new UnauthorizedAccessException();
+        }
+        var isAdmin = await userManager.IsInRoleAsync(user, "Admin");
+        return (user, isAdmin);
+    }
+
+    public Task<bool> IsUserAdmin(AppUser user)
+    {
+        return userManager.IsInRoleAsync(user, "Admin");
+    }
+
+    public async Task<bool> IsNotAdmin(AppUser user)
+    {
+        return !await userManager.IsInRoleAsync(user, "Admin");
     }
 
     public async Task DeleteUser()
@@ -47,7 +78,8 @@ public class UserService(
         {
             user.AvatarUri = await fileWriter.WriteAsync(
                 request.File,
-                "images/"
+                "images/",
+                Guid.NewGuid().ToString()
             );
         }
 

@@ -1,4 +1,6 @@
-﻿namespace Muzonia.Api.Features.Arist;
+﻿using Muzonia.Api.Features.Playlists;
+
+namespace Muzonia.Api.Features.Artist;
 
 public static class MapArtists
 {
@@ -14,6 +16,8 @@ public static class MapArtists
             .MapEndpoint<CreateArtist>()
             .MapEndpoint<GetMyArtists>()
             .MapEndpoint<GetArtist>()
-            .MapEndpoint<UpdateArtist>();
+            .MapEndpoint<GetEntries>()
+            .MapEndpoint<UpdateArtist>()
+            .MapEndpoint<GetArtistTracks>();
     }
 }

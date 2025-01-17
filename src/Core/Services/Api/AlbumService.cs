@@ -33,7 +33,11 @@ public class AlbumService(
             );
         }
 
-        var file = await fileWriter.WriteAsync(request.File, "images/");
+        var file = await fileWriter.WriteAsync(
+            request.File,
+            "images/",
+            Guid.NewGuid().ToString()
+        );
 
         if (file is null)
         {

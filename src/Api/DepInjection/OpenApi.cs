@@ -56,6 +56,11 @@ internal static class OpenApi
         router.MapGet("/", reroute).ExcludeFromDescription();
         router.MapGet("/apiui", reroute).ExcludeFromDescription();
 
+        app.UseSwaggerUI(o =>
+        {
+            o.SwaggerEndpoint("/openapi/v1.json", "API");
+        });
+
         return app;
     }
 }

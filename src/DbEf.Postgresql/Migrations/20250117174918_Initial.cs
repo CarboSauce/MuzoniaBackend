@@ -20,8 +20,8 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 {
                     Id = table.Column<string>(type: "character varying(36)", nullable: false),
                     Title = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ImageUri = table.Column<string>(type: "text", nullable: false)
+                    ImageUri = table.Column<string>(type: "text", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -70,6 +70,22 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Files",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "character varying(36)", nullable: false),
+                    Data = table.Column<byte[]>(type: "bytea", maxLength: 31457280, nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Path = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    ContentType = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Files", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -98,8 +114,8 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Description = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
                     ImageUri = table.Column<string>(type: "text", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UserId = table.Column<string>(type: "character varying(36)", nullable: false)
+                    UserId = table.Column<string>(type: "character varying(36)", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -198,27 +214,52 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Playlist",
+                name: "PlaybackQueues",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "character varying(36)", nullable: false),
+                    UserId = table.Column<string>(type: "character varying(36)", nullable: false),
+                    RepeatMode = table.Column<int>(type: "integer", nullable: false),
+                    IsRandom = table.Column<bool>(type: "boolean", nullable: false),
+                    CurrentIndex = table.Column<long>(type: "bigint", nullable: false),
+                    Timestamp = table.Column<long>(type: "bigint", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PlaybackQueues", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PlaybackQueues_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Playlists",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "character varying(36)", nullable: false),
                     Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Description = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     IsPublic = table.Column<bool>(type: "boolean", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ImageUri = table.Column<string>(type: "text", nullable: true),
                     UserId = table.Column<string>(type: "character varying(36)", nullable: false),
-                    AppUserId = table.Column<string>(type: "character varying(36)", nullable: true)
+                    TrackCount = table.Column<int>(type: "integer", nullable: false),
+                    AppUserId = table.Column<string>(type: "character varying(36)", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Playlist", x => x.Id);
+                    table.PrimaryKey("PK_Playlists", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Playlist_AspNetUsers_AppUserId",
+                        name: "FK_Playlists_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Playlist_AspNetUsers_UserId",
+                        name: "FK_Playlists_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -250,28 +291,29 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Songs",
+                name: "Tracks",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "character varying(36)", nullable: false),
-                    DataUri = table.Column<string>(type: "text", nullable: false),
+                    DataUri = table.Column<string>(type: "text", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Title = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     Genre = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    Duration = table.Column<long>(type: "bigint", nullable: false),
                     AlbumId = table.Column<string>(type: "character varying(36)", nullable: false),
                     PrimaryArtistId = table.Column<string>(type: "character varying(36)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Songs", x => x.Id);
+                    table.PrimaryKey("PK_Tracks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Songs_Albums_AlbumId",
+                        name: "FK_Tracks_Albums_AlbumId",
                         column: x => x.AlbumId,
                         principalTable: "Albums",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Songs_Artists_PrimaryArtistId",
+                        name: "FK_Tracks_Artists_PrimaryArtistId",
                         column: x => x.PrimaryArtistId,
                         principalTable: "Artists",
                         principalColumn: "Id",
@@ -285,7 +327,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     Id = table.Column<string>(type: "character varying(36)", nullable: false),
                     UserId = table.Column<string>(type: "character varying(36)", nullable: false),
                     SongId = table.Column<string>(type: "character varying(36)", nullable: false),
-                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -297,84 +339,86 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_History_Songs_SongId",
+                        name: "FK_History_Tracks_SongId",
                         column: x => x.SongId,
-                        principalTable: "Songs",
+                        principalTable: "Tracks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "PlaylistSong",
-                columns: table => new
-                {
-                    PlaylistId = table.Column<string>(type: "character varying(36)", nullable: false),
-                    SongId = table.Column<string>(type: "character varying(36)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PlaylistSong", x => new { x.PlaylistId, x.SongId });
-                    table.ForeignKey(
-                        name: "FK_PlaylistSong_Playlist_PlaylistId",
-                        column: x => x.PlaylistId,
-                        principalTable: "Playlist",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PlaylistSong_Songs_SongId",
-                        column: x => x.SongId,
-                        principalTable: "Songs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Queue",
+                name: "PlaylistTracks",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "character varying(36)", nullable: false),
-                    UserId = table.Column<string>(type: "character varying(36)", nullable: false),
-                    SongId = table.Column<string>(type: "character varying(36)", nullable: false),
-                    Index = table.Column<long>(type: "bigint", nullable: false)
+                    PlaylistId = table.Column<string>(type: "character varying(36)", nullable: false),
+                    TrackId = table.Column<string>(type: "character varying(36)", nullable: false),
+                    Index = table.Column<int>(type: "integer", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Queue", x => x.Id);
+                    table.PrimaryKey("PK_PlaylistTracks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Queue_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
+                        name: "FK_PlaylistTracks_Playlists_PlaylistId",
+                        column: x => x.PlaylistId,
+                        principalTable: "Playlists",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Queue_Songs_SongId",
-                        column: x => x.SongId,
-                        principalTable: "Songs",
+                        name: "FK_PlaylistTracks_Tracks_TrackId",
+                        column: x => x.TrackId,
+                        principalTable: "Tracks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "SongArtists",
+                name: "QueueEntries",
                 columns: table => new
                 {
-                    ArtistId = table.Column<string>(type: "character varying(36)", nullable: false),
-                    TrackId = table.Column<string>(type: "character varying(36)", nullable: false),
-                    SongId = table.Column<string>(type: "character varying(36)", nullable: false)
+                    Id = table.Column<string>(type: "character varying(36)", nullable: false),
+                    SongId = table.Column<string>(type: "character varying(36)", nullable: false),
+                    Index = table.Column<long>(type: "bigint", nullable: false),
+                    QueueId = table.Column<string>(type: "character varying(36)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SongArtists", x => new { x.ArtistId, x.TrackId });
+                    table.PrimaryKey("PK_QueueEntries", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SongArtists_Artists_ArtistId",
+                        name: "FK_QueueEntries_PlaybackQueues_QueueId",
+                        column: x => x.QueueId,
+                        principalTable: "PlaybackQueues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_QueueEntries_Tracks_SongId",
+                        column: x => x.SongId,
+                        principalTable: "Tracks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TrackArtists",
+                columns: table => new
+                {
+                    TrackId = table.Column<string>(type: "character varying(36)", nullable: false),
+                    ArtistId = table.Column<string>(type: "character varying(36)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrackArtists", x => new { x.ArtistId, x.TrackId });
+                    table.ForeignKey(
+                        name: "FK_TrackArtists_Artists_ArtistId",
                         column: x => x.ArtistId,
                         principalTable: "Artists",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_SongArtists_Songs_TrackId",
+                        name: "FK_TrackArtists_Tracks_TrackId",
                         column: x => x.TrackId,
-                        principalTable: "Songs",
+                        principalTable: "Tracks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -384,14 +428,20 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "8b46361d-d806-4403-bc0b-f96d6057b369", "2", "User", "USER" },
-                    { "ccf2a9b4-e60a-4dc3-9195-67a067fd0add", "1", "Admin", "ADMIN" }
+                    { "85deccaa-119d-4d43-abbc-c92f76bc22be", "1", "Admin", "ADMIN" },
+                    { "d4dd6c74-668f-4bd1-a74d-e6ad01175e76", "2", "User", "USER" }
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ArtistAlbums_ArtistId",
                 table: "ArtistAlbums",
                 column: "ArtistId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Artists_Name_UserId",
+                table: "Artists",
+                columns: new[] { "Name", "UserId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Artists_UserId",
@@ -437,6 +487,12 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Files_Path",
+                table: "Files",
+                column: "Path",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_History_SongId",
                 table: "History",
                 column: "SongId");
@@ -447,43 +503,53 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Playlist_AppUserId",
-                table: "Playlist",
+                name: "IX_PlaybackQueues_UserId",
+                table: "PlaybackQueues",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Playlists_AppUserId",
+                table: "Playlists",
                 column: "AppUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Playlist_UserId",
-                table: "Playlist",
+                name: "IX_Playlists_UserId",
+                table: "Playlists",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PlaylistSong_SongId",
-                table: "PlaylistSong",
-                column: "SongId");
+                name: "IX_PlaylistTracks_PlaylistId",
+                table: "PlaylistTracks",
+                column: "PlaylistId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Queue_SongId",
-                table: "Queue",
-                column: "SongId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Queue_UserId",
-                table: "Queue",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SongArtists_TrackId",
-                table: "SongArtists",
+                name: "IX_PlaylistTracks_TrackId",
+                table: "PlaylistTracks",
                 column: "TrackId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Songs_AlbumId",
-                table: "Songs",
+                name: "IX_QueueEntries_QueueId",
+                table: "QueueEntries",
+                column: "QueueId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QueueEntries_SongId",
+                table: "QueueEntries",
+                column: "SongId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrackArtists_TrackId",
+                table: "TrackArtists",
+                column: "TrackId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tracks_AlbumId",
+                table: "Tracks",
                 column: "AlbumId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Songs_PrimaryArtistId",
-                table: "Songs",
+                name: "IX_Tracks_PrimaryArtistId",
+                table: "Tracks",
                 column: "PrimaryArtistId");
         }
 
@@ -509,25 +575,31 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Files");
+
+            migrationBuilder.DropTable(
                 name: "History");
 
             migrationBuilder.DropTable(
-                name: "PlaylistSong");
+                name: "PlaylistTracks");
 
             migrationBuilder.DropTable(
-                name: "Queue");
+                name: "QueueEntries");
 
             migrationBuilder.DropTable(
-                name: "SongArtists");
+                name: "TrackArtists");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Playlist");
+                name: "Playlists");
 
             migrationBuilder.DropTable(
-                name: "Songs");
+                name: "PlaybackQueues");
+
+            migrationBuilder.DropTable(
+                name: "Tracks");
 
             migrationBuilder.DropTable(
                 name: "Albums");

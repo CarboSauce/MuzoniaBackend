@@ -3,7 +3,7 @@ using Muzonia.Core.Dto.Request;
 using Muzonia.Core.Dto.Response;
 using Muzonia.Core.Services.Api;
 
-namespace Muzonia.Api.Features.Arist;
+namespace Muzonia.Api.Features.Artist;
 
 public class UpdateArtist : IEndpoint
 {

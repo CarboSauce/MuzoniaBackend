@@ -61,16 +61,16 @@ Backend written in C# for Muzonia music streaming service
 
 ### Playlists
 
-- [ ] Create Playlist
-- [ ] Update Playlist
-- [ ] Delete Playlist
-- [ ] Search by name
-- [ ] Get Playlist By Id
-- [ ] Get My Playlists
-- [ ] Get Playlist By User
-- [ ] Add track to playlist
-- [ ] Remove track from playlist
-- [ ] Reorder tracks
+- [x] Create Playlist
+- [x] Update Playlist
+- [x] Delete Playlist
+- [x] Search by name
+- [x] Get Playlist By Id
+- [x] Get My Playlists
+- [x] Get Playlist By User
+- [x] Add track to playlist
+- [x] Remove track from playlist
+- [x] Reorder tracks
 
 ### Queue
 

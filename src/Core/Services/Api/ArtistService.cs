@@ -34,7 +34,11 @@ public class ArtistService(
 
         await EnsureSingleArtist(user);
 
-        var fileUri = await fileWriter.WriteAsync(request.File, "images/");
+        var fileUri = await fileWriter.WriteAsync(
+            request.File,
+            "images/",
+            Guid.NewGuid().ToString()
+        );
 
         if (fileUri is null)
         {
@@ -87,7 +91,11 @@ public class ArtistService(
 
         if (request.File is not null)
         {
-            var file = await fileWriter.WriteAsync(request.File, "images/");
+            var file = await fileWriter.WriteAsync(
+                request.File,
+                "images/",
+                Guid.NewGuid().ToString()
+            );
             if (file is not null)
             {
                 artist.ImageUri = file;

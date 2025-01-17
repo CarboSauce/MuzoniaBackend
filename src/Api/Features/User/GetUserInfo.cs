@@ -19,14 +19,19 @@ public class GetUserInfo : IEndpoint
     )
     {
         var user = await userService.GetUserInfo();
+        if (user is null)
+        {
+            return TypedResults.NotFound();
+        }
 
-        return user is not null
-            ? TypedResults.Ok(
-                UserResponse.From(
-                    user,
-                    user.Artist is null ? null : new(user.Artist)
-                )
+        var isAdmin = await userService.IsUserAdmin(user);
+
+        return TypedResults.Ok(
+            UserResponse.From(
+                user,
+                user.Artist is null ? null : new(user.Artist),
+                isAdmin
             )
-            : TypedResults.NotFound();
+        );
     }
 }

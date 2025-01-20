@@ -9,7 +9,7 @@ public class EditUserInfo : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        app.MapPut("/", Handle)
+        app.MapPatch("/", Handle)
             .WithName("EditUserInfo")
             .WithDescription("Edit user info");
     }

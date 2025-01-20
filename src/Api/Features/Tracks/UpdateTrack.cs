@@ -10,7 +10,7 @@ namespace Muzonia.Api.Features.Tracks;
 public class UpdateTrack : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) =>
-        app.MapPut("/{id}", Handle).WithValidation<Validator>();
+        app.MapPatch("/{id}", Handle).WithValidation<Validator>();
 
     public class Validator : AbstractValidator<Request>
     {

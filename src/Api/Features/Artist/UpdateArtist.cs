@@ -8,7 +8,7 @@ namespace Muzonia.Api.Features.Artist;
 public class UpdateArtist : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) =>
-        app.MapPut("/{id}", Handle);
+        app.MapPatch("/{id}", Handle);
 
     private static async Task<
         Results<Ok<ArtistResponse>, BadRequest, ForbidHttpResult, NotFound>

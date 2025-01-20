@@ -10,7 +10,7 @@ namespace Muzonia.Api.Features.Playlists;
 public class EditPlaylistInfo : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) =>
-        app.MapPut("/{id}", Handle);
+        app.MapPatch("/{id}", Handle);
 
     public record Request(
         string? Name,

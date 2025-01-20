@@ -15,24 +15,10 @@ namespace Muzonia.DbEf.Postgresql.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Albums",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "character varying(36)", nullable: false),
-                    Title = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    ImageUri = table.Column<string>(type: "text", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Albums", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(36)", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
@@ -46,7 +32,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(36)", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     AvatarUri = table.Column<string>(type: "text", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -73,7 +59,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 name: "Files",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(36)", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Data = table.Column<byte[]>(type: "bytea", maxLength: 31457280, nullable: false),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
@@ -91,7 +77,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RoleId = table.Column<string>(type: "character varying(36)", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false),
                     ClaimType = table.Column<string>(type: "text", nullable: true),
                     ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
@@ -110,11 +96,11 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 name: "Artists",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(36)", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Description = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
                     ImageUri = table.Column<string>(type: "text", nullable: false),
-                    UserId = table.Column<string>(type: "character varying(36)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -134,7 +120,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<string>(type: "character varying(36)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ClaimType = table.Column<string>(type: "text", nullable: true),
                     ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
@@ -156,7 +142,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
                     ProviderKey = table.Column<string>(type: "text", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<string>(type: "character varying(36)", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -173,8 +159,8 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "character varying(36)", nullable: false),
-                    RoleId = table.Column<string>(type: "character varying(36)", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -197,7 +183,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "character varying(36)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "text", nullable: true)
@@ -217,8 +203,8 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 name: "PlaybackQueues",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(36)", nullable: false),
-                    UserId = table.Column<string>(type: "character varying(36)", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     RepeatMode = table.Column<int>(type: "integer", nullable: false),
                     IsRandom = table.Column<bool>(type: "boolean", nullable: false),
                     CurrentIndex = table.Column<long>(type: "bigint", nullable: false),
@@ -240,14 +226,14 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 name: "Playlists",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(36)", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Description = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     IsPublic = table.Column<bool>(type: "boolean", nullable: false),
                     ImageUri = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<string>(type: "character varying(36)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     TrackCount = table.Column<int>(type: "integer", nullable: false),
-                    AppUserId = table.Column<string>(type: "character varying(36)", nullable: true),
+                    AppUserId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -267,11 +253,32 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Albums",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ImageUri = table.Column<string>(type: "text", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Albums", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Albums_Artists_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "Artists",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ArtistAlbums",
                 columns: table => new
                 {
-                    ArtistId = table.Column<string>(type: "character varying(36)", nullable: false),
-                    AlbumId = table.Column<string>(type: "character varying(36)", nullable: false)
+                    ArtistId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AlbumId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -294,14 +301,14 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 name: "Tracks",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(36)", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DataUri = table.Column<string>(type: "text", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Title = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     Genre = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     Duration = table.Column<long>(type: "bigint", nullable: false),
-                    AlbumId = table.Column<string>(type: "character varying(36)", nullable: false),
-                    PrimaryArtistId = table.Column<string>(type: "character varying(36)", nullable: false)
+                    AlbumId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PrimaryArtistId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -324,9 +331,9 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 name: "History",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(36)", nullable: false),
-                    UserId = table.Column<string>(type: "character varying(36)", nullable: false),
-                    SongId = table.Column<string>(type: "character varying(36)", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SongId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -350,9 +357,9 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 name: "PlaylistTracks",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(36)", nullable: false),
-                    PlaylistId = table.Column<string>(type: "character varying(36)", nullable: false),
-                    TrackId = table.Column<string>(type: "character varying(36)", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PlaylistId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TrackId = table.Column<Guid>(type: "uuid", nullable: false),
                     Index = table.Column<int>(type: "integer", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -377,10 +384,10 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 name: "QueueEntries",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "character varying(36)", nullable: false),
-                    SongId = table.Column<string>(type: "character varying(36)", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    SongId = table.Column<Guid>(type: "uuid", nullable: false),
                     Index = table.Column<long>(type: "bigint", nullable: false),
-                    QueueId = table.Column<string>(type: "character varying(36)", nullable: false)
+                    QueueId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -403,8 +410,8 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 name: "TrackArtists",
                 columns: table => new
                 {
-                    TrackId = table.Column<string>(type: "character varying(36)", nullable: false),
-                    ArtistId = table.Column<string>(type: "character varying(36)", nullable: false)
+                    TrackId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArtistId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -428,9 +435,14 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "85deccaa-119d-4d43-abbc-c92f76bc22be", "1", "Admin", "ADMIN" },
-                    { "d4dd6c74-668f-4bd1-a74d-e6ad01175e76", "2", "User", "USER" }
+                    { new Guid("85deccaa-119d-4d43-abbc-c92f76bc22be"), "1", "Admin", "ADMIN" },
+                    { new Guid("d4dd6c74-668f-4bd1-a74d-e6ad01175e76"), "2", "User", "USER" }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Albums_OwnerId",
+                table: "Albums",
+                column: "OwnerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ArtistAlbums_ArtistId",

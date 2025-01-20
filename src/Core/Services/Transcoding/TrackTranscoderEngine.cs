@@ -56,15 +56,6 @@ internal class TrackTranscoderEngineFfmpeg(
         }
         var fileName = await CreateInputFile();
         // csharpier-ignore
-        // string ffmpegParams =
-        //    $" -i \"{fileName}\" -c:a aac -map a:0 -b:a:0 64k -f hls -hls_time 10 -hls_playlist_type vod"
-        //   + " -map a:0 -b:a:1 128k -f hls -hls_time 10 -hls_playlist_type vod"
-        //   + " -map a:0 -b:a:2 192k -f hls -hls_time 10 -hls_playlist_type vod"
-        //   + " -var_stream_map \"a:0,name:64k a:1,name:128k a:2,name:192k\""
-        //   + $" -hls_segment_filename \"{Path.Combine(tmpDir, "stream_%v_%03d.aac")}\""
-        //   + $" -master_pl_name \"{Path.Combine(tmpDir, "master_playlist.m3u8")}\""
-        //   + $" \"{Path.Combine(tmpDir, "stream_%v.m3u8")}\"";
-        // csharpier-ignore
         string ffmpegParams =
            $" -i \"{fileName}\" -c:a aac -map a:0 -b:a:0 64k -f hls -hls_time 10 -hls_playlist_type vod"
           + " -map a:0 -b:a:1 128k -f hls -hls_time 10 -hls_playlist_type vod"
@@ -86,18 +77,7 @@ internal class TrackTranscoderEngineFfmpeg(
             WorkingDirectory = tmpDir
         };
 
-        // process.ErrorDataReceived += (sender, e) =>
-        // {
-        //     if (e.Data is not null)
-        //     {
-        //         Console.WriteLine(e.Data);
-        //     }
-        // };
-
         process.Start();
-        // process.BeginErrorReadLine();
-        // await stream.CopyToAsync(process.StandardInput.BaseStream);
-        // process.StandardInput.Close();
 
         // read line of stdout and check for regex match
         TimeSpan? duration = null;
@@ -151,7 +131,7 @@ internal class TrackTranscoderEngineFfmpeg(
             SearchOption.TopDirectoryOnly
         );
 
-        fileWriter.CreateDirectory("tracks/", trackId.ToString());
+        await fileWriter.CreateDirectory("tracks/", trackId.ToString());
 
         var trackUrlPrefix = $"tracks/{trackId.ToString()}/";
 

@@ -26,10 +26,19 @@ public class AlbumService(
     {
         var user = await userManager.GetCurrentUser(claims);
 
-        if (!await artistService.IsUserArtist(user.Id, request.ArtistIds))
+        var artist = await dbContext
+            .Artists.Where(a => a.UserId == user.Id)
+            .FirstOrDefaultAsync();
+
+        if (artist is null)
+        {
+            throw new BadRequestException("User is not an artist");
+        }
+
+        if (!request.ArtistIds.Contains(artist.Id))
         {
             throw new ForbiddenException(
-                "You are not allowed to create album for this artist"
+                $"Artist {artist.Id} is not in the list of artists"
             );
         }
 
@@ -53,7 +62,12 @@ public class AlbumService(
             throw new NotFoundException("Artist not found");
         }
 
-        var album = new Album { Title = request.Name, ImageUri = file, };
+        var album = new Album
+        {
+            OwnerId = artist.Id,
+            Title = request.Name,
+            ImageUri = file,
+        };
 
         dbContext.Albums.Add(album);
 
@@ -89,16 +103,14 @@ public class AlbumService(
         return albums;
     }
 
-    public async Task<IEnumerable<AlbumResponse>> GetArtistAlbums(
-        Guid artistId
-    ) =>
+    public async Task<AlbumResponse[]> GetArtistAlbums(EntityId artistId) =>
         await dbContext
             .Albums.Where(a => a.Artists.Any(b => b.Id == artistId))
             .Select(a => new AlbumResponse(
                 a,
                 a.Artists.Select(b => new ArtistResponse(b)).ToArray()
             ))
-            .ToListAsync();
+            .ToArrayAsync();
 
     public async Task<IEnumerable<AlbumResponse>> GetArtistAlbumsPaginate(
         Guid artistId,
@@ -106,7 +118,6 @@ public class AlbumService(
         int limit
     )
     {
-        logger.LogDebug("Getting albums for artist {artistId}", artistId);
         return await dbContext
             .Albums.Where(a => a.Artists.Any(b => b.Id == artistId))
             .OrderBy(a => a.CreationDate)

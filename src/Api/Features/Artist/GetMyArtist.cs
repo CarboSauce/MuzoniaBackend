@@ -4,16 +4,19 @@ using Muzonia.Core.Services.Api;
 
 namespace Muzonia.Api.Features.Artist;
 
-public class GetMyArtists : IEndpoint
+public class GetMyArtist : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapGet("/me", Handle);
 
-    private static async Task<Ok<IEnumerable<ArtistResponse>>> Handle(
+    private static async Task<Results<Ok<ArtistResponse>, NotFound>> Handle(
         ArtistService artistService
     )
     {
-        var artists = await artistService.GetMyArtists();
-        return TypedResults.Ok(artists);
+        var artist = await artistService.GetMyArtist();
+
+        return artist is not null
+            ? TypedResults.Ok(artist)
+            : TypedResults.NotFound();
     }
 }

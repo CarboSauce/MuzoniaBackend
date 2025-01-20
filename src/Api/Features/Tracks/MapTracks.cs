@@ -11,7 +11,10 @@ public static class MapTracks
         endpoints
             .MapAuthorizedGroup()
             .MapEndpoint<CreateTrack>()
+            .MapEndpoint<DeleteTrack>()
             .MapEndpoint<GetTrackById>()
-            .MapEndpoint<SearchTrack>();
+            .MapEndpoint<IsTranscoded>()
+            .MapEndpoint<SearchTrack>()
+            .MapEndpoint<UpdateTrack>();
     }
 }

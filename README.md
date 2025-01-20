@@ -12,19 +12,19 @@ Backend written in C# for Muzonia music streaming service
 - [ ] Reset password
 - [ ] Change email
 - [x] Update Profile
-- [ ] Delete Profile
+- [x] Delete Profile
 - [x] Get My Profile
-- [ ] Get User By Id
-- [ ] Get User By Username
+- [x] Get User By Id
+- [x] Get User By Username
 
 ### Album
 
 - [x] Create Album
 - [x] Update Album
-- [ ] Delete Album
+- [x] Delete Album
 - [x] Get Album By Id
-- [ ] Edit album
-- [ ] Search by name
+- [x] Edit album
+- [x] Search by name
 
 ### Artist
 
@@ -32,26 +32,21 @@ Backend written in C# for Muzonia music streaming service
 - [x] Update Artist
 - [x] Delete Artist
 - [x] Get Artist By Id
-- [ ] Search by name
+- [x] Search by name
 - [x] Get My artists
-- [ ] Search artist
-- [ ] Follow artist
-- [ ] Unfollow artist
-- [ ] Get artist followers
-- [ ] Get artist following
-- [ ] Get artist albums
-- [ ] Get artist songs
+- [x] Get artist albums
+- [x] Get artist songs
 
 ### Track
 
-- [ ] Create Track
-- [ ] Update Track
-- [ ] Delete Track
-- [ ] Search by name
-- [ ] Get Track By Id
-- [ ] Get My Tracks
-- [ ] Get Track By Artist
-- [ ] Get Track By Album
+- [x] Create Track
+- [x] Update Track
+- [x] Delete Track
+- [x] Search by name
+- [x] Get Track By Id
+- [x] Get My Tracks
+- [x] Get Track By Artist
+- [x] Get Track By Album
 
 ### History
 

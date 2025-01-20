@@ -26,7 +26,9 @@ public class GetArtistTracks : IEndpoint
     )
     {
         var track = await dbContext
-            .TrackArtists.Where(e => e.ArtistId == artistId)
+            .TrackArtists.Where(e =>
+                e.ArtistId == artistId || e.Track.DataUri != null
+            )
             .Select(e => new Response(
                 e.Track.Title,
                 e.Track.Genre,

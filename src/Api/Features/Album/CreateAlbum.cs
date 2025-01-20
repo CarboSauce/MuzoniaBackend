@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Muzonia.Core.Dto.Request;
 using Muzonia.Core.Dto.Response;
 using Muzonia.Core.Services.Api;
@@ -15,7 +16,7 @@ public class CreateAlbum : IEndpoint
     > Handle(
         HttpContext context,
         AlbumService albumService,
-        CreateAlbumRequest request
+        [FromForm] CreateAlbumRequest request
     )
     {
         var album = await albumService.CreateAlbum(request);

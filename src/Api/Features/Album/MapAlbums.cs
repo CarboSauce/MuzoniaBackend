@@ -11,9 +11,11 @@ public static class MapAlbums
         endpoints
             .MapAuthorizedGroup()
             .MapEndpoint<CreateAlbum>()
-            //.MapEndpoint<DeleteAlbum>()
+            .MapEndpoint<DeleteAlbum>()
+            .MapEndpoint<EditAlbum>()
+            .MapEndpoint<GetAlbums>()
+            .MapEndpoint<GetAlbumTracks>()
             .MapEndpoint<GetMyAlbums>()
-            .MapEndpoint<GetAlbums>();
-        //.MapEndpoint<UpdateAlbum>();
+            .MapEndpoint<SearchAlbum>();
     }
 }

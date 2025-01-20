@@ -64,6 +64,7 @@ public class DbSeed(
         var album = new Album
         {
             Title = "Dummy album",
+            OwnerId = artist.Id,
             ImageUri = new Uri("https://picsum.photos/200"),
         };
 

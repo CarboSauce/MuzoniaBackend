@@ -115,9 +115,9 @@ public class CreateTrack : IEndpoint
         var transcodeId = await transcodingService.Enqueue(track.Id, file.Id);
 
         var response = new Response(
+            Id: track.Id,
             Title: track.Title,
             Genre: track.Genre,
-            Id: track.Id,
             CreationDate: track.CreationDate,
             AlbumId: track.AlbumId,
             PrimaryArtistId: track.PrimaryArtistId,

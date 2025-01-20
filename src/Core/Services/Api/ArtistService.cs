@@ -59,14 +59,14 @@ public class ArtistService(
         return new(artist);
     }
 
-    public async Task<IEnumerable<ArtistResponse>> GetMyArtists()
+    public async Task<ArtistResponse?> GetMyArtist()
     {
         var user = await userManager.GetCurrentUser(claims);
 
         var artists = await dbContext
             .Artists.Where(a => a.UserId == user.Id)
             .Select(a => new ArtistResponse(a))
-            .ToListAsync();
+            .SingleOrDefaultAsync();
 
         return artists;
     }
@@ -107,18 +107,18 @@ public class ArtistService(
         return new(artist);
     }
 
-    public async Task DeleteArtist(Guid id)
-    {
-        var artist = await dbContext.Artists.FindAsync(id);
-
-        if (artist is null)
-        {
-            throw new NotFoundException("Artist not found");
-        }
-
-        dbContext.Artists.Remove(artist);
-        await dbContext.SaveChangesAsync();
-    }
+    // public async Task DeleteArtist(Guid id)
+    // {
+    //     var artist = await dbContext.Artists.FindAsync(id);
+    //
+    //     if (artist is null)
+    //     {
+    //         throw new NotFoundException("Artist not found");
+    //     }
+    //
+    //     dbContext.Artists.Remove(artist);
+    //     await dbContext.SaveChangesAsync();
+    // }
 
     internal async Task<bool> IsUserArtist(Guid userId, Guid[] artistId) =>
         await dbContext

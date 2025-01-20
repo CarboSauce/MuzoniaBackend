@@ -25,4 +25,11 @@ public static class Endpoints
         root.MapTracksEndpoints();
         root.MapPlaylistEndpoints();
     }
+
+    public static RouteHandlerBuilder WithValidation<T>(
+        this RouteHandlerBuilder builder
+    ) =>
+        builder
+            .AddEndpointFilter<RequestValidationAsyncFilter<T>>()
+            .ProducesValidationProblem();
 }

@@ -23,7 +23,14 @@ internal static class Database
             builder.Services.AddDbContext<ApiDbContext>(o =>
             {
                 var conn = builder.Configuration.GetConnectionString("apidb");
-                o.UseNpgsql(conn, o => o.MigrationsAssembly("DbEf.Postgresql"));
+                o.UseNpgsql(
+                    conn,
+                    o =>
+                    {
+                        o.MigrationsAssembly("DbEf.Postgresql");
+                        o.SetPostgresVersion(16, 0);
+                    }
+                );
             });
         }
         return builder;

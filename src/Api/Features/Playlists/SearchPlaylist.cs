@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Muzonia.Api.Common;
 using Muzonia.Core.Services.Api;
 
 namespace Muzonia.Api.Features.Playlists;
@@ -25,10 +26,16 @@ public class SearchPlaylist : IEndpoint
         UserService userService
     )
     {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return TypedResults.BadRequest();
+        }
+
         var (user, isAdmin) = await userService.CurrentUser();
 
         var playlists = await dbContext
             .Playlists.Where(e => EF.Functions.ILike(e.Name, $"%{name}%"))
+            .WhereIf(!isAdmin, e => e.IsPublic || e.UserId == user.Id)
             .Select(e => new Response(
                 e.Name,
                 e.Description,

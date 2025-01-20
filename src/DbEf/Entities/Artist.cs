@@ -10,9 +10,10 @@ public class Artist : Entity
     public required Uri ImageUri { get; set; }
     public required EntityId UserId { get; set; }
     public AppUser User { get; set; } = null!;
-    public virtual ICollection<Track> PrimarySongs { get; } = null!;
-    public virtual ICollection<Track> Songs { get; } = null!;
+    public virtual ICollection<Track> PrimaryTracks { get; } = null!;
+    public virtual ICollection<Track> Tracks { get; } = null!;
     public virtual ICollection<Album> Albums { get; } = null!;
+    public virtual ICollection<Album> OwnedAlbums { get; } = null!;
 }
 
 public class ArtistConfig : IEntityTypeConfiguration<Artist>
@@ -25,8 +26,9 @@ public class ArtistConfig : IEntityTypeConfiguration<Artist>
         builder.HasIndex(e => new { e.Name, e.UserId }).IsUnique();
         builder.Property(e => e.Description).HasMaxLength(512);
         builder.HasOne(e => e.User).WithOne(e => e.Artist);
+        builder.HasMany(e => e.OwnedAlbums).WithOne(e => e.Owner);
         builder
-            .HasMany(e => e.Songs)
+            .HasMany(e => e.Tracks)
             .WithMany(e => e.Artists)
             .UsingEntity<TrackArtist>();
         builder

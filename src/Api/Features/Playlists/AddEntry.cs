@@ -11,8 +11,8 @@ public class AddEntry : IEndpoint
 
     public record Response(
         EntityId Id,
-        EntityId PlaylistId,
         EntityId TrackId,
+        EntityId PlaylistId,
         DateTime CreationDate,
         int Index
     );
@@ -33,7 +33,7 @@ public class AddEntry : IEndpoint
         }
 
         var track = await dbContext.Tracks.FirstOrDefaultAsync(e =>
-            e.Id == trackId
+            e.Id == trackId || e.DataUri != null
         );
 
         if (track is null)

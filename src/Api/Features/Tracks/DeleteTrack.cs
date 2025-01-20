@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Muzonia.Api.Common;
 using Muzonia.Core.Services.Api;
-using Muzonia.DbEf.Entities;
 
-namespace Muzonia.Api.Features.Playlists;
+namespace Muzonia.Api.Features.Tracks;
 
-public class DeletePlaylist : IEndpoint
+public class DeleteTrack : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapDelete("/{id}", Handle);
@@ -20,16 +18,17 @@ public class DeletePlaylist : IEndpoint
     {
         var (user, isAdmin) = await userService.CurrentUser();
 
-        var playlist = await dbContext
-            .Playlists.Where(e => e.Id == id)
+        var track = await dbContext
+            .Tracks.Where(t => t.Id == id)
+            .WhereIf(!isAdmin, t => t.PrimaryArtist.UserId == user.Id)
             .FirstOrDefaultAsync();
 
-        if (playlist is null || playlist.UserId != user.Id || !isAdmin)
+        if (track is null)
         {
             return TypedResults.BadRequest();
         }
 
-        dbContext.Playlists.Remove(playlist);
+        dbContext.Tracks.Remove(track);
         await dbContext.SaveChangesAsync();
 
         return TypedResults.NoContent();

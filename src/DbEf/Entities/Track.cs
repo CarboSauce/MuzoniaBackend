@@ -28,12 +28,12 @@ public class SongConfig : IEntityTypeConfiguration<Track>
         builder.Property(e => e.Genre).HasMaxLength(128);
         builder
             .HasOne(e => e.PrimaryArtist)
-            .WithMany(e => e.PrimarySongs)
+            .WithMany(e => e.PrimaryTracks)
             .HasForeignKey(e => e.PrimaryArtistId);
 
         builder
             .HasMany(e => e.Artists)
-            .WithMany(e => e.Songs)
+            .WithMany(e => e.Tracks)
             .UsingEntity<TrackArtist>();
 
         builder

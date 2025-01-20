@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -119,6 +120,7 @@ void ConfigureServices(
     );
 
     services
+        .AddValidatorsFromAssembly(typeof(Program).Assembly)
         .AddCors()
         .AddServices(apiConfig, config)
         .AddAuth(config, apiConfig, env)

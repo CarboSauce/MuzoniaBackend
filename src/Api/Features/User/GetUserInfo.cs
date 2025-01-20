@@ -14,7 +14,6 @@ public class GetUserInfo : IEndpoint
     }
 
     private static async Task<Results<Ok<UserResponse>, NotFound>> Handle(
-        HttpContext context,
         UserService userService
     )
     {

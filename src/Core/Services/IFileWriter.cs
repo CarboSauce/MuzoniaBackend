@@ -16,7 +16,7 @@ public interface IFileWriter
         string filePrefix
     );
 
-    void CreateDirectory(string existingPrefix, string createPrefix);
+    ValueTask CreateDirectory(string existingPrefix, string createPrefix);
 
     Uri Resolve(string filename, string prefix, string filePrefix);
 }
@@ -83,7 +83,7 @@ public sealed class StaticFileWriter(
         );
     }
 
-    public void CreateDirectory(string existingPrefix, string createPrefix)
+    public ValueTask CreateDirectory(string existingPrefix, string createPrefix)
     {
         var path = Path.Combine(
             env.WebRootPath,
@@ -92,6 +92,7 @@ public sealed class StaticFileWriter(
             createPrefix
         );
         Directory.CreateDirectory(path);
+        return ValueTask.CompletedTask;
     }
 
     public Uri Resolve(string filename, string prefix, string filePrefix)
@@ -127,7 +128,10 @@ public sealed class NoopFileWriter : IFileWriter, ISingleton
         );
     }
 
-    public void CreateDirectory(string existingPrefix, string createPrefix) { }
+    public ValueTask CreateDirectory(
+        string existingPrefix,
+        string createPrefix
+    ) => ValueTask.CompletedTask;
 
     public Uri Resolve(string filename, string prefix, string filePrefix)
     {

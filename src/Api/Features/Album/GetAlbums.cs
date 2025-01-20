@@ -7,13 +7,13 @@ namespace Muzonia.Api.Features.Album;
 public class GetAlbums : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) =>
-        app.MapGet("/{id}/{pageId}", Handle);
+        app.MapGet("/{id}", Handle);
 
     private static async Task<
-        Results<Ok<IEnumerable<AlbumResponse>>, ForbidHttpResult>
-    > Handle(AlbumService albumService, Guid id, Guid pageId)
+        Results<Ok<AlbumResponse[]>, ForbidHttpResult>
+    > Handle(AlbumService albumService, Guid id)
     {
-        var albums = await albumService.GetArtistAlbumsPaginate(id, pageId, 30);
+        var albums = await albumService.GetArtistAlbums(id);
         return TypedResults.Ok(albums);
     }
 }

@@ -28,6 +28,9 @@ public class UserService(
         return user;
     }
 
+    public async Task<AppUser?> GetUserById(EntityId id) =>
+        await userManager.FindByIdAsync(id.ToString());
+
     public async Task<(AppUser user, bool isAdmin)> CurrentUser()
     {
         var user = await userManager.GetUserAsync(claims);

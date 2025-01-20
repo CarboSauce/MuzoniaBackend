@@ -1,4 +1,5 @@
-﻿using EntityFramework.Exceptions.PostgreSQL;
+﻿using System.ComponentModel.DataAnnotations;
+using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -21,25 +22,29 @@ public class ApiDbContext(DbContextOptions<ApiDbContext> options)
     public DbSet<QueueEntry> QueueEntries { get; set; } = null!;
     public DbSet<PlaybackQueue> PlaybackQueues { get; set; } = null!;
 
+    public static readonly EntityId AdminRoleId = EntityId.Parse(
+        "85deccaa-119d-4d43-abbc-c92f76bc22be"
+    );
+    public static readonly EntityId UserRoleId = EntityId.Parse(
+        "d4dd6c74-668f-4bd1-a74d-e6ad01175e76"
+    );
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
-        var adminId = EntityId.Parse("85deccaa-119d-4d43-abbc-c92f76bc22be");
-        var userId = EntityId.Parse("d4dd6c74-668f-4bd1-a74d-e6ad01175e76");
 
         IdentityRole<EntityId>[] roles =
         [
             new()
             {
-                Id = adminId,
+                Id = AdminRoleId,
                 ConcurrencyStamp = "1",
                 Name = "Admin",
                 NormalizedName = "ADMIN",
             },
             new()
             {
-                Id = userId,
+                Id = UserRoleId,
                 ConcurrencyStamp = "2",
                 Name = "User",
                 NormalizedName = "USER",
@@ -59,14 +64,14 @@ public class ApiDbContext(DbContextOptions<ApiDbContext> options)
         optionsBuilder.UseExceptionProcessor();
     }
 
-    protected override void ConfigureConventions(
-        ModelConfigurationBuilder configurationBuilder
-    )
-    {
-        base.ConfigureConventions(configurationBuilder);
-
-        configurationBuilder
-            .Properties<EntityId>()
-            .HaveConversion<GuidToStringConverter>();
-    }
+    // protected override void ConfigureConventions(
+    //     ModelConfigurationBuilder configurationBuilder
+    // )
+    // {
+    //     base.ConfigureConventions(configurationBuilder);
+    //
+    //     configurationBuilder
+    //         .Properties<EntityId>()
+    //         .HaveConversion<GuidToStringConverter>();
+    // }
 }

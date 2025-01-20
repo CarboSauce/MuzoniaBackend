@@ -11,7 +11,10 @@ public static class MapUsers
         endpoints
             .MapAuthorizedGroup()
             .MapEndpoint<DeleteUser>()
+            .MapEndpoint<DeleteUserById>()
             .MapEndpoint<EditUserInfo>()
-            .MapEndpoint<GetUserInfo>();
+            .MapEndpoint<GetUserById>()
+            .MapEndpoint<GetUserInfo>()
+            .MapEndpoint<SearchUsers>();
     }
 }

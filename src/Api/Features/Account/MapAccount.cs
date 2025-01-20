@@ -12,7 +12,9 @@ public static class MapAccount
             .MapAnonymousGroup()
             .MapEndpoint<ConfirmEmail>()
             .MapEndpoint<LoginUser>()
-            .MapEndpoint<RegisterUser>();
+            .MapEndpoint<RegisterUser>()
+            .MapEndpoint<ResetPassword>()
+            .MapEndpoint<ResetPasswordRequest>();
 
         endpoints.MapAuthorizedGroup().MapEndpoint<LogoutUser>();
     }

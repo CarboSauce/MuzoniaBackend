@@ -12,7 +12,7 @@ namespace Muzonia.Api.Features.Album;
 public class EditAlbum : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) =>
-        app.MapPatch("/{id}", Handle).WithValidation<Validator>();
+        app.MapPatch("/{id}", Handle).WithValidation<Request>();
 
     public class Validator : AbstractValidator<Request>
     {

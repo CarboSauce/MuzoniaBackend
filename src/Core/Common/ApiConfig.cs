@@ -91,28 +91,55 @@ public class AspireConfig
     }
 }
 
+public class EmailConfig
+{
+    public string ClientUrl { get; set; } = "http://localhost:3000";
+    public string ConfirmEmailEndpoint { get; set; } = "confirmEmail";
+    public string ForgotPasswordEndpoint { get; set; } = "forgotPassword";
+
+    public static EmailConfig? Configure(
+        IServiceCollection services,
+        IConfiguration config
+    )
+    {
+        var configurationSection = config.GetSection("EmailConfig");
+        var emailConfig = configurationSection.Get<EmailConfig>();
+
+        if (emailConfig is null)
+            return null;
+
+        services.Configure<EmailConfig>(configurationSection);
+        services.AddSingleton(emailConfig);
+
+        return emailConfig;
+    }
+}
+
 public static class ConfigExt
 {
     public static (
         ApiConfig? apiConfig,
         AdminConfig? adminConfig,
-        AspireConfig? aspireConfig
+        AspireConfig? aspireConfig,
+        EmailConfig? emailConfig
     ) AddConfigNullable(this IServiceCollection services, IConfiguration config)
     {
         var apiConfig = ApiConfig.Configure(services, config);
         var adminConfig = AdminConfig.Configure(services, config);
         var aspireConfig = AspireConfig.Configure(services, config);
+        var emailConfig = EmailConfig.Configure(services, config);
 
-        return (apiConfig, adminConfig, aspireConfig);
+        return (apiConfig, adminConfig, aspireConfig, emailConfig);
     }
 
     public static (
         ApiConfig apiConfig,
         AdminConfig adminConfig,
-        AspireConfig aspireConfig
+        AspireConfig aspireConfig,
+        EmailConfig emailConfig
     ) AddConfig(this IServiceCollection services, IConfiguration config)
     {
-        (var apiConfig, var adminConfig, var aspireConfig) =
+        var (apiConfig, adminConfig, aspireConfig, emailConfig) =
             services.AddConfigNullable(config);
 
         if (apiConfig is null)
@@ -134,10 +161,18 @@ public static class ConfigExt
             );
         }
 
+        if (emailConfig is null)
+        {
+            Console.WriteLine(
+                "EmailConfig is missing, Creating default instance"
+            );
+        }
+
         return (
             apiConfig ?? new(),
             adminConfig ?? new(),
-            aspireConfig ?? new()
+            aspireConfig ?? new(),
+            emailConfig ?? new()
         );
     }
 }

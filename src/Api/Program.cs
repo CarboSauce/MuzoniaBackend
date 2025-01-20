@@ -24,7 +24,7 @@ builder.Host.UseSerilog(
     }
 );
 
-(var apiConfig, _, var aspireConfig) = CreateConfig(builder);
+var (apiConfig, _, aspireConfig, _) = CreateConfig(builder);
 
 ConfigureExternalServices(aspireConfig, builder);
 ConfigureServices(builder.Services, builder.Environment, builder.Configuration);
@@ -52,17 +52,12 @@ app.UseOpenApi(app, app.Configuration, appEnv)
 
 app.MapEndpoints();
 
-app.Run();
+await app.RunAsync();
 return;
 
-(ApiConfig, AdminConfig, AspireConfig) CreateConfig(
+(ApiConfig, AdminConfig, AspireConfig, EmailConfig) CreateConfig(
     WebApplicationBuilder builder
-)
-{
-    var globalConfig = builder.Services.AddConfig(builder.Configuration);
-
-    return globalConfig;
-}
+) => builder.Services.AddConfig(builder.Configuration);
 
 static void ConfigureExternalServices(
     AspireConfig aspireConfig,

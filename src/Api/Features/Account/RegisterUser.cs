@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Muzonia.Core;
+using Microsoft.Extensions.Options;
+using Muzonia.Core.Common;
 using Muzonia.Core.Services;
 using Muzonia.DbEf.Entities;
 
@@ -10,7 +12,7 @@ namespace Muzonia.Api.Features.Account;
 public class RegisterUser : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) =>
-        app.MapPost("/register", Handle);
+        app.MapPost("/register", Handle).WithValidation<Request>();
 
     public record Request(string Username, string Email, string Password);
 
@@ -20,14 +22,22 @@ public class RegisterUser : IEndpoint
         DateTime CreationDate
     );
 
+    public class Validator : AbstractValidator<Request>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Username).Length(3, 64);
+            RuleFor(x => x.Email).EmailAddress();
+        }
+    }
+
     private static async Task<
         Results<Ok<Response>, BadRequest<IEnumerable<IdentityError>>>
     > Handle(
-        HttpContext context,
+        [FromBody] Request request,
         SignInManager<AppUser> signInManager,
-        [FromServices] LinkGenerator linkGenerator,
         IEmail email,
-        [FromBody] Request request
+        IOptions<EmailConfig> emailConfig
     )
     {
         var user = new AppUser
@@ -58,16 +68,18 @@ public class RegisterUser : IEndpoint
         }
         else
         {
-            var callbackUrl = linkGenerator.GetUriByName(
-                context,
-                "ConfirmEmail",
-                new { userId = user.Id, token }
-            );
+            var config = emailConfig.Value;
+
+            var callbackUri = new UriBuilder($"{config.ClientUrl}")
+            {
+                Path = config.ConfirmEmailEndpoint,
+                Query = $"token={token}&userId={user.Id}",
+            };
 
             await email.SendEmailAsync(
                 user.Email,
                 "Confirm your email",
-                $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>."
+                $"Please confirm your account by <a clicktracking=\"off\" href='{callbackUri.Uri}'>clicking here</a>."
             );
         }
 

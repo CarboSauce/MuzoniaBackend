@@ -13,9 +13,15 @@ public class ConfirmEmail : IEndpoint
 
     private static async Task<
         Results<Created, BadRequest<IEnumerable<IdentityError>>>
-    > Handle(SignInManager<AppUser> signInManager, string email, string token)
+    > Handle(
+        SignInManager<AppUser> signInManager,
+        EntityId userId,
+        string token
+    )
     {
-        var user = await signInManager.UserManager.FindByEmailAsync(email);
+        var user = await signInManager.UserManager.FindByIdAsync(
+            userId.ToString()
+        );
 
         if (user is null)
         {

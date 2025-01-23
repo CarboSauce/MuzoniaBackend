@@ -17,7 +17,23 @@ internal static class Auth
         services.AddAuthorization();
         services
             .AddAuthentication(IdentityConstants.ApplicationScheme)
-            .AddCookie(IdentityConstants.ApplicationScheme);
+            .AddCookie(
+                IdentityConstants.ApplicationScheme,
+                o =>
+                {
+                    o.Events.OnRedirectToLogin = context =>
+                    {
+                        context.Response.StatusCode = 401;
+                        return Task.CompletedTask;
+                    };
+
+                    o.Events.OnRedirectToAccessDenied = context =>
+                    {
+                        context.Response.StatusCode = 403;
+                        return Task.CompletedTask;
+                    };
+                }
+            );
 
         services
             .AddIdentityCore<AppUser>(o =>
@@ -46,8 +62,8 @@ internal static class Auth
             })
             .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<ApiDbContext>()
-            .AddDefaultTokenProviders()
-            .AddApiEndpoints();
+            .AddSignInManager()
+            .AddDefaultTokenProviders();
 
         return services;
     }

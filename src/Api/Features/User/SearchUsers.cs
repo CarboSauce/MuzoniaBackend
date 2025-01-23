@@ -12,8 +12,8 @@ public class SearchUsers : IEndpoint
     public record Response(
         EntityId Id,
         DateTime CreationDate,
-        string Name,
-        Uri? AvatarUri
+        string UserName,
+        Uri? Avatar
     );
 
     private static async Task<

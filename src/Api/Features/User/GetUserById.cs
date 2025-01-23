@@ -13,9 +13,9 @@ public class GetUserById : IEndpoint
 
     public record Response(
         EntityId Id,
-        string Name,
+        string UserName,
         DateTime CreationDate,
-        Uri? AvatarUri,
+        Uri? Avatar,
         EntityId? ArtistId,
         bool IsAdmin
     );

@@ -33,7 +33,7 @@ var app = builder.Build();
 
 await RunServices(app.Services, app.Environment);
 
-//app.UseHttpLogging();
+app.UseHttpLogging();
 
 var appEnv = app.Environment;
 
@@ -116,7 +116,7 @@ void ConfigureServices(
 
     services
         .AddValidatorsFromAssembly(typeof(Program).Assembly)
-        .AddCors()
+        .AddCustomCors(config)
         .AddServices(apiConfig, config)
         .AddAuth(config, apiConfig, env)
         .AddOpenApiServices(config, env)

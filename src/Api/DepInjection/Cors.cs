@@ -1,8 +1,12 @@
-﻿namespace Muzonia.Api.DepInjection;
+﻿using System.Text.RegularExpressions;
+
+namespace Muzonia.Api.DepInjection;
 
 internal static class Cors
 {
-    public static IServiceCollection AddCors(
+    public const string CorsPolicyName = "MuzoniaCors";
+
+    public static IServiceCollection AddCustomCors(
         this IServiceCollection services,
         IConfiguration cfg
     ) =>
@@ -10,15 +14,12 @@ internal static class Cors
         {
             options.AddDefaultPolicy(policyBuilder =>
             {
-                var allowLocalhost = cfg.GetValue("AllowLocalhost", false);
-                if (allowLocalhost)
-                {
-                    policyBuilder.SetIsOriginAllowed(origin =>
-                        new Uri(origin).Host == "localhost"
-                    );
-                }
+                var allowedOrigins = cfg.GetSection("CorsAllowedOrigins")
+                    .Get<string[]>();
+
                 policyBuilder
-                    .AllowAnyOrigin()
+                    .AllowCredentials()
+                    .WithOrigins(allowedOrigins ?? ["http://localhost:3000"])
                     .AllowAnyMethod()
                     .AllowAnyHeader();
             });

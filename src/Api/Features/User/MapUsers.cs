@@ -13,6 +13,7 @@ public static class MapUsers
             .MapEndpoint<DeleteUser>()
             .MapEndpoint<DeleteUserById>()
             .MapEndpoint<EditUserInfo>()
+            .MapEndpoint<GetUserBasicInfo>()
             .MapEndpoint<GetUserById>()
             .MapEndpoint<GetUserInfo>()
             .MapEndpoint<SearchUsers>();

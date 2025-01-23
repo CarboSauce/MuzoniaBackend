@@ -1,4 +1,5 @@
 ﻿using EntityFramework.Exceptions.Common;
+using Muzonia.Api.DepInjection;
 using Muzonia.Api.Features.Account;
 using Muzonia.Api.Features.Album;
 using Muzonia.Api.Features.Artist;

@@ -32,7 +32,16 @@ public class ArtistService(
 
         await EnsureUniqueName(request);
 
-        await EnsureSingleArtist(user);
+        var targetUser = await userManager.FindByIdAsync(
+            request.UserId.ToString()
+        );
+
+        if (targetUser is null)
+        {
+            throw new NotFoundException("Target user not found");
+        }
+
+        await EnsureSingleArtist(targetUser);
 
         var fileUri = await fileWriter.WriteAsync(
             request.File,

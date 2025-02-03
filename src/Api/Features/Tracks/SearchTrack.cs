@@ -15,10 +15,14 @@ public class SearchTrack : IEndpoint
         long Duration,
         EntityId Id,
         DateTime CreationDate,
-        EntityId AlbumId,
-        EntityId PrimaryArtistId,
-        EntityId[] OtherArtistIds
+        AlbumResponse Album,
+        ArtistResponse PrimaryArtist,
+        ArtistResponse[] OtherArtists
     );
+
+    public record ArtistResponse(EntityId Id, string Name);
+
+    public record AlbumResponse(EntityId Id, string Title);
 
     private static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
         string name,
@@ -40,11 +44,13 @@ public class SearchTrack : IEndpoint
                 e.Duration,
                 e.Id,
                 e.CreationDate,
-                e.AlbumId,
-                e.PrimaryArtistId,
-                e.Artists.Select(a => a.Id).ToArray()
+                new(e.AlbumId, e.Album.Title),
+                new(e.PrimaryArtistId, e.PrimaryArtist.Name),
+                e.Artists.Select(a => new ArtistResponse(a.Id, a.Name))
+                    .ToArray()
             ))
             .Take(50)
+            .OrderBy(a => a.Id)
             .ToArrayAsync();
 
         return TypedResults.Ok(track);

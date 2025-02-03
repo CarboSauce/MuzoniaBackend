@@ -14,11 +14,13 @@ public class SearchPlaylist : IEndpoint
         string Title,
         string Description,
         EntityId Id,
-        EntityId UserId,
+        UserResponse User,
         DateTime CreationDate,
         bool IsPublic,
         Uri? ImageUri
     );
+
+    public record UserResponse(EntityId Id, string UserName, Uri? Avatar);
 
     private static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
         string name,
@@ -40,12 +42,13 @@ public class SearchPlaylist : IEndpoint
                 e.Name,
                 e.Description,
                 e.Id,
-                e.UserId,
+                new(e.UserId, e.User.UserName!, e.User.AvatarUri),
                 e.CreationDate,
                 e.IsPublic,
                 e.ImageUri
             ))
             .Take(50)
+            .OrderBy(e => e.Id)
             .ToArrayAsync();
 
         return TypedResults.Ok(playlists);

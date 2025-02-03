@@ -41,6 +41,7 @@ public class SearchUsers : IEndpoint
                 e.UserName!,
                 e.AvatarUri
             ))
+            .OrderBy(a => a.Id)
             .Take(50)
             .ToArrayAsync();
 

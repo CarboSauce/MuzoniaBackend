@@ -55,6 +55,7 @@ public class SearchArtist : IEndpoint
                 a.CreationDate
             ))
             .Take(50)
+            .OrderBy(a => a.Id)
             .ToArrayAsync();
 
         return TypedResults.Ok(artists);

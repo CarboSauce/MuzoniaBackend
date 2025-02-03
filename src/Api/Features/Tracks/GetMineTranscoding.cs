@@ -1,18 +1,17 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Muzonia.Core.Services.Api;
 
 namespace Muzonia.Api.Features.Tracks;
 
-public class GetTrackById : IEndpoint
+public class GetMineTranscoding : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) =>
-        app.MapGet("/{id}", Handle);
+        app.MapGet("/transcoding", Handle);
 
     public record Response(
         string Title,
         string Genre,
-        Uri? DataUri,
-        long Duration,
         EntityId Id,
         DateTime CreationDate,
         AlbumResponse Album,
@@ -20,35 +19,38 @@ public class GetTrackById : IEndpoint
         ArtistResponse[] OtherArtists
     );
 
+    public record AlbumResponse(EntityId Id, string Title);
+
     public record ArtistResponse(EntityId Id, string Name);
 
-    public record AlbumResponse(EntityId Id, string Title, Uri ImageUri);
-
-    private static async Task<Results<Ok<Response>, BadRequest>> Handle(
+    private static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
         EntityId id,
-        ApiDbContext dbContext
+        ApiDbContext dbContext,
+        ArtistService artistService,
+        UserService userService
     )
     {
+        var (user, isAdmin) = await userService.CurrentUser();
+        var artist = await artistService.GetArtist(user);
+
+        if (artist is null)
+        {
+            return TypedResults.BadRequest();
+        }
+
         var track = await dbContext
-            .Tracks.Where(e => e.Id == id && e.DataUri != null)
+            .Tracks.Where(e => e.PrimaryArtistId == artist.Id)
             .Select(e => new Response(
                 e.Title,
                 e.Genre,
-                e.DataUri,
-                e.Duration,
                 e.Id,
                 e.CreationDate,
-                new(e.AlbumId, e.Album.Title, e.Album.ImageUri),
+                new(e.AlbumId, e.Album.Title),
                 new(e.PrimaryArtistId, e.PrimaryArtist.Name),
                 e.Artists.Select(a => new ArtistResponse(a.Id, a.Name))
                     .ToArray()
             ))
-            .FirstOrDefaultAsync();
-
-        if (track is null)
-        {
-            return TypedResults.BadRequest();
-        }
+            .ToArrayAsync();
 
         return TypedResults.Ok(track);
     }

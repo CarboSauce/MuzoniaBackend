@@ -22,7 +22,7 @@ public class SearchTrack : IEndpoint
 
     public record ArtistResponse(EntityId Id, string Name);
 
-    public record AlbumResponse(EntityId Id, string Title);
+    public record AlbumResponse(EntityId Id, string Title, Uri ImageUri);
 
     private static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
         string name,
@@ -37,6 +37,7 @@ public class SearchTrack : IEndpoint
                 || EF.Functions.ILike(e.Genre, searchName)
                 || e.Artists.Any(a => EF.Functions.ILike(a.Name, searchName))
             )
+            .Where(e => e.DataUri != null)
             .OrderBy(a => a.Id)
             .Take(50)
             .Select(e => new Response(
@@ -46,7 +47,7 @@ public class SearchTrack : IEndpoint
                 e.Duration,
                 e.Id,
                 e.CreationDate,
-                new(e.AlbumId, e.Album.Title),
+                new(e.AlbumId, e.Album.Title, e.Album.ImageUri),
                 new(e.PrimaryArtistId, e.PrimaryArtist.Name),
                 e.Artists.Select(a => new ArtistResponse(a.Id, a.Name))
                     .ToArray()

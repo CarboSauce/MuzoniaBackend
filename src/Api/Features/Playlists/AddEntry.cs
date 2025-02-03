@@ -33,7 +33,7 @@ public class AddEntry : IEndpoint
         }
 
         var track = await dbContext.Tracks.FirstOrDefaultAsync(e =>
-            e.Id == trackId || e.DataUri != null
+            e.Id == trackId && e.DataUri != null
         );
 
         if (track is null)

@@ -103,15 +103,6 @@ public class AlbumService(
         return albums;
     }
 
-    public async Task<AlbumResponse[]> GetArtistAlbums(EntityId artistId) =>
-        await dbContext
-            .Albums.Where(a => a.Artists.Any(b => b.Id == artistId))
-            .Select(a => new AlbumResponse(
-                a,
-                a.Artists.Select(b => new ArtistResponse(b)).ToArray()
-            ))
-            .ToArrayAsync();
-
     public async Task<IEnumerable<AlbumResponse>> GetArtistAlbumsPaginate(
         Guid artistId,
         Guid pageId,

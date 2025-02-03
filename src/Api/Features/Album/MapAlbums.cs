@@ -14,7 +14,6 @@ public static class MapAlbums
             .MapEndpoint<DeleteAlbum>()
             .MapEndpoint<EditAlbum>()
             .MapEndpoint<GetAlbums>()
-            .MapEndpoint<GetAlbumTracks>()
             .MapEndpoint<GetMyAlbums>()
             .MapEndpoint<SearchAlbum>();
     }

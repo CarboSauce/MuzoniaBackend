@@ -10,16 +10,27 @@ public class GetEntries : IEndpoint
         app.MapGet("/{id}/tracks", Handle);
 
     public record Response(
+        EntityId Id,
+        DateTime CreationDate,
+        int Index,
+        TrackResponse Track
+    );
+
+    public record TrackResponse(
         string Title,
         string Genre,
         Uri? DataUri,
         long Duration,
         EntityId Id,
         DateTime CreationDate,
-        EntityId AlbumId,
-        EntityId PrimaryArtistId,
-        EntityId[] OtherArtistIds
+        AlbumResponse Album,
+        ArtistResponse PrimaryArtist,
+        ArtistResponse[] OtherArtists
     );
+
+    public record ArtistResponse(EntityId Id, string Name);
+
+    public record AlbumResponse(EntityId Id, string Title, Uri ImageUri);
 
     private static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
         EntityId id,
@@ -41,15 +52,28 @@ public class GetEntries : IEndpoint
         var tracks = await dbContext
             .PlaylistTracks.Where(e => e.PlaylistId == id)
             .Select(e => new Response(
-                e.Track.Title,
-                e.Track.Genre,
-                e.Track.DataUri,
-                e.Track.Duration,
-                e.Track.Id,
-                e.Track.CreationDate,
-                e.Track.AlbumId,
-                e.Track.PrimaryArtistId,
-                e.Track.Artists.Select(a => a.Id).ToArray()
+                e.Id,
+                e.CreationDate,
+                e.Index,
+                new TrackResponse(
+                    e.Track.Title,
+                    e.Track.Genre,
+                    e.Track.DataUri,
+                    e.Track.Duration,
+                    e.Track.Id,
+                    e.Track.CreationDate,
+                    new(
+                        e.Track.AlbumId,
+                        e.Track.Album.Title,
+                        e.Track.Album.ImageUri
+                    ),
+                    new(e.Track.PrimaryArtistId, e.Track.PrimaryArtist.Name),
+                    e.Track.Artists.Select(a => new ArtistResponse(
+                            a.Id,
+                            a.Name
+                        ))
+                        .ToArray()
+                )
             ))
             .ToArrayAsync();
 

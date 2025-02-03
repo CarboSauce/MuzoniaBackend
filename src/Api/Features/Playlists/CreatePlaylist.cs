@@ -18,7 +18,7 @@ public class CreatePlaylist : IEndpoint
         string Name,
         string Description,
         bool IsPublic,
-        IFormFile File
+        IFormFile? File
     );
 
     public record Response(
@@ -35,11 +35,13 @@ public class CreatePlaylist : IEndpoint
         HttpContext context
     )
     {
-        var fileUri = await fileWriter.WriteAsync(
-            req.File,
-            "images/",
-            EntityId.NewGuid().ToString()
-        );
+        var fileUri = req.File is not null
+            ? await fileWriter.WriteAsync(
+                req.File,
+                "images/",
+                EntityId.NewGuid().ToString()
+            )
+            : null;
 
         var userId = context.GetUserId();
         var playlist = new Playlist

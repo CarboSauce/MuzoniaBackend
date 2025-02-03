@@ -20,12 +20,15 @@ internal static class StaticFiles
         if (staticContentRoot is not null)
             env.WebRootPath = staticContentRoot;
 
+        var mappingProvider = new FileExtensionContentTypeProvider();
+        mappingProvider.Mappings[".m3u8"] = "application/x-mpegURL";
+
         var staticFileOptions = new StaticFileOptions
         {
             FileProvider = new PhysicalFileProvider(
                 Path.Combine(env.WebRootPath, "muzonia")
             ),
-            ContentTypeProvider = new FileExtensionContentTypeProvider(),
+            ContentTypeProvider = mappingProvider,
             RequestPath = "/static",
             OnPrepareResponse = ctx =>
             {

@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Muzonia.Api.Features.Tracks;
 
-public class GetTrackById : IEndpoint
+public class GetArtistTracks : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) =>
-        app.MapGet("/{id}", Handle);
+        app.MapGet("/{id}/artist", Handle);
 
     public record Response(
         string Title,
@@ -24,31 +24,33 @@ public class GetTrackById : IEndpoint
 
     public record AlbumResponse(EntityId Id, string Title, Uri ImageUri);
 
-    private static async Task<Results<Ok<Response>, BadRequest>> Handle(
+    private static async Task<Ok<Response[]>> Handle(
         EntityId id,
         ApiDbContext dbContext
     )
     {
         var track = await dbContext
-            .Tracks.Where(e => e.Id == id && e.DataUri != null)
+            .TrackArtists.Where(e =>
+                (e.ArtistId == id || e.Track.PrimaryArtistId == id)
+                && e.Track.DataUri != null
+            )
             .Select(e => new Response(
-                e.Title,
-                e.Genre,
-                e.DataUri,
-                e.Duration,
-                e.Id,
-                e.CreationDate,
-                new(e.AlbumId, e.Album.Title, e.Album.ImageUri),
-                new(e.PrimaryArtistId, e.PrimaryArtist.Name),
-                e.Artists.Select(a => new ArtistResponse(a.Id, a.Name))
+                e.Track.Title,
+                e.Track.Genre,
+                e.Track.DataUri,
+                e.Track.Duration,
+                e.Track.Id,
+                e.Track.CreationDate,
+                new(
+                    e.Track.AlbumId,
+                    e.Track.Album.Title,
+                    e.Track.Album.ImageUri
+                ),
+                new(e.Track.PrimaryArtistId, e.Track.PrimaryArtist.Name),
+                e.Track.Artists.Select(a => new ArtistResponse(a.Id, a.Name))
                     .ToArray()
             ))
-            .FirstOrDefaultAsync();
-
-        if (track is null)
-        {
-            return TypedResults.BadRequest();
-        }
+            .ToArrayAsync();
 
         return TypedResults.Ok(track);
     }

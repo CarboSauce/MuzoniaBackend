@@ -16,7 +16,6 @@ public static class MapArtists
             .MapEndpoint<DeleteArtist>()
             .MapEndpoint<GetArtist>()
             .MapEndpoint<GetArtistAlbums>()
-            .MapEndpoint<GetArtistTracks>()
             .MapEndpoint<GetMyArtist>()
             .MapEndpoint<SearchArtist>()
             .MapEndpoint<UpdateArtist>();

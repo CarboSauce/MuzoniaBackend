@@ -3,24 +3,28 @@ using Microsoft.EntityFrameworkCore;
 using Muzonia.Api.Common;
 using Muzonia.Core.Services.Api;
 
-namespace Muzonia.Api.Features.Album;
+namespace Muzonia.Api.Features.Tracks;
 
 public class GetAlbumTracks : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) =>
-        app.MapGet("/{id}/tracks", Handle);
+        app.MapGet("/{id}/album", Handle);
 
     public record Response(
-        EntityId Id,
         string Title,
         string Genre,
         Uri? DataUri,
         long Duration,
+        EntityId Id,
         DateTime CreationDate,
-        EntityId AlbumId,
-        EntityId PrimaryArtistId,
-        EntityId[] OtherArtistIds
+        AlbumResponse Album,
+        ArtistResponse PrimaryArtist,
+        ArtistResponse[] OtherArtists
     );
+
+    public record ArtistResponse(EntityId Id, string Name);
+
+    public record AlbumResponse(EntityId Id, string Title, Uri ImageUri);
 
     private static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
         EntityId id,
@@ -34,17 +38,18 @@ public class GetAlbumTracks : IEndpoint
         }
 
         var tracks = await dbContext
-            .Tracks.Where(e => e.AlbumId == id)
+            .Tracks.Where(e => e.AlbumId == id && e.DataUri != null)
             .Select(e => new Response(
-                e.Id,
                 e.Title,
                 e.Genre,
                 e.DataUri,
                 e.Duration,
+                e.Id,
                 e.CreationDate,
-                e.AlbumId,
-                e.PrimaryArtistId,
-                e.Artists.Select(a => a.Id).ToArray()
+                new(e.AlbumId, e.Album.Title, e.Album.ImageUri),
+                new(e.PrimaryArtistId, e.PrimaryArtist.Name),
+                e.Artists.Select(a => new ArtistResponse(a.Id, a.Name))
+                    .ToArray()
             ))
             .ToArrayAsync();
 

@@ -15,6 +15,7 @@ public static class MapPlaylists
             .MapEndpoint<DeletePlaylist>()
             .MapEndpoint<EditPlaylistInfo>()
             .MapEndpoint<GetEntries>()
+            .MapEndpoint<GetMinePlaylists>()
             .MapEndpoint<GetPlaylist>()
             .MapEndpoint<GetUserPlaylists>()
             .MapEndpoint<RemoveEntry>()

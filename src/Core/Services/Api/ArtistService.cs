@@ -80,6 +80,12 @@ public class ArtistService(
         return artists;
     }
 
+    public async Task<ArtistResponse?> GetArtist(AppUser user) =>
+        await dbContext
+            .Artists.Where(a => a.UserId == user.Id)
+            .Select(a => new ArtistResponse(a))
+            .SingleOrDefaultAsync();
+
     public async Task<ArtistResponse> UpdateArtist(
         Guid id,
         UpdateArtistRequest request

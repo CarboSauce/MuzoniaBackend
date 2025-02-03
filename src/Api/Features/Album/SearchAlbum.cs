@@ -36,6 +36,8 @@ public class SearchAlbum : IEndpoint
 
         var albums = await dbContext
             .Albums.Where(e => EF.Functions.ILike(e.Title, $"%{name}%"))
+            .Take(50)
+            .OrderBy(a => a.Id)
             .Select(e => new Response(
                 e.Id,
                 e.Title,
@@ -43,7 +45,6 @@ public class SearchAlbum : IEndpoint
                 e.Artists.Select(a => new ArtistResponse(a.Id, a.Name))
                     .ToArray()
             ))
-            .Take(50)
             .ToArrayAsync();
 
         return TypedResults.Ok(albums);

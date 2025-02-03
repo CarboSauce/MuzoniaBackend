@@ -37,6 +37,8 @@ public class SearchTrack : IEndpoint
                 || EF.Functions.ILike(e.Genre, searchName)
                 || e.Artists.Any(a => EF.Functions.ILike(a.Name, searchName))
             )
+            .OrderBy(a => a.Id)
+            .Take(50)
             .Select(e => new Response(
                 e.Title,
                 e.Genre,
@@ -49,8 +51,6 @@ public class SearchTrack : IEndpoint
                 e.Artists.Select(a => new ArtistResponse(a.Id, a.Name))
                     .ToArray()
             ))
-            .Take(50)
-            .OrderBy(a => a.Id)
             .ToArrayAsync();
 
         return TypedResults.Ok(track);

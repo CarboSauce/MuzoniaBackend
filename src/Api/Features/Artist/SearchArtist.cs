@@ -46,6 +46,8 @@ public class SearchArtist : IEndpoint
                 EF.Functions.ILike(a.Name, $"%{name}%")
                 || EF.Functions.ILike(a.Description, $"%{name}%")
             )
+            .OrderBy(a => a.Id)
+            .Take(50)
             .Select(a => new ArtistResponse(
                 a.Id,
                 a.UserId,
@@ -54,8 +56,6 @@ public class SearchArtist : IEndpoint
                 a.ImageUri,
                 a.CreationDate
             ))
-            .Take(50)
-            .OrderBy(a => a.Id)
             .ToArrayAsync();
 
         return TypedResults.Ok(artists);

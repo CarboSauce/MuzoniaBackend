@@ -38,6 +38,8 @@ public class SearchPlaylist : IEndpoint
         var playlists = await dbContext
             .Playlists.Where(e => EF.Functions.ILike(e.Name, $"%{name}%"))
             .WhereIf(!isAdmin, e => e.IsPublic || e.UserId == user.Id)
+            .OrderBy(e => e.Id)
+            .Take(50)
             .Select(e => new Response(
                 e.Name,
                 e.Description,
@@ -47,8 +49,6 @@ public class SearchPlaylist : IEndpoint
                 e.IsPublic,
                 e.ImageUri
             ))
-            .Take(50)
-            .OrderBy(e => e.Id)
             .ToArrayAsync();
 
         return TypedResults.Ok(playlists);

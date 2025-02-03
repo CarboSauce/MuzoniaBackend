@@ -35,14 +35,14 @@ public class SearchUsers : IEndpoint
                 e.UserName != null
                 && EF.Functions.ILike(e.UserName, $"%{name}%")
             )
+            .OrderBy(a => a.Id)
+            .Take(50)
             .Select(e => new Response(
                 e.Id,
                 e.CreationDate,
                 e.UserName!,
                 e.AvatarUri
             ))
-            .OrderBy(a => a.Id)
-            .Take(50)
             .ToArrayAsync();
 
         return TypedResults.Ok(users);

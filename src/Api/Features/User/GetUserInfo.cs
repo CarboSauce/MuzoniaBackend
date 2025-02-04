@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using Muzonia.Core.Dto.Response;
 using Muzonia.Core.Services.Api;
 
@@ -13,8 +14,19 @@ public class GetUserInfo : IEndpoint
             .WithDescription("Get user info");
     }
 
-    private static async Task<Results<Ok<UserResponse>, NotFound>> Handle(
-        UserService userService
+    public record Response(
+        EntityId Id,
+        string Username,
+        string Email,
+        DateTime CreationDate,
+        Uri? Avatar,
+        ArtistResponse? Artist,
+        bool IsAdmin
+    );
+
+    private static async Task<Results<Ok<Response>, NotFound>> Handle(
+        UserService userService,
+        ApiDbContext dbContext
     )
     {
         var user = await userService.GetUserInfo();
@@ -23,14 +35,36 @@ public class GetUserInfo : IEndpoint
             return TypedResults.NotFound();
         }
 
-        var isAdmin = await userService.IsUserAdmin(user);
+        var response = await dbContext
+            .Users.Where(u => u.Id == user.Id)
+            .Select(u => new Response(
+                u.Id,
+                u.UserName!,
+                u.Email!,
+                u.CreationDate,
+                u.AvatarUri,
+                u.Artist != null
+                    ? new ArtistResponse(
+                        u.Artist.Id,
+                        u.Artist.UserId,
+                        u.Artist.Name,
+                        u.Artist.Description,
+                        u.Artist.ImageUri,
+                        u.Artist.CreationDate
+                    )
+                    : null,
+                dbContext.UserRoles.Any(ur =>
+                    ur.RoleId == ApiDbContext.AdminRoleId
+                    && ur.UserId == user.Id
+                )
+            ))
+            .FirstOrDefaultAsync();
 
-        return TypedResults.Ok(
-            UserResponse.From(
-                user,
-                user.Artist is null ? null : new(user.Artist),
-                isAdmin
-            )
-        );
+        if (response is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        return TypedResults.Ok(response);
     }
 }

@@ -13,10 +13,10 @@ public class GetUserById : IEndpoint
 
     public record Response(
         EntityId Id,
-        string UserName,
+        string Username,
         DateTime CreationDate,
         Uri? Avatar,
-        EntityId? ArtistId,
+        ArtistResponse? Artist,
         bool IsAdmin
     );
 
@@ -36,7 +36,16 @@ public class GetUserById : IEndpoint
                 u.UserName!,
                 u.CreationDate,
                 u.AvatarUri,
-                u.Artist != null ? u.Artist.Id : null,
+                u.Artist != null
+                    ? new ArtistResponse(
+                        u.Artist.Id,
+                        u.Artist.UserId,
+                        u.Artist.Name,
+                        u.Artist.Description,
+                        u.Artist.ImageUri,
+                        u.Artist.CreationDate
+                    )
+                    : null,
                 dbContext.UserRoles.Any(ur =>
                     ur.RoleId == ApiDbContext.AdminRoleId && ur.UserId == id
                 )

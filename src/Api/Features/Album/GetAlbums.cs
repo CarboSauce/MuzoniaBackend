@@ -9,7 +9,7 @@ namespace Muzonia.Api.Features.Album;
 public class GetAlbums : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) =>
-        app.MapGet("/{id}", Handle).WithSummary("Get album by id");
+        app.MapGet("/{id}", Handle).WithDescription("Get album by id");
 
     private static async Task<
         Results<Ok<AlbumResponse>, UnauthorizedHttpResult>

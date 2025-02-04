@@ -4,7 +4,7 @@ namespace Muzonia.Core.Dto.Response;
 
 public record UserResponse(
     Guid Id,
-    string UserName,
+    string Username,
     string Email,
     DateTime CreationDate,
     ArtistResponse? Artist,

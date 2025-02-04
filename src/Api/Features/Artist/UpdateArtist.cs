@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Muzonia.Core.Dto.Request;
 using Muzonia.Core.Dto.Response;
 using Muzonia.Core.Services.Api;
@@ -12,7 +13,11 @@ public class UpdateArtist : IEndpoint
 
     private static async Task<
         Results<Ok<ArtistResponse>, BadRequest, ForbidHttpResult, NotFound>
-    > Handle(Guid id, ArtistService artistService, UpdateArtistRequest request)
+    > Handle(
+        Guid id,
+        ArtistService artistService,
+        [FromForm] UpdateArtistRequest request
+    )
     {
         var artist = await artistService.UpdateArtist(id, request);
         return TypedResults.Ok(artist);

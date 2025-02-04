@@ -12,12 +12,13 @@ public class EditPlaylistInfo : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapPatch("/{id}", Handle);
 
-    public record Request(
-        string? Name,
-        string? Description,
-        string? IsPublic,
-        IFormFile? File
-    );
+    public class Request
+    {
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+        public string? IsPublic { get; set; }
+        public IFormFile? File { get; set; }
+    }
 
     public record Response(
         EntityId Id,

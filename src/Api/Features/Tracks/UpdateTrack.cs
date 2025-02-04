@@ -21,7 +21,12 @@ public class UpdateTrack : IEndpoint
         }
     }
 
-    public record Request(string? Title, string? Genre, EntityId? AlbumId);
+    public class Request
+    {
+        public string? Title { get; set; }
+        public string? Genre { get; set; }
+        public EntityId? AlbumId { get; set; }
+    }
 
     public record Response(
         EntityId Id,

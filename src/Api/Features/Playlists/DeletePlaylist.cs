@@ -22,9 +22,10 @@ public class DeletePlaylist : IEndpoint
 
         var playlist = await dbContext
             .Playlists.Where(e => e.Id == id)
+            .WhereIf(!isAdmin, e => e.UserId == user.Id)
             .FirstOrDefaultAsync();
 
-        if (playlist is null || playlist.UserId != user.Id || !isAdmin)
+        if (playlist is null)
         {
             return TypedResults.BadRequest();
         }

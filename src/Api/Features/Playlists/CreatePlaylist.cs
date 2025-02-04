@@ -14,14 +14,16 @@ public class CreatePlaylist : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapPost("/", Handle);
 
-    public record Request(
-        string Name,
-        string Description,
-        bool IsPublic,
-        IFormFile? File
-    );
+    public class Request
+    {
+        public string Name { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public bool IsPublic { get; set; }
+        public IFormFile? File { get; set; }
+    }
 
     public record Response(
+        EntityId Id,
         string Name,
         string Description,
         bool IsPublic,
@@ -60,6 +62,7 @@ public class CreatePlaylist : IEndpoint
 
         return TypedResults.Ok(
             new Response(
+                playlist.Id,
                 playlist.Name,
                 playlist.Description,
                 playlist.IsPublic,

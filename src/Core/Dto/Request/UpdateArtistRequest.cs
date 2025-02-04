@@ -2,8 +2,9 @@
 
 namespace Muzonia.Core.Dto.Request;
 
-public record UpdateArtistRequest(
-    string? Name,
-    string? Description,
-    IFormFile? File
-);
+public class UpdateArtistRequest
+{
+    public string? Name { get; set; }
+    public string? Description { get; set; }
+    public IFormFile? File { get; set; }
+}

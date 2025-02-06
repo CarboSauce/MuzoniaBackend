@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Muzonia.Core.Dto.Request;
 using Muzonia.Core.Dto.Response;
 using Muzonia.Core.Services.Api;
@@ -17,7 +18,7 @@ public class EditUserInfo : IEndpoint
     private static async Task<Results<Ok<UserResponse>, BadRequest>> Handle(
         HttpContext context,
         UserService userService,
-        EditUserRequest request
+        [FromForm] EditUserRequest request
     )
     {
         var user = await userService.EditUserInfo(request);

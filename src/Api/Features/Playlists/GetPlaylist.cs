@@ -26,12 +26,13 @@ public class GetPlaylist : IEndpoint
         UserService userService
     )
     {
-        var user = await userService.GetUser();
+        var (user, isAdmin) = await userService.CurrentUser();
 
         var playlist = await dbContext
             .Playlists.Where(e =>
                 e.Id == id //&& (e.UserId == userId || e.IsPublic)
             )
+            .WhereIf(!isAdmin, e => e.UserId == user.Id || e.IsPublic)
             .Select(e => new Response(
                 e.Name,
                 e.Description,
@@ -43,11 +44,7 @@ public class GetPlaylist : IEndpoint
             ))
             .FirstOrDefaultAsync();
 
-        if (
-            playlist is null
-            || playlist.UserId != user.Id
-            || await userService.IsNotAdmin(user)
-        )
+        if (playlist is null)
         {
             return TypedResults.BadRequest();
         }

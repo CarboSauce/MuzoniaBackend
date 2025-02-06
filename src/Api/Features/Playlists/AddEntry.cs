@@ -45,7 +45,7 @@ public class AddEntry : IEndpoint
         {
             PlaylistId = id,
             TrackId = trackId,
-            Index = playlist.TrackCount + 1,
+            Index = playlist.TrackCount,
         };
 
         dbContext.PlaylistTracks.Add(entry);

@@ -22,7 +22,11 @@ public class EditAlbum : IEndpoint
         }
     }
 
-    public record Request(string? Title, IFormFile? File);
+    public class Request
+    {
+        public string? Title { get; set; }
+        public IFormFile? File { get; set; }
+    };
 
     public record Response(
         EntityId Id,

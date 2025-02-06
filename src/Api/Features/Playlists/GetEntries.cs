@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Muzonia.Api.Common;
+using Muzonia.Core.Services.Api;
 
 namespace Muzonia.Api.Features.Playlists;
 
@@ -35,13 +36,13 @@ public class GetEntries : IEndpoint
     private static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
         EntityId id,
         ApiDbContext dbContext,
-        HttpContext context
+        UserService userService
     )
     {
-        var userId = context.GetUserId();
+        var (user, isAdmin) = await userService.CurrentUser();
 
         var playlist = await dbContext.Playlists.AnyAsync(e =>
-            e.Id == id && (e.UserId == userId || e.IsPublic)
+            e.Id == id && (e.UserId == user.Id || e.IsPublic)
         );
 
         if (playlist is false)
@@ -51,6 +52,10 @@ public class GetEntries : IEndpoint
 
         var tracks = await dbContext
             .PlaylistTracks.Where(e => e.PlaylistId == id)
+            .WhereIf(
+                !isAdmin,
+                e => e.Playlist.UserId == user.Id || e.Playlist.IsPublic
+            )
             .Select(e => new Response(
                 e.Id,
                 e.CreationDate,

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Muzonia.DbEf.Entities;
 
 namespace Muzonia.Api.Features.Account;
@@ -11,14 +12,14 @@ public class ConfirmEmail : IEndpoint
             .WithName("ConfirmEmail")
             .WithDescription("Confirm email");
 
+    public record Request(EntityId UserId, string Token);
+
     private static async Task<
         Results<Created, BadRequest<IEnumerable<IdentityError>>>
-    > Handle(
-        SignInManager<AppUser> signInManager,
-        EntityId userId,
-        string token
-    )
+    > Handle(SignInManager<AppUser> signInManager, [FromBody] Request req)
     {
+        var (userId, token) = req;
+
         var user = await signInManager.UserManager.FindByIdAsync(
             userId.ToString()
         );

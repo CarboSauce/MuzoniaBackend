@@ -13,6 +13,7 @@ public static class MapArtists
         endpoints
             .MapAuthorizedGroup()
             .MapEndpoint<CreateArtist>()
+            .MapEndpoint<CreateArtistForUser>()
             .MapEndpoint<DeleteArtist>()
             .MapEndpoint<GetArtist>()
             .MapEndpoint<GetArtistAlbums>()

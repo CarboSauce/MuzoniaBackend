@@ -62,8 +62,7 @@ internal static class Auth
             })
             .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<ApiDbContext>()
-            .AddSignInManager()
-            .AddDefaultTokenProviders();
+            .AddSignInManager();
 
         return services;
     }

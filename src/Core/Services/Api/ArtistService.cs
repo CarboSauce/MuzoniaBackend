@@ -21,7 +21,10 @@ public class ArtistService(
     IFileWriter fileWriter
 ) : ITransient
 {
-    public async Task<ArtistResponse> CreateArtist(CreateArtistRequest request)
+    public async Task<ArtistResponse> CreateArtist(
+        EntityId userId,
+        CreateArtistRequest request
+    )
     {
         var user = await userManager.GetUserAsync(claims);
 
@@ -32,9 +35,7 @@ public class ArtistService(
 
         await EnsureUniqueName(request);
 
-        var targetUser = await userManager.FindByIdAsync(
-            request.UserId.ToString()
-        );
+        var targetUser = await userManager.FindByIdAsync(userId.ToString());
 
         if (targetUser is null)
         {
@@ -56,7 +57,7 @@ public class ArtistService(
 
         var artist = new Artist
         {
-            UserId = request.UserId,
+            UserId = userId,
             Name = request.Name,
             Description = request.Description,
             ImageUri = fileUri,
@@ -121,19 +122,6 @@ public class ArtistService(
 
         return new(artist);
     }
-
-    // public async Task DeleteArtist(Guid id)
-    // {
-    //     var artist = await dbContext.Artists.FindAsync(id);
-    //
-    //     if (artist is null)
-    //     {
-    //         throw new NotFoundException("Artist not found");
-    //     }
-    //
-    //     dbContext.Artists.Remove(artist);
-    //     await dbContext.SaveChangesAsync();
-    // }
 
     internal async Task<bool> IsUserArtist(Guid userId, Guid[] artistId) =>
         await dbContext

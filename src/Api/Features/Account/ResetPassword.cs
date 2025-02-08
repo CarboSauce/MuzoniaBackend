@@ -9,16 +9,13 @@ public class ResetPassword : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapPost("/resetPassword", Handle);
 
+    public record Request(EntityId UserId, string Token, string NewPassword);
+
     private static async Task<
         Results<Ok, NotFound, BadRequest<IEnumerable<IdentityError>>>
-    > Handle(
-        EntityId userId,
-        string token,
-        string newPassword,
-        UserManager<AppUser> userManager
-    )
+    > Handle(Request req, UserManager<AppUser> userManager)
     {
-        var user = await userManager.FindByIdAsync(userId.ToString());
+        var user = await userManager.FindByIdAsync(req.UserId.ToString());
         if (user is null)
         {
             return TypedResults.NotFound();
@@ -26,8 +23,8 @@ public class ResetPassword : IEndpoint
 
         var result = await userManager.ResetPasswordAsync(
             user,
-            token,
-            newPassword
+            req.Token,
+            req.NewPassword
         );
 
         if (!result.Succeeded)

@@ -10,6 +10,7 @@ public sealed class AppUser : IdentityUser<EntityId>
     public DateTime CreationDate { get; set; }
 
     public ICollection<Playlist> Playlists { get; } = null!;
+    public ICollection<Device> Devices { get; } = null!;
     public Artist? Artist { get; set; }
 
     public AppUser()
@@ -26,5 +27,6 @@ public class AppUserConfig : IEntityTypeConfiguration<AppUser>
     {
         builder.HasOne(e => e.Artist).WithOne(e => e.User);
         builder.HasMany(e => e.Playlists).WithOne(e => e.User);
+        builder.HasMany(e => e.Devices).WithOne(e => e.User);
     }
 }

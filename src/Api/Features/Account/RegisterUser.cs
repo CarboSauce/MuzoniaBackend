@@ -73,7 +73,7 @@ public class RegisterUser : IEndpoint
             var callbackUri = new UriBuilder($"{config.ClientUrl}")
             {
                 Path = config.ConfirmEmailEndpoint,
-                Query = $"token={token}&userId={user.Id}",
+                Query = $"token={Uri.EscapeDataString(token)}&userId={user.Id}",
             };
 
             await email.SendEmailAsync(

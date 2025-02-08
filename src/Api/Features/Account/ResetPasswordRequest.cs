@@ -49,7 +49,7 @@ public class ResetPasswordRequest : IEndpoint
         var callbackUri = new UriBuilder($"{config.ClientUrl}")
         {
             Path = config.ForgotPasswordEndpoint,
-            Query = $"token={token}&userId={user.Id}",
+            Query = $"token={Uri.EscapeDataString(token)}&userId={user.Id}",
         };
 
         await email.SendEmailAsync(

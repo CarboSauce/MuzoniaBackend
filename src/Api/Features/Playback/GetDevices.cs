@@ -9,7 +9,7 @@ public class GetDevices : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapGet("/devices", Handle);
 
-    public record Response(EntityId Id, string Name);
+    public record Response(EntityId Id, string Name, string ConnectionId);
 
     private static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
         ApiDbContext dbContext,
@@ -20,7 +20,7 @@ public class GetDevices : IEndpoint
 
         var result = await dbContext
             .Devices.Where(e => e.UserId == user.Id)
-            .Select(e => new Response(e.Id, e.Name))
+            .Select(e => new Response(e.Id, e.Name, e.ConnectionId))
             .ToArrayAsync();
 
         return TypedResults.Ok(result);

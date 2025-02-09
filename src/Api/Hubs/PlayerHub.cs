@@ -48,10 +48,9 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
         {
             await dbContext.SaveChangesAsync();
         }
-        catch (UniqueConstraintException ex)
+        catch (DbUpdateException ex)
         {
             logger.LogWarning(
-                ex,
                 "User({userId}) already has a playback queue",
                 userId
             );
@@ -266,6 +265,49 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
         await Clients
             .GroupExcept(UserIdentifier, ConnectionId)
             .SendAsync("EntryRemoved", new { entryId });
+    }
+
+    public async Task PermuteQueue(int[] newIndices)
+    {
+        var userId = UserId;
+
+        var queue = await dbContext
+            .PlaybackQueues.Where(p => p.Id == userId)
+            .FirstOrDefaultAsync();
+
+        if (queue is null)
+        {
+            throw new HubException("User does not have a playback queue");
+        }
+
+        var entries = await dbContext
+            .QueueEntries.Where(e => e.QueueId == queue.Id)
+            .OrderBy(e => e.Id)
+            .ToListAsync();
+
+        if (entries.Count != newIndices.Length)
+        {
+            throw new HubException("Invalid permutation length");
+        }
+
+        if (!newIndices.All(i => i >= 0 && i < entries.Count))
+        {
+            throw new HubException("Invalid permutation indexes");
+        }
+
+        for (var i = 0; i < entries.Count; i++)
+        {
+            entries[i].Index = newIndices[i];
+        }
+
+        await dbContext.SaveChangesAsync();
+
+        await Clients
+            .GroupExcept(UserIdentifier, ConnectionId)
+            .SendAsync(
+                "QueuePermuted",
+                entries.Select(e => new { e.Id, e.Index })
+            );
     }
 
     public async Task CleanPlay(EntityId[] trackIds)

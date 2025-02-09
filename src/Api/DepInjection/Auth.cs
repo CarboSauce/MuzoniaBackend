@@ -21,6 +21,8 @@ internal static class Auth
                 IdentityConstants.ApplicationScheme,
                 o =>
                 {
+                    o.Cookie.SameSite = SameSiteMode.None;
+                    o.Cookie.Name = "MuzoniaAuth";
                     o.Events.OnRedirectToLogin = context =>
                     {
                         context.Response.StatusCode = 401;

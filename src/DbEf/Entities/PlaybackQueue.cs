@@ -17,7 +17,6 @@ public class PlaybackQueue : Entity
     public required bool IsPublic { get; set; }
     public required bool IsModifiable { get; set; }
     public required bool IsRepeat { get; set; }
-    public required int Volume { get; set; }
     public required bool IsPlaying { get; set; }
     public required bool IsRandom { get; set; }
     public required int CurrentIndex { get; set; }

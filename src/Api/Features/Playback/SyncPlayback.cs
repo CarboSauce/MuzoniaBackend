@@ -12,7 +12,6 @@ public class SyncPlayback : IEndpoint
     public record Request(
         int CurrentIndex,
         int Timestamp,
-        int Volume,
         bool IsPlaying,
         bool IsRepeat,
         bool IsRandom
@@ -33,7 +32,6 @@ public class SyncPlayback : IEndpoint
             .ExecuteUpdateAsync(s =>
                 s.SetProperty(e => e.CurrentIndex, req.CurrentIndex)
                     .SetProperty(e => e.Timestamp, req.Timestamp)
-                    .SetProperty(e => e.Volume, req.Volume)
                     .SetProperty(e => e.IsPlaying, req.IsPlaying)
                     .SetProperty(e => e.IsRepeat, req.IsRepeat)
                     .SetProperty(e => e.IsRandom, req.IsRandom)

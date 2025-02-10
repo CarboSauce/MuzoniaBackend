@@ -68,32 +68,6 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
         );
     }
 
-    // public async Task SetVolume(int volume, int timestamp)
-    // {
-    //     var userId = UserId;
-    //
-    //     if (volume is < 0 or > 100)
-    //     {
-    //         throw new HubException("Volume must be between 0 and 100");
-    //     }
-    //
-    //     var queueId = await EnsureUserCanModifyQueue(userId);
-    //
-    //     await dbContext
-    //         .PlaybackQueues.Where(p => p.Id == queueId)
-    //         .ExecuteUpdateAsync(p =>
-    //             p.SetProperty(q => q.Volume, volume)
-    //                 .SetProperty(q => q.Timestamp, timestamp)
-    //         );
-    //
-    //     await SendToGroupExcept(
-    //         queueId,
-    //         ConnectionId,
-    //         "Volume",
-    //         new { volume, timestamp }
-    //     );
-    // }
-
     public async Task Seek(int position)
     {
         var userId = UserId;

@@ -19,7 +19,6 @@ public class CreateQueueForUser : IEndpoint
         {
             OwnerId = user.Id,
             IsRepeat = false,
-            Volume = 50,
             IsPlaying = false,
             IsRandom = false,
             CurrentIndex = 0,

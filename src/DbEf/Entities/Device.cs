@@ -19,7 +19,5 @@ public sealed class DeviceConfig : IEntityTypeConfiguration<Device>
         builder.HasIndex(e => e.ConnectionId).IsUnique();
         builder.Property(e => e.ConnectionId).HasMaxLength(256);
         builder.Property(e => e.Name).HasMaxLength(256);
-        builder.HasOne(e => e.PlaybackQueue).WithOne(e => e.Device);
-        builder.HasOne(e => e.User).WithMany(e => e.Devices);
     }
 }

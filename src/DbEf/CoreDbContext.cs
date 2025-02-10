@@ -21,7 +21,8 @@ public class ApiDbContext(DbContextOptions<ApiDbContext> options)
     public DbSet<PlaylistTrack> PlaylistTracks { get; set; } = null!;
     public DbSet<QueueEntry> QueueEntries { get; set; } = null!;
     public DbSet<PlaybackQueue> PlaybackQueues { get; set; } = null!;
-    public DbSet<Device> Devices { get; set; } = null!;
+    public DbSet<QueueUser> QueueUsers { get; set; } = null!;
+    public DbSet<CurrentQueue> CurrentQueues { get; set; } = null!;
 
     public static readonly EntityId AdminRoleId = EntityId.Parse(
         "85deccaa-119d-4d43-abbc-c92f76bc22be"

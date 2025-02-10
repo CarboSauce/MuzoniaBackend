@@ -12,10 +12,10 @@ public enum RepeatMode
 
 public class PlaybackQueue : Entity
 {
-    public required EntityId UserId { get; set; }
-    public required EntityId? DeviceId { get; set; }
-    public Device? Device { get; } = null!;
-    public AppUser User { get; set; } = null!;
+    public required EntityId OwnerId { get; set; }
+    public AppUser Owner { get; set; } = null!;
+    public required bool IsPublic { get; set; }
+    public required bool IsModifiable { get; set; }
     public required bool IsRepeat { get; set; }
     public required int Volume { get; set; }
     public required bool IsPlaying { get; set; }
@@ -24,6 +24,7 @@ public class PlaybackQueue : Entity
     public required int TrackCount { get; set; }
     public required int Timestamp { get; set; }
     public virtual ICollection<QueueEntry> Entries { get; } = null!;
+    public ICollection<QueueUser> QueueUsers { get; } = null!;
 }
 
 public class UserQueueConfig : IEntityTypeConfiguration<PlaybackQueue>
@@ -32,7 +33,7 @@ public class UserQueueConfig : IEntityTypeConfiguration<PlaybackQueue>
     {
         builder.HasKey(e => e.Id);
         builder.HasMany(e => e.Entries).WithOne(e => e.Queue);
-        builder.Property(e => e.DeviceId).HasMaxLength(256);
-        builder.HasOne(e => e.Device).WithOne(e => e.PlaybackQueue);
+        builder.HasOne(e => e.Owner).WithOne(e => e.Queue);
+        builder.HasIndex(e => e.OwnerId).IsUnique();
     }
 }

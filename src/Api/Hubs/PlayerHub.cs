@@ -15,6 +15,8 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
     private string UserIdentifier => Context.UserIdentifier!;
     private string ConnectionId => Context.ConnectionId;
 
+    private static readonly ConnectionMapping<string> UserMapping = new();
+
     public override async Task OnConnectedAsync()
     {
         var clientId = Context.ConnectionId;
@@ -26,68 +28,21 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
             userId
         );
 
-        await Groups.AddToGroupAsync(Context.ConnectionId, userId);
+        UserMapping.Add(userId, clientId);
 
-        dbContext.PlaybackQueues.Add(
-            new PlaybackQueue
-            {
-                Id = UserId,
-                DeviceId = null,
-                UserId = UserId,
-                IsRepeat = false,
-                Volume = 50,
-                IsPlaying = false,
-                IsRandom = false,
-                CurrentIndex = 0,
-                TrackCount = 0,
-                Timestamp = 0,
-            }
-        );
+        var queueId = await dbContext
+            .CurrentQueues.Where(c => c.UserId == UserId)
+            .Select(c => c.QueueId)
+            .FirstOrDefaultAsync();
 
-        try
-        {
-            await dbContext.SaveChangesAsync();
-        }
-        catch (DbUpdateException ex)
-        {
-            logger.LogWarning(
-                "User({userId}) already has a playback queue",
-                userId
-            );
-        }
+        await Groups.AddToGroupAsync(clientId, queueId.ToString());
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        var connectionId = Context.ConnectionId;
-        var userId = UserId;
+        logger.LogInformation("Client {clientId} disconnected", ConnectionId);
 
-        var device = await dbContext
-            .Devices.Where(d => d.Id == userId)
-            .FirstOrDefaultAsync();
-
-        if (device is not null)
-        {
-            logger.LogInformation(
-                "User({userId}) with connection({connectionId}) disconnected from {deviceName}",
-                Context.UserIdentifier,
-                Context.ConnectionId,
-                device.Name
-            );
-
-            await Clients
-                .GroupExcept(UserIdentifier, connectionId)
-                .SendAsync(
-                    "DeviceLeft",
-                    new { Id = device.Id, Name = device.Name, }
-                );
-
-            await Groups.RemoveFromGroupAsync(connectionId, UserIdentifier);
-
-            dbContext.Remove(device);
-
-            await dbContext.SaveChangesAsync();
-        }
+        UserMapping.Remove(UserIdentifier, ConnectionId);
 
         await base.OnDisconnectedAsync(exception);
     }
@@ -96,58 +51,47 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
     {
         var userId = UserId;
 
+        var queueId = await EnsureUserCanModifyQueue(userId);
+
         await dbContext
-            .PlaybackQueues.Where(p => p.Id == userId)
+            .PlaybackQueues.Where(p => p.Id == queueId)
             .ExecuteUpdateAsync(p =>
                 p.SetProperty(q => q.IsPlaying, isPlaying)
+                    .SetProperty(q => q.Timestamp, timestamp)
             );
 
-        await Clients
-            .GroupExcept(UserIdentifier, ConnectionId)
-            .SendAsync("IsPlaying", new { isPlaying, timestamp });
+        await SendToGroupExcept(
+            queueId,
+            ConnectionId,
+            "IsPlaying",
+            new { isPlaying, timestamp }
+        );
     }
 
-    public async Task SetVolume(int volume, int timestamp)
-    {
-        var userId = UserId;
-
-        if (volume is < 0 or > 100)
-        {
-            throw new HubException("Volume must be between 0 and 100");
-        }
-
-        await dbContext
-            .PlaybackQueues.Where(p => p.Id == userId)
-            .ExecuteUpdateAsync(p => p.SetProperty(q => q.Volume, volume));
-
-        await Clients
-            .GroupExcept(UserIdentifier, ConnectionId)
-            .SendAsync("Volume", new { volume, timestamp });
-    }
-
-    public async Task SelectDevice(EntityId deviceId, int timestamp)
-    {
-        var userId = UserId;
-
-        await dbContext
-            .PlaybackQueues.Where(p => p.Id == userId)
-            .ExecuteUpdateAsync(p => p.SetProperty(q => q.DeviceId, deviceId));
-
-        await Clients
-            .GroupExcept(UserIdentifier, ConnectionId)
-            .SendAsync("DeviceSelected", new { deviceId, timestamp });
-    }
-
-    // public async Task GetDevices()
+    // public async Task SetVolume(int volume, int timestamp)
     // {
     //     var userId = UserId;
     //
-    //     var devices = await dbContext
-    //         .Devices.Where(d => d.UserId == userId)
-    //         .Select(d => new { d.Id, d.Name })
-    //         .ToArrayAsync();
+    //     if (volume is < 0 or > 100)
+    //     {
+    //         throw new HubException("Volume must be between 0 and 100");
+    //     }
     //
-    //     await Clients.Group(UserIdentifier).SendAsync("Devices", devices);
+    //     var queueId = await EnsureUserCanModifyQueue(userId);
+    //
+    //     await dbContext
+    //         .PlaybackQueues.Where(p => p.Id == queueId)
+    //         .ExecuteUpdateAsync(p =>
+    //             p.SetProperty(q => q.Volume, volume)
+    //                 .SetProperty(q => q.Timestamp, timestamp)
+    //         );
+    //
+    //     await SendToGroupExcept(
+    //         queueId,
+    //         ConnectionId,
+    //         "Volume",
+    //         new { volume, timestamp }
+    //     );
     // }
 
     public async Task Seek(int position)
@@ -161,62 +105,83 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
             );
         }
 
+        var queueId = await EnsureUserCanModifyQueue(userId);
+
         await dbContext
-            .PlaybackQueues.Where(p => p.Id == userId)
+            .PlaybackQueues.Where(p => p.Id == queueId)
             .ExecuteUpdateAsync(p => p.SetProperty(q => q.Timestamp, position));
 
-        await Clients
-            .GroupExcept(UserIdentifier, ConnectionId)
-            .SendAsync("Seek", new { position });
+        await SendToGroupExcept(
+            queueId,
+            ConnectionId,
+            "Seek",
+            new { position }
+        );
     }
 
     public async Task Sync(int timestamp)
     {
         var userId = UserId;
 
+        var queueId = await EnsureUserCanModifyQueue(userId);
+
         await dbContext
-            .PlaybackQueues.Where(p => p.Id == userId)
+            .PlaybackQueues.Where(p => p.Id == queueId)
             .ExecuteUpdateAsync(p =>
                 p.SetProperty(q => q.Timestamp, timestamp)
             );
 
-        await Clients
-            .GroupExcept(UserIdentifier, ConnectionId)
-            .SendAsync("Sync", new { timestamp });
+        await SendToGroupExcept(
+            queueId,
+            ConnectionId,
+            "Sync",
+            new { timestamp }
+        );
     }
 
     public async Task SetIsRepeat(bool isRepeat)
     {
         var userId = UserId;
 
+        var queueId = await EnsureUserCanModifyQueue(userId);
+
         await dbContext
-            .PlaybackQueues.Where(p => p.Id == userId)
+            .PlaybackQueues.Where(p => p.Id == queueId)
             .ExecuteUpdateAsync(p => p.SetProperty(q => q.IsRepeat, isRepeat));
 
-        await Clients
-            .GroupExcept(UserIdentifier, ConnectionId)
-            .SendAsync("IsRepeat", new { isRepeat });
+        await SendToGroupExcept(
+            queueId,
+            ConnectionId,
+            "IsRepeat",
+            new { isRepeat }
+        );
     }
 
     public async Task SetIsRandom(bool isRandom)
     {
         var userId = UserId;
 
+        var queueId = await EnsureUserCanModifyQueue(userId);
         await dbContext
-            .PlaybackQueues.Where(p => p.Id == userId)
+            .PlaybackQueues.Where(p => p.Id == queueId)
             .ExecuteUpdateAsync(p => p.SetProperty(q => q.IsRandom, isRandom));
 
-        await Clients
-            .GroupExcept(UserIdentifier, ConnectionId)
-            .SendAsync("IsRandom", new { isRandom });
+        await SendToGroupExcept(
+            queueId,
+            ConnectionId,
+            "IsRandom",
+            new { isRandom }
+        );
     }
 
     public async Task AddEntry(EntityId trackId)
     {
         var userId = UserId;
 
+        var queueId = await EnsureUserCanModifyQueue(userId);
+
         var queue = await dbContext
-            .PlaybackQueues.Where(p => p.Id == userId)
+            .PlaybackQueues.Where(p => p.Id == queueId)
             .FirstOrDefaultAsync();
 
         if (queue is null)
@@ -235,53 +200,49 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
 
         await dbContext.SaveChangesAsync();
 
-        await Clients
-            .GroupExcept(UserIdentifier, ConnectionId)
-            .SendAsync(
-                "EntryAdded",
-                new
-                {
-                    entry.Id,
-                    entry.TrackId,
-                    entry.Index,
-                    entry.QueueId
-                }
-            );
+        await SendToGroupExcept(
+            queueId,
+            ConnectionId,
+            "EntryAdded",
+            new
+            {
+                entry.Id,
+                entry.TrackId,
+                entry.Index,
+                entry.QueueId
+            }
+        );
     }
 
     public async Task RemoveEntry(EntityId entryId)
     {
         var userId = UserId;
 
+        var queueId = await EnsureUserCanModifyQueue(userId);
+
         var entry = await dbContext
-            .QueueEntries.Where(e =>
-                e.Id == entryId && e.Queue.UserId == userId
-            )
+            .QueueEntries.Where(e => e.Id == entryId)
             .ExecuteDeleteAsync();
 
         if (entry == 0)
             return;
 
-        await Clients
-            .GroupExcept(UserIdentifier, ConnectionId)
-            .SendAsync("EntryRemoved", new { entryId });
+        await SendToGroupExcept(
+            queueId,
+            ConnectionId,
+            "EntryRemoved",
+            new { entryId }
+        );
     }
 
     public async Task PermuteQueue(int[] newIndices)
     {
         var userId = UserId;
 
-        var queue = await dbContext
-            .PlaybackQueues.Where(p => p.Id == userId)
-            .FirstOrDefaultAsync();
-
-        if (queue is null)
-        {
-            throw new HubException("User does not have a playback queue");
-        }
+        var queueId = await EnsureUserCanModifyQueue(userId);
 
         var entries = await dbContext
-            .QueueEntries.Where(e => e.QueueId == queue.Id)
+            .QueueEntries.Where(e => e.QueueId == queueId)
             .OrderBy(e => e.Id)
             .ToListAsync();
 
@@ -302,26 +263,19 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
 
         await dbContext.SaveChangesAsync();
 
-        await Clients
-            .GroupExcept(UserIdentifier, ConnectionId)
-            .SendAsync(
-                "QueuePermuted",
-                entries.Select(e => new { e.Id, e.Index })
-            );
+        await SendToGroupExcept(
+            queueId,
+            ConnectionId,
+            "QueuePermuted",
+            entries.Select(e => new { e.Id, e.Index })
+        );
     }
 
     public async Task CleanPlay(EntityId[] trackIds)
     {
         var userId = UserId;
 
-        var queue = await dbContext
-            .PlaybackQueues.Where(p => p.Id == userId)
-            .FirstOrDefaultAsync();
-
-        if (queue is null)
-        {
-            throw new HubException("User does not have a playback queue");
-        }
+        var queue = await EnsureUserCanModifyQueueAndGet(userId);
 
         var entries = await dbContext
             .QueueEntries.Where(e => e.QueueId == queue.Id)
@@ -345,19 +299,22 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
 
         await dbContext.SaveChangesAsync();
 
-        await Clients
-            .GroupExcept(UserIdentifier, ConnectionId)
-            .SendAsync("CleanPlay", new { trackIds });
+        await SendToGroupExcept(
+            queue.Id,
+            ConnectionId,
+            "CleanPlay",
+            new { trackIds }
+        );
     }
 
     public async Task SetCurrentTrack(EntityId entryId)
     {
         var userId = UserId;
 
+        var queueId = await EnsureUserCanModifyQueue(userId);
+
         var entry = await dbContext
-            .QueueEntries.Where(e =>
-                e.Id == entryId && e.Queue.UserId == userId
-            )
+            .QueueEntries.Where(e => e.Id == entryId && e.QueueId == queueId)
             .FirstOrDefaultAsync();
 
         if (entry is null)
@@ -371,39 +328,23 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
                 p.SetProperty(q => q.CurrentIndex, entry.Index)
             );
 
-        await Clients
-            .GroupExcept(UserIdentifier, ConnectionId)
-            .SendAsync("CurrentTrack", new { entryId });
-    }
-
-    public async Task SetDevicePlayback(EntityId deviceId)
-    {
-        var userId = UserId;
-
-        var queue = await dbContext
-            .PlaybackQueues.Where(p => p.Id == userId)
-            .FirstOrDefaultAsync();
-
-        if (queue is null)
-        {
-            throw new HubException("User does not have a playback queue");
-        }
-
-        queue.DeviceId = deviceId;
-        await dbContext.SaveChangesAsync();
-
-        await Clients
-            .GroupExcept(UserIdentifier, ConnectionId)
-            .SendAsync("DevicePlayback", new { deviceId });
+        await SendToGroupExcept(
+            queueId,
+            ConnectionId,
+            "CurrentTrack",
+            new { entryId }
+        );
     }
 
     public async Task ReorderEntry(int newIndex, int oldIndex)
     {
         var userId = UserId;
 
+        var queueId = await EnsureUserCanModifyQueue(userId);
+
         var entry = await dbContext
             .QueueEntries.Where(e =>
-                e.Index == oldIndex && e.Queue.UserId == userId
+                e.Index == oldIndex && e.QueueId == queueId
             )
             .FirstOrDefaultAsync();
 
@@ -412,71 +353,371 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
             throw new HubException("Entry does not exist");
         }
 
-        var isMovingDown = newIndex > oldIndex;
-
-        if (isMovingDown)
+        await dbContext.UseTransactionAsync(async () =>
         {
-            await dbContext
-                .QueueEntries.Where(e =>
-                    e.QueueId == entry.QueueId
-                    && e.Index > oldIndex
-                    && e.Index <= newIndex
-                )
-                .ExecuteUpdateAsync(e =>
-                    e.SetProperty(q => q.Index, q => q.Index - 1)
+            var isMovingDown = newIndex > oldIndex;
+
+            if (isMovingDown)
+            {
+                await dbContext
+                    .QueueEntries.Where(e =>
+                        e.QueueId == entry.QueueId
+                        && e.Index > oldIndex
+                        && e.Index <= newIndex
+                    )
+                    .ExecuteUpdateAsync(e =>
+                        e.SetProperty(q => q.Index, q => q.Index - 1)
+                    );
+            }
+            else
+            {
+                await dbContext
+                    .QueueEntries.Where(e =>
+                        e.QueueId == entry.QueueId
+                        && e.Index < oldIndex
+                        && e.Index >= newIndex
+                    )
+                    .ExecuteUpdateAsync(e =>
+                        e.SetProperty(q => q.Index, q => q.Index + 1)
+                    );
+            }
+
+            entry.Index = newIndex;
+            await dbContext.SaveChangesAsync();
+        });
+
+        await SendToGroupExcept(
+            queueId,
+            ConnectionId,
+            "EntryReordered",
+            new { entryId = entry.Id, newIndex }
+        );
+    }
+
+    public async Task JoinQueue(EntityId queueId)
+    {
+        var userId = UserId;
+
+        var queue = await dbContext
+            .PlaybackQueues.Where(p => p.Id == queueId && p.IsPublic)
+            .FirstOrDefaultAsync();
+
+        if (queue is null)
+        {
+            throw new HubException("Queue does not exist or is not public");
+        }
+
+        var userQueue = await dbContext
+            .QueueUsers.Where(u => u.QueueId == queueId && u.UserId == userId)
+            .FirstOrDefaultAsync();
+
+        if (userQueue is null)
+        {
+            await dbContext.UseTransactionAsync(async () =>
+            {
+                dbContext.QueueUsers.Add(
+                    new QueueUser
+                    {
+                        QueueId = queueId,
+                        UserId = userId,
+                        IsBanned = false,
+                    }
                 );
+
+                await dbContext
+                    .CurrentQueues.Where(c => c.UserId == userId)
+                    .ExecuteUpdateAsync(c =>
+                        c.SetProperty(q => q.QueueId, queueId)
+                    );
+
+                await dbContext.SaveChangesAsync();
+            });
+        }
+        else if (userQueue.IsBanned)
+        {
+            throw new HubException("User is banned from the queue");
         }
         else
         {
-            await dbContext
-                .QueueEntries.Where(e =>
-                    e.QueueId == entry.QueueId
-                    && e.Index < oldIndex
-                    && e.Index >= newIndex
-                )
-                .ExecuteUpdateAsync(e =>
-                    e.SetProperty(q => q.Index, q => q.Index + 1)
-                );
+            throw new HubException("User is already in the queue");
         }
 
-        entry.Index = newIndex;
-        await dbContext.SaveChangesAsync();
+        var conIds = UserMapping.GetAll(userId.ToString());
+        var oldQueueId = await GetGroupId(userId);
 
-        await Clients
-            .GroupExcept(UserIdentifier, ConnectionId)
-            .SendAsync(
-                "EntriesReordered",
-                new { entryId = entry.Id, newIndex }
-            );
+        foreach (var conId in conIds)
+        {
+            await Groups.RemoveFromGroupAsync(conId, oldQueueId.ToString());
+            await Groups.AddToGroupAsync(conId, queueId.ToString());
+        }
+
+        await SendToGroup(queueId, "UserJoined", new { userId });
     }
 
-    public async Task Join(string deviceName)
+    public async Task LeaveQueue(EntityId queueId)
     {
-        var userId = UserIdentifier;
-        var connectionId = Context.ConnectionId;
+        var userId = UserId;
 
-        var newDevice = new Device
+        var userQueue = await dbContext
+            .QueueUsers.Where(u =>
+                u.QueueId == queueId
+                && u.UserId == userId
+                && u.Queue.OwnerId != userId
+            )
+            .FirstOrDefaultAsync();
+
+        if (userQueue is null)
         {
-            UserId = UserId,
-            Name = deviceName,
-            ConnectionId = connectionId,
-        };
+            throw new HubException("User is not in the queue");
+        }
 
-        dbContext.Devices.Add(newDevice);
+        var mainQueueId = await GetOwnedQueueId(userId);
+        await dbContext.UseTransactionAsync(async () =>
+        {
+            dbContext.QueueUsers.Remove(userQueue);
+
+            await dbContext
+                .CurrentQueues.Where(c => c.UserId == userId)
+                .ExecuteUpdateAsync(c =>
+                    c.SetProperty(q => q.QueueId, mainQueueId)
+                );
+
+            await dbContext.SaveChangesAsync();
+        });
+
+        var conIds = UserMapping.GetAll(userId.ToString());
+
+        await SendToGroup(queueId, "UserLeft", new { userId });
+
+        foreach (var conId in conIds)
+        {
+            await Groups.RemoveFromGroupAsync(conId, queueId.ToString());
+        }
+    }
+
+    public async Task KickUser(EntityId queueId, EntityId userId)
+    {
+        var kickerId = UserId;
+
+        var _ = await EnsureIsOwner(queueId, kickerId);
+
+        var user = await dbContext
+            .QueueUsers.Where(u =>
+                u.QueueId == queueId
+                && u.UserId == userId
+                && u.Queue.OwnerId != userId
+            )
+            .FirstOrDefaultAsync();
+
+        if (user is null)
+        {
+            throw new HubException("User is not in the queue");
+        }
+
+        var ownedQueueId = await GetOwnedQueueId(userId);
+
+        await dbContext.UseTransactionAsync(async () =>
+        {
+            await dbContext
+                .CurrentQueues.Where(c => c.UserId == userId)
+                .ExecuteUpdateAsync(c =>
+                    c.SetProperty(q => q.QueueId, ownedQueueId)
+                );
+
+            user.IsBanned = true;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var conIds = UserMapping.GetAll(userId.ToString());
+
+        await SendToGroup(queueId, "UserKicked", new { userId });
+
+        foreach (var conId in conIds)
+        {
+            await Groups.RemoveFromGroupAsync(conId, queueId.ToString());
+        }
+    }
+
+    public async Task OpenQueue()
+    {
+        var userId = UserId;
+
+        var queue = await dbContext
+            .PlaybackQueues.Where(e => e.OwnerId == userId)
+            .FirstOrDefaultAsync();
+
+        if (queue is null)
+        {
+            throw new HubException("User does not have a playback queue");
+        }
+
+        queue.IsPublic = true;
+        queue.IsModifiable = true;
         await dbContext.SaveChangesAsync();
+    }
 
-        logger.LogInformation(
-            "User({userId}) with connection({connectionId}) joined as {deviceName}",
-            userId,
-            connectionId,
-            deviceName
-        );
+    public async Task CloseQueue()
+    {
+        var userId = UserId;
 
-        await Clients
-            .GroupExcept(userId, connectionId)
-            .SendAsync(
-                "DeviceJoined",
-                new { deviceName, deviceId = newDevice.Id }
-            );
+        var queue = await dbContext
+            .PlaybackQueues.Where(e => e.OwnerId == userId)
+            .FirstOrDefaultAsync();
+
+        if (queue is null)
+        {
+            throw new HubException("User does not have a playback queue");
+        }
+
+        var userQueues = await dbContext
+            .PlaybackQueues.Where(e =>
+                dbContext.QueueUsers.Any(qc => qc.UserId == e.OwnerId)
+            )
+            .Select(e => new { queueId = e.Id, userId = e.OwnerId })
+            .ToArrayAsync();
+
+        await dbContext.UseTransactionAsync(async () =>
+        {
+            foreach (var userQueue in userQueues)
+            {
+                await dbContext
+                    .CurrentQueues.Where(c => c.UserId == userQueue.userId)
+                    .ExecuteUpdateAsync(c =>
+                        c.SetProperty(q => q.QueueId, userQueue.queueId)
+                    );
+                if (queue.OwnerId != userQueue.userId)
+                    await dbContext
+                        .QueueUsers.Where(u =>
+                            u.UserId == userQueue.userId
+                            && u.QueueId == queue.Id
+                        )
+                        .ExecuteDeleteAsync();
+            }
+
+            queue.IsPublic = false;
+            queue.IsModifiable = false;
+            await dbContext.SaveChangesAsync();
+        });
+
+        await SendToGroup(queue.Id, "QueueClosed", new { queueId = queue.Id });
+    }
+
+    private IClientProxy QueueGroupExcept(string groupName, string exceptId) =>
+        Clients.GroupExcept(groupName, exceptId);
+
+    private async Task<EntityId> GetGroupId(EntityId userId)
+    {
+        var res = await dbContext
+            .CurrentQueues.Where(c => c.UserId == userId)
+            .Select(p => p.QueueId)
+            .FirstOrDefaultAsync();
+
+        return res;
+    }
+
+    private async Task<EntityId> GetOwnedQueueId(EntityId userId)
+    {
+        var res = await dbContext
+            .PlaybackQueues.Where(p => p.OwnerId == userId)
+            .Select(p => p.Id)
+            .FirstOrDefaultAsync();
+
+        return res;
+    }
+
+    private async Task SendToGroupExcept<T>(
+        EntityId queueId,
+        string exceptId,
+        string message,
+        T value
+    )
+    {
+        await QueueGroupExcept(queueId.ToString(), exceptId)
+            .SendAsync(message, value);
+    }
+
+    private async Task SendToGroup<T>(EntityId queueId, string message, T value)
+    {
+        // var groupName = await GetGroupId(UserId);
+
+        await Clients.Group(queueId.ToString()).SendAsync(message, value);
+    }
+
+    private async Task<EntityId> EnsureUserCanModifyQueue(EntityId userId)
+    {
+        var queueId = await GetGroupId(userId);
+
+        var queue = await dbContext
+            .PlaybackQueues.Where(p => p.Id == queueId)
+            .Where(p =>
+                p.OwnerId == userId
+                || (p.IsModifiable && p.QueueUsers.Any(u => u.UserId == userId))
+            )
+            .AnyAsync();
+
+        if (!queue)
+        {
+            throw new HubException("User does not have a playback queue");
+        }
+
+        return queueId;
+    }
+
+    private async Task<PlaybackQueue> EnsureUserCanModifyQueueAndGet(
+        EntityId userId
+    )
+    {
+        var queueId = await GetGroupId(userId);
+
+        var queue = await dbContext
+            .PlaybackQueues.Where(p => p.Id == queueId)
+            .Where(p =>
+                p.OwnerId == userId
+                || (p.IsModifiable && p.QueueUsers.Any(u => u.UserId == userId))
+            )
+            .FirstOrDefaultAsync();
+
+        if (queue is null)
+        {
+            throw new HubException("User does not have a playback queue");
+        }
+
+        return queue;
+    }
+
+    private async Task<PlaybackQueue> EnsureIsOwner(
+        EntityId queueId,
+        EntityId userId
+    )
+    {
+        var queue = await dbContext
+            .PlaybackQueues.Where(p => p.Id == queueId && p.OwnerId == userId)
+            .FirstOrDefaultAsync();
+
+        if (queue is null)
+        {
+            throw new HubException("User is not the owner of the queue");
+        }
+
+        return queue;
+    }
+
+    private async Task<EntityId> EnsureUserCanAccessQueue(EntityId userId)
+    {
+        var queueId = await GetGroupId(userId);
+
+        var queue = await dbContext
+            .PlaybackQueues.Where(p => p.Id == queueId)
+            .Where(p =>
+                p.OwnerId == userId || p.QueueUsers.Any(u => u.UserId == userId)
+            )
+            .AnyAsync();
+
+        if (!queue)
+        {
+            throw new HubException("User does not have a playback queue");
+        }
+
+        return queueId;
     }
 }

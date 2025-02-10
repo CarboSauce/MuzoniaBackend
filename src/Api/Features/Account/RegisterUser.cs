@@ -36,6 +36,7 @@ public class RegisterUser : IEndpoint
     > Handle(
         [FromBody] Request request,
         SignInManager<AppUser> signInManager,
+        ApiDbContext dbContext,
         IEmail email,
         IOptions<EmailConfig> emailConfig
     )
@@ -46,10 +47,44 @@ public class RegisterUser : IEndpoint
             Email = request.Email
         };
 
-        var result = await signInManager.UserManager.CreateAsync(
-            user,
-            request.Password
-        );
+        var result = await dbContext.UseTransactionAsync(async () =>
+        {
+            var identityResult = await signInManager.UserManager.CreateAsync(
+                user,
+                request.Password
+            );
+
+            dbContext.PlaybackQueues.Add(
+                new PlaybackQueue
+                {
+                    OwnerId = user.Id,
+                    IsRepeat = false,
+                    Volume = 50,
+                    IsPlaying = false,
+                    IsRandom = false,
+                    CurrentIndex = 0,
+                    TrackCount = 0,
+                    Timestamp = 0,
+                    IsModifiable = false,
+                    IsPublic = false,
+                }
+            );
+
+            dbContext.QueueUsers.Add(
+                new QueueUser
+                {
+                    UserId = user.Id,
+                    QueueId = user.Id,
+                    IsBanned = false,
+                }
+            );
+
+            dbContext.CurrentQueues.Add(
+                new CurrentQueue { UserId = user.Id, QueueId = user.Id, }
+            );
+
+            return identityResult;
+        });
 
         if (!result.Succeeded)
         {

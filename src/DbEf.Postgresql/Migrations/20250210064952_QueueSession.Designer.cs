@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Muzonia.DbEf;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Muzonia.DbEf.Postgresql.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250210064952_QueueSession")]
+    partial class QueueSession
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -317,21 +320,6 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     b.HasIndex("ArtistId");
 
                     b.ToTable("ArtistAlbums");
-                });
-
-            modelBuilder.Entity("Muzonia.DbEf.Entities.CurrentQueue", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("QueueId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("UserId");
-
-                    b.HasIndex("QueueId");
-
-                    b.ToTable("CurrentQueues");
                 });
 
             modelBuilder.Entity("Muzonia.DbEf.Entities.Device", b =>
@@ -741,25 +729,6 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     b.Navigation("Album");
 
                     b.Navigation("Artist");
-                });
-
-            modelBuilder.Entity("Muzonia.DbEf.Entities.CurrentQueue", b =>
-                {
-                    b.HasOne("Muzonia.DbEf.Entities.PlaybackQueue", "Queue")
-                        .WithMany()
-                        .HasForeignKey("QueueId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Muzonia.DbEf.Entities.AppUser", "User")
-                        .WithOne()
-                        .HasForeignKey("Muzonia.DbEf.Entities.CurrentQueue", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Queue");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Muzonia.DbEf.Entities.Device", b =>

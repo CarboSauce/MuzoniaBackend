@@ -7,7 +7,7 @@ namespace Muzonia.Api.Features.Playback;
 public class GetEntries : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) =>
-        app.MapGet("/entries", Handle);
+        app.MapGet("/{queueId}/entries", Handle);
 
     public record Response(EntityId Id, int Index, TrackResponse Track);
 
@@ -27,6 +27,7 @@ public class GetEntries : IEndpoint
     public record ArtistResponse(EntityId Id, string Name);
 
     private static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
+        EntityId queueId,
         UserService userService,
         ApiDbContext dbContext
     )
@@ -34,7 +35,13 @@ public class GetEntries : IEndpoint
         var user = await userService.GetUser();
 
         var result = await dbContext
-            .QueueEntries.Where(e => e.Queue.UserId == user.Id)
+            .QueueEntries.Where(e =>
+                e.QueueId == queueId
+                && (
+                    e.Queue.OwnerId == user.Id
+                    || e.Queue.QueueUsers.Any(u => u.UserId == user.Id)
+                )
+            )
             .OrderBy(e => e.Index)
             .Select(e => new Response(
                 e.Id,

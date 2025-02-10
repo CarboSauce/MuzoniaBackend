@@ -10,8 +10,12 @@ public static class MapPlayback
 
         endpoints
             .MapAuthorizedGroup()
-            .MapEndpoint<GetDevices>()
+            .MapEndpoint<GetCurrentQueue>()
+            .MapEndpoint<CreateQueueForUser>()
             .MapEndpoint<GetEntries>()
-            .MapEndpoint<GetPlaybackState>();
+            .MapEndpoint<GetMyQueue>()
+            .MapEndpoint<GetQueueState>()
+            .MapEndpoint<GetUsers>()
+            .MapEndpoint<SyncPlayback>();
     }
 }

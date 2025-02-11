@@ -35,7 +35,10 @@ public class SearchAlbum : IEndpoint
         }
 
         var albums = await dbContext
-            .Albums.Where(e => EF.Functions.ILike(e.Title, $"%{name}%"))
+            .Albums.Where(e =>
+                EF.Functions.ILike(e.Title, $"%{name}%")
+                || EF.Functions.ILike(e.Owner.Name, $"%{name}%")
+            )
             .Take(50)
             .OrderBy(a => a.Id)
             .Select(e => new Response(

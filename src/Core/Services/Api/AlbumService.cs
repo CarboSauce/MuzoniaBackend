@@ -62,6 +62,11 @@ public class AlbumService(
             throw new NotFoundException("Artist not found");
         }
 
+        if (await dbContext.Albums.AnyAsync(a => a.Title == request.Name))
+        {
+            throw new BadRequestException("Album already exists");
+        }
+
         var album = new Album
         {
             OwnerId = artist.Id,

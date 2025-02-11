@@ -32,12 +32,7 @@ public class GetUserPlaylists : IEndpoint
 
         var playlistsQuery = dbContext
             .Playlists.Where(e => e.UserId == userId)
-            .WhereIf(!isAdmin || userId != user.Id, e => e.IsPublic);
-
-        // if (!isAdmin || userId != user.Id)
-        // {
-        //     playlistsQuery = playlistsQuery.Where(e => e.IsPublic);
-        // }
+            .WhereIf(!isAdmin && userId != user.Id, e => e.IsPublic);
 
         var playlists = await playlistsQuery
             .Select(e => new Response(

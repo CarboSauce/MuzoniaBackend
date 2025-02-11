@@ -105,12 +105,11 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
                 p.SetProperty(q => q.Timestamp, timestamp)
             );
 
-        await SendToGroupExcept(
-            queueId,
-            ConnectionId,
-            "Sync",
-            new { timestamp }
-        );
+        var conIds = UserMapping.GetAll(userId.ToString());
+
+        await Clients
+            .GroupExcept(queueId.ToString(), conIds)
+            .SendAsync("Sync", new { timestamp });
     }
 
     public async Task SetIsRepeat(bool isRepeat)
@@ -167,10 +166,12 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
         {
             QueueId = queue.Id,
             TrackId = trackId,
-            Index = queue.CurrentIndex,
+            Index = queue.TrackCount,
         };
 
         dbContext.QueueEntries.Add(entry);
+
+        queue.TrackCount += 1;
 
         await dbContext.SaveChangesAsync();
 
@@ -196,10 +197,42 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
 
         var entry = await dbContext
             .QueueEntries.Where(e => e.Id == entryId)
-            .ExecuteDeleteAsync();
+            .FirstOrDefaultAsync();
 
-        if (entry == 0)
-            return;
+        if (entry is null)
+        {
+            throw new HubException("Entry does not exist");
+        }
+
+        var playbackQueue = await dbContext
+            .PlaybackQueues.Where(p => p.Id == queueId)
+            .FirstOrDefaultAsync();
+
+        if (playbackQueue is null)
+        {
+            throw new HubException("Queue does not exist");
+        }
+
+        await dbContext.UseTransactionAsync(async () =>
+        {
+            await dbContext
+                .QueueEntries.Where(e =>
+                    e.QueueId == queueId && e.Index > entry.Index
+                )
+                .ExecuteUpdateAsync(e =>
+                    e.SetProperty(q => q.Index, q => q.Index - 1)
+                );
+
+            if (playbackQueue.TrackCount == entry.Index + 1)
+            {
+                playbackQueue.CurrentIndex = 0;
+            }
+            playbackQueue.TrackCount -= 1;
+
+            dbContext.QueueEntries.Remove(entry);
+
+            await dbContext.SaveChangesAsync();
+        });
 
         await SendToGroupExcept(
             queueId,
@@ -265,8 +298,9 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
             {
                 QueueId = queue.Id,
                 TrackId = trackId,
-                Index = queue.TrackCount++,
+                Index = queue.TrackCount,
             };
+            queue.TrackCount += 1;
 
             dbContext.QueueEntries.Add(entry);
         }
@@ -281,7 +315,7 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
         );
     }
 
-    public async Task SetCurrentTrack(EntityId entryId)
+    public async Task SetCurrentTrack(EntityId entryId, int timestamp)
     {
         var userId = UserId;
 
@@ -297,20 +331,21 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
         }
 
         await dbContext
-            .PlaybackQueues.Where(p => p.Id == userId)
+            .PlaybackQueues.Where(p => p.Id == queueId)
             .ExecuteUpdateAsync(p =>
                 p.SetProperty(q => q.CurrentIndex, entry.Index)
+                    .SetProperty(q => q.Timestamp, timestamp)
             );
 
         await SendToGroupExcept(
             queueId,
             ConnectionId,
             "CurrentTrack",
-            new { entryId }
+            new { entryId, timestamp }
         );
     }
 
-    public async Task ReorderEntry(int newIndex, int oldIndex)
+    public async Task ReorderEntry(int oldIndex, int newIndex)
     {
         var userId = UserId;
 
@@ -425,7 +460,12 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
             await Groups.AddToGroupAsync(conId, queueId.ToString());
         }
 
-        await SendToGroup(queueId, "UserJoined", new { userId });
+        await SendToGroupExcept(
+            queueId,
+            ConnectionId,
+            "UserJoined",
+            new { userId }
+        );
     }
 
     public async Task LeaveQueue(EntityId queueId)
@@ -461,7 +501,12 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
 
         var conIds = UserMapping.GetAll(userId.ToString());
 
-        await SendToGroup(queueId, "UserLeft", new { userId });
+        await SendToGroupExcept(
+            queueId,
+            ConnectionId,
+            "UserLeft",
+            new { userId }
+        );
 
         foreach (var conId in conIds)
         {
@@ -504,7 +549,12 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
 
         var conIds = UserMapping.GetAll(userId.ToString());
 
-        await SendToGroup(queueId, "UserKicked", new { userId });
+        await SendToGroupExcept(
+            queueId,
+            ConnectionId,
+            "UserKicked",
+            new { userId }
+        );
 
         foreach (var conId in conIds)
         {
@@ -573,7 +623,12 @@ public class PlayerHub(ILogger<PlayerHub> logger, ApiDbContext dbContext) : Hub
             await dbContext.SaveChangesAsync();
         });
 
-        await SendToGroup(queue.Id, "QueueClosed", new { queueId = queue.Id });
+        await SendToGroupExcept(
+            queue.Id,
+            ConnectionId,
+            "QueueClosed",
+            new { queueId = queue.Id }
+        );
     }
 
     private IClientProxy QueueGroupExcept(string groupName, string exceptId) =>

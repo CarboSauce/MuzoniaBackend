@@ -35,7 +35,7 @@ public class RegisterUser : IEndpoint
         Results<Ok<Response>, BadRequest<IEnumerable<IdentityError>>>
     > Handle(
         [FromBody] Request request,
-        SignInManager<AppUser> signInManager,
+        UserManager<AppUser> userManager,
         ApiDbContext dbContext,
         IEmail email,
         IOptions<EmailConfig> emailConfig
@@ -49,38 +49,40 @@ public class RegisterUser : IEndpoint
 
         var result = await dbContext.UseTransactionAsync(async () =>
         {
-            var identityResult = await signInManager.UserManager.CreateAsync(
+            var identityResult = await userManager.CreateAsync(
                 user,
                 request.Password
             );
 
-            dbContext.PlaybackQueues.Add(
-                new PlaybackQueue
-                {
-                    OwnerId = user.Id,
-                    IsRepeat = false,
-                    IsPlaying = false,
-                    IsRandom = false,
-                    CurrentIndex = 0,
-                    TrackCount = 0,
-                    Timestamp = 0,
-                    IsModifiable = false,
-                    IsPublic = false,
-                }
-            );
+            var queue = new PlaybackQueue
+            {
+                OwnerId = user.Id,
+                IsRepeat = false,
+                IsPlaying = false,
+                IsRandom = false,
+                CurrentIndex = 0,
+                TrackCount = 0,
+                Timestamp = 0,
+                IsModifiable = false,
+                IsPublic = false,
+            };
+
+            dbContext.PlaybackQueues.Add(queue);
 
             dbContext.QueueUsers.Add(
                 new QueueUser
                 {
                     UserId = user.Id,
-                    QueueId = user.Id,
+                    QueueId = queue.Id,
                     IsBanned = false,
                 }
             );
 
             dbContext.CurrentQueues.Add(
-                new CurrentQueue { UserId = user.Id, QueueId = user.Id, }
+                new CurrentQueue { UserId = user.Id, QueueId = queue.Id, }
             );
+
+            await dbContext.SaveChangesAsync();
 
             return identityResult;
         });
@@ -91,14 +93,11 @@ public class RegisterUser : IEndpoint
         }
 
         // Generate Token and send email
-        var token =
-            await signInManager.UserManager.GenerateEmailConfirmationTokenAsync(
-                user
-            );
+        var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
 
         if (email is NoopEmail)
         {
-            await signInManager.UserManager.ConfirmEmailAsync(user, token);
+            await userManager.ConfirmEmailAsync(user, token);
         }
         else
         {

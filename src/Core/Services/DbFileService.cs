@@ -43,6 +43,7 @@ public class DbFileService(ApiDbContext dbContext) : IDbFileService, IScoped
             Data = stream.GetBuffer(),
             Path = Path.Combine(uniqueId.ToString(), file.FileName),
             ContentType = file.ContentType,
+            Length = (int)stream.Length,
         };
 
         return entity;

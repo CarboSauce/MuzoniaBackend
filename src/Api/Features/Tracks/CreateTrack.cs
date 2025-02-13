@@ -35,6 +35,7 @@ public class CreateTrack : IEndpoint
         string TranscodingId
     );
 
+    [RequestSizeLimit(10_485_760)]
     private static async Task<Results<Ok<Response>, BadRequest<string>>> Handle(
         [FromForm] Request request,
         ClaimsPrincipal claims,

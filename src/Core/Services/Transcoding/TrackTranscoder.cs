@@ -24,7 +24,7 @@ public class TrackTranscoder(
         }
 
         TrackReturn result;
-        using (var stream = new MemoryStream(file.Data))
+        using (var stream = new MemoryStream(file.Data, 0, file.Length))
         {
             result = await transcoderEngine.Transcode(
                 file.Name,

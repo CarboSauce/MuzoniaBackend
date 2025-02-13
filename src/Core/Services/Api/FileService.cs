@@ -22,6 +22,7 @@ public class FileService(
             ContentType = file.ContentType,
             Name = file.FileName,
             Path = key,
+            Length = buffer.Length
         };
 
         dbContext.Files.Add(newFile);

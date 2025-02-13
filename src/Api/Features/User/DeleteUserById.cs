@@ -21,7 +21,7 @@ public class DeleteUserById : IEndpoint
     {
         var (curUser, isAdmin) = await userService.CurrentUser();
 
-        if (curUser.Id != id || !isAdmin)
+        if (curUser.Id != id && !isAdmin)
         {
             return TypedResults.Forbid();
         }

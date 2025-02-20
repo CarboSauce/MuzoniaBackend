@@ -12,6 +12,28 @@ public interface IDbFileService
     Task<FileModel> SaveFile(IFormFile file);
 }
 
+public class NoopDbFileService : IDbFileService, IScoped
+{
+    public Task<FileModel?> GetFile(EntityId id) =>
+        Task.FromResult<FileModel?>(null);
+
+    public Task<byte[]?> GetFileData(EntityId id) =>
+        Task.FromResult<byte[]?>(null);
+
+    public Task<FileModel> SaveFile(IFormFile file) =>
+        Task.FromResult(
+            new FileModel
+            {
+                Id = Guid.NewGuid(),
+                Name = "dummy",
+                Data = [],
+                Path = "dummy",
+                ContentType = "dummy",
+                Length = 0,
+            }
+        );
+}
+
 public class DbFileService(ApiDbContext dbContext) : IDbFileService, IScoped
 {
     public async Task<FileModel?> GetFile(EntityId id)

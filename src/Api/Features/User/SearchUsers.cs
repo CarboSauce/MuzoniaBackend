@@ -16,7 +16,7 @@ public class SearchUsers : IEndpoint
         Uri? Avatar
     );
 
-    private static async Task<
+    public static async Task<
         Results<Ok<Response[]>, BadRequest, ForbidHttpResult>
     > Handle(string name, HttpContext context, ApiDbContext dbContext)
     {

@@ -11,7 +11,7 @@ public class CreateAlbum : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapPost("/", Handle).WithDescription("Create album");
 
-    private static async Task<
+    public static async Task<
         Results<Ok<AlbumResponse>, BadRequest, ForbidHttpResult, NotFound>
     > Handle(
         HttpContext context,

@@ -22,7 +22,7 @@ public class SearchPlaylist : IEndpoint
 
     public record UserResponse(EntityId Id, string UserName, Uri? Avatar);
 
-    private static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
+    public static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
         string name,
         ApiDbContext dbContext,
         UserService userService

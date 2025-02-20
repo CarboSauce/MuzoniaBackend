@@ -36,7 +36,7 @@ public class CreateTrack : IEndpoint
     );
 
     [RequestSizeLimit(10_485_760)]
-    private static async Task<Results<Ok<Response>, BadRequest<string>>> Handle(
+    public static async Task<Results<Ok<Response>, BadRequest<string>>> Handle(
         [FromForm] Request request,
         ClaimsPrincipal claims,
         ApiDbContext dbContext,

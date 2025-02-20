@@ -12,7 +12,7 @@ public class ReorderEntry : IEndpoint
 
     public record Request(EntityId entryId, int oldIndex, int newIndex);
 
-    private static async Task<Results<Ok, BadRequest>> Handle(
+    public static async Task<Results<Ok, BadRequest>> Handle(
         EntityId playlistId,
         [FromBody] Request req,
         ApiDbContext dbContext,
@@ -62,7 +62,7 @@ public class ReorderEntry : IEndpoint
         return TypedResults.Ok();
     }
 
-    private static async Task ExecuteReordering(
+    public static async Task ExecuteReordering(
         EntityId playlistId,
         EntityId entryId,
         ApiDbContext dbContext,

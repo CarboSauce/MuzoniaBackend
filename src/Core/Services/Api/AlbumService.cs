@@ -16,13 +16,13 @@ namespace Muzonia.Core.Services.Api;
 public class AlbumService(
     UserManager<AppUser> userManager,
     ApiDbContext dbContext,
-    ArtistService artistService,
     IFileWriter fileWriter,
-    ClaimsPrincipal claims,
-    ILogger<AlbumService> logger
+    ClaimsPrincipal claims
 ) : ITransient
 {
-    public async Task<AlbumResponse> CreateAlbum(CreateAlbumRequest request)
+    public virtual async Task<AlbumResponse> CreateAlbum(
+        CreateAlbumRequest request
+    )
     {
         var user = await userManager.GetCurrentUser(claims);
 
@@ -93,7 +93,7 @@ public class AlbumService(
         return new(album, artists);
     }
 
-    public async Task<IEnumerable<AlbumResponse>> GetMyAlbums()
+    public virtual async Task<IEnumerable<AlbumResponse>> GetMyAlbums()
     {
         var user = await userManager.GetCurrentUser(claims);
 
@@ -108,11 +108,9 @@ public class AlbumService(
         return albums;
     }
 
-    public async Task<IEnumerable<AlbumResponse>> GetArtistAlbumsPaginate(
-        Guid artistId,
-        Guid pageId,
-        int limit
-    )
+    public virtual async Task<
+        IEnumerable<AlbumResponse>
+    > GetArtistAlbumsPaginate(Guid artistId, Guid pageId, int limit)
     {
         return await dbContext
             .Albums.Where(a => a.Artists.Any(b => b.Id == artistId))

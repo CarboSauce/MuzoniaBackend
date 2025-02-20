@@ -37,7 +37,7 @@ public class UpdateTrack : IEndpoint
         EntityId PrimaryArtistId
     );
 
-    private static async Task<Results<Ok<Response>, BadRequest<string>>> Handle(
+    public static async Task<Results<Ok<Response>, BadRequest<string>>> Handle(
         EntityId id,
         Request req,
         ApiDbContext dbContext,

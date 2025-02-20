@@ -9,7 +9,7 @@ public class GetMyAlbums : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapGet("/", Handle);
 
-    private static async Task<
+    public static async Task<
         Results<Ok<IEnumerable<AlbumResponse>>, ForbidHttpResult>
     > Handle(AlbumService albumService)
     {

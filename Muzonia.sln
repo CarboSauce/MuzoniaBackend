@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbEf", "src\DbEf\DbEf.cspro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbEf.Postgresql", "src\DbEf.Postgresql\DbEf.Postgresql.csproj", "{FF4237D7-D229-4874-8FCA-53FCBAA8DCC8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.IntegrationTest", "test\Api.IntegrationTest\Api.IntegrationTest.csproj", "{76AA3ACB-1FB2-46F3-9597-8C4D7C620433}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{FF4237D7-D229-4874-8FCA-53FCBAA8DCC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF4237D7-D229-4874-8FCA-53FCBAA8DCC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF4237D7-D229-4874-8FCA-53FCBAA8DCC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76AA3ACB-1FB2-46F3-9597-8C4D7C620433}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76AA3ACB-1FB2-46F3-9597-8C4D7C620433}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76AA3ACB-1FB2-46F3-9597-8C4D7C620433}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76AA3ACB-1FB2-46F3-9597-8C4D7C620433}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

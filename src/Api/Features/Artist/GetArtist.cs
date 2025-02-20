@@ -19,7 +19,7 @@ public class GetArtist : IEndpoint
         DateTime CreationDate
     );
 
-    private static async Task<Results<Ok<GetAristResponse>, NotFound>> Handle(
+    public static async Task<Results<Ok<GetAristResponse>, NotFound>> Handle(
         ApiDbContext dbContext,
         EntityId Id
     )

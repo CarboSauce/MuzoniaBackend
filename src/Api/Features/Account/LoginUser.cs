@@ -11,7 +11,7 @@ public class LoginUser : IEndpoint
 
     public record Request(string Username, string Password, bool RememberMe);
 
-    private static async Task<Results<Ok, UnauthorizedHttpResult>> Handle(
+    public static async Task<Results<Ok, UnauthorizedHttpResult>> Handle(
         SignInManager<AppUser> signInManager,
         Request request
     )

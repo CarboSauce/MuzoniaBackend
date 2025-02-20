@@ -1,0 +1,6 @@
+﻿{
+  "ConnectionStrings": {
+    "apidb": "Server=localhost;Port=5432;Database=muzonia_test;Username=dotnet;Password=dotnet;",
+    "hangfire": "Server=localhost;Port=5432;Database=muzonia;Username=dotnet;Password=dotnet;"
+  }
+}

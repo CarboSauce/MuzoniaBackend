@@ -31,7 +31,7 @@ public class RegisterUser : IEndpoint
         }
     }
 
-    private static async Task<
+    public static async Task<
         Results<Ok<Response>, BadRequest<IEnumerable<IdentityError>>>
     > Handle(
         [FromBody] Request request,
@@ -53,6 +53,11 @@ public class RegisterUser : IEndpoint
                 user,
                 request.Password
             );
+
+            if (!identityResult.Succeeded)
+            {
+                return identityResult;
+            }
 
             var queue = new PlaybackQueue
             {

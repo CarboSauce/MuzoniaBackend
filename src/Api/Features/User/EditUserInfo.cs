@@ -15,7 +15,7 @@ public class EditUserInfo : IEndpoint
             .WithDescription("Edit user info");
     }
 
-    private static async Task<Results<Ok<UserResponse>, BadRequest>> Handle(
+    public static async Task<Results<Ok<UserResponse>, BadRequest>> Handle(
         HttpContext context,
         UserService userService,
         [FromForm] EditUserRequest request

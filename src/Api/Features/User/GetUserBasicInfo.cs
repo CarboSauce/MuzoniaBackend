@@ -21,7 +21,7 @@ public class GetUserBasicInfo : IEndpoint
         Uri? Avatar
     );
 
-    private static async Task<Results<Ok<Response>, NotFound>> Handle(
+    public static async Task<Results<Ok<Response>, NotFound>> Handle(
         UserService userService
     )
     {

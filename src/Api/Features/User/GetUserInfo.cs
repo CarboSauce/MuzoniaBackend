@@ -24,7 +24,7 @@ public class GetUserInfo : IEndpoint
         bool IsAdmin
     );
 
-    private static async Task<Results<Ok<Response>, NotFound>> Handle(
+    public static async Task<Results<Ok<Response>, NotFound>> Handle(
         UserService userService,
         ApiDbContext dbContext
     )

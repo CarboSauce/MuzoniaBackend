@@ -9,7 +9,7 @@ public class CreateQueueForUser : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapPost("/create", Handle);
 
-    private static async Task<Results<Ok, BadRequest<string>>> Handle(
+    public static async Task<Results<Ok, BadRequest<string>>> Handle(
         ApiDbContext dbContext,
         UserService userService
     )

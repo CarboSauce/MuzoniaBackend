@@ -20,7 +20,7 @@ public class GetPlaylist : IEndpoint
         Uri? ImageUri
     );
 
-    private static async Task<Results<Ok<Response>, BadRequest>> Handle(
+    public static async Task<Results<Ok<Response>, BadRequest>> Handle(
         EntityId id,
         ApiDbContext dbContext,
         UserService userService

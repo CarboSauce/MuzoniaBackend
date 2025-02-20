@@ -11,12 +11,12 @@ public class UserService(
     ClaimsPrincipal claims
 ) : ITransient
 {
-    public Task<AppUser?> GetUserInfo()
+    public virtual Task<AppUser?> GetUserInfo()
     {
         return userManager.GetUserAsync(claims);
     }
 
-    public async Task<AppUser> GetUser()
+    public virtual async Task<AppUser> GetUser()
     {
         var user = await userManager.GetUserAsync(claims);
 
@@ -28,10 +28,10 @@ public class UserService(
         return user;
     }
 
-    public async Task<AppUser?> GetUserById(EntityId id) =>
+    public virtual async Task<AppUser?> GetUserById(EntityId id) =>
         await userManager.FindByIdAsync(id.ToString());
 
-    public async Task<(AppUser user, bool isAdmin)> CurrentUser()
+    public virtual async Task<(AppUser user, bool isAdmin)> CurrentUser()
     {
         var user = await userManager.GetUserAsync(claims);
         if (user is null)
@@ -42,17 +42,17 @@ public class UserService(
         return (user, isAdmin);
     }
 
-    public Task<bool> IsUserAdmin(AppUser user)
+    public virtual Task<bool> IsUserAdmin(AppUser user)
     {
         return userManager.IsInRoleAsync(user, "Admin");
     }
 
-    public async Task<bool> IsNotAdmin(AppUser user)
+    public virtual async Task<bool> IsNotAdmin(AppUser user)
     {
         return !await userManager.IsInRoleAsync(user, "Admin");
     }
 
-    public async Task DeleteUser()
+    public virtual async Task DeleteUser()
     {
         var user = await userManager.GetUserAsync(claims);
 
@@ -62,7 +62,7 @@ public class UserService(
         }
     }
 
-    public async Task<AppUser?> EditUserInfo(EditUserRequest request)
+    public virtual async Task<AppUser?> EditUserInfo(EditUserRequest request)
     {
         var user = await userManager.GetUserAsync(claims);
 

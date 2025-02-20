@@ -21,7 +21,7 @@ public class ArtistService(
     IFileWriter fileWriter
 ) : ITransient
 {
-    public async Task<ArtistResponse> CreateArtist(
+    public virtual async Task<ArtistResponse> CreateArtist(
         EntityId userId,
         CreateArtistRequest request
     )
@@ -69,7 +69,7 @@ public class ArtistService(
         return new(artist);
     }
 
-    public async Task<ArtistResponse?> GetMyArtist()
+    public virtual async Task<ArtistResponse?> GetMyArtist()
     {
         var user = await userManager.GetCurrentUser(claims);
 
@@ -81,13 +81,13 @@ public class ArtistService(
         return artists;
     }
 
-    public async Task<ArtistResponse?> GetArtist(AppUser user) =>
+    public virtual async Task<ArtistResponse?> GetArtist(AppUser user) =>
         await dbContext
             .Artists.Where(a => a.UserId == user.Id)
             .Select(a => new ArtistResponse(a))
             .SingleOrDefaultAsync();
 
-    public async Task<ArtistResponse> UpdateArtist(
+    public virtual async Task<ArtistResponse> UpdateArtist(
         Guid id,
         UpdateArtistRequest request
     )

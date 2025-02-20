@@ -13,7 +13,7 @@ public class RemoveEntry : IEndpoint
 
     public record Response();
 
-    private static async Task<Results<NoContent, BadRequest>> Handle(
+    public static async Task<Results<NoContent, BadRequest>> Handle(
         EntityId id,
         EntityId entryId,
         ApiDbContext dbContext,

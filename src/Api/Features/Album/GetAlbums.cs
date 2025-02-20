@@ -11,7 +11,7 @@ public class GetAlbums : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapGet("/{id}", Handle).WithDescription("Get album by id");
 
-    private static async Task<
+    public static async Task<
         Results<Ok<AlbumResponse>, UnauthorizedHttpResult>
     > Handle(EntityId id, ApiDbContext dbContext, HttpContext context)
     {

@@ -9,7 +9,7 @@ public class GetMyArtist : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapGet("/me", Handle);
 
-    private static async Task<Results<Ok<ArtistResponse>, NotFound>> Handle(
+    public static async Task<Results<Ok<ArtistResponse>, NotFound>> Handle(
         ArtistService artistService
     )
     {

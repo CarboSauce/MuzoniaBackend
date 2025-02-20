@@ -64,9 +64,7 @@ static void ConfigureExternalServices(
     WebApplicationBuilder builder
 )
 {
-    builder
-        .AddDatabase(aspireConfig, builder.Environment)
-        .AddRedis(aspireConfig);
+    builder.AddDatabase(aspireConfig, builder.Environment);
 }
 
 async Task RunServices(IServiceProvider services, IWebHostEnvironment env)
@@ -126,3 +124,5 @@ void ConfigureServices(
     services.AddSignalR();
     services.AddRouting(o => o.LowercaseUrls = true);
 }
+
+public partial class Program { }

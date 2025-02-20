@@ -7,6 +7,10 @@
     <UserSecretsId>0ebd6448-19be-49c7-a032-766e8e9b1c36</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <InternalsVisibleTo Include="Api.IntegrationTest" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Aspire.StackExchange.Redis" Version="9.0.0" />

@@ -24,7 +24,7 @@ public class GetArtistTracks : IEndpoint
 
     public record AlbumResponse(EntityId Id, string Title, Uri ImageUri);
 
-    private static async Task<Ok<Response[]>> Handle(
+    public static async Task<Ok<Response[]>> Handle(
         EntityId id,
         ApiDbContext dbContext
     )

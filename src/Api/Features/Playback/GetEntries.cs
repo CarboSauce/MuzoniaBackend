@@ -26,7 +26,7 @@ public class GetEntries : IEndpoint
 
     public record ArtistResponse(EntityId Id, string Name);
 
-    private static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
+    public static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
         EntityId queueId,
         UserService userService,
         ApiDbContext dbContext

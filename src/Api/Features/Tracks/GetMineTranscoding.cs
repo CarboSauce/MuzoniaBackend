@@ -23,7 +23,7 @@ public class GetMineTranscoding : IEndpoint
 
     public record ArtistResponse(EntityId Id, string Name);
 
-    private static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
+    public static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
         ApiDbContext dbContext,
         ArtistService artistService,
         UserService userService
@@ -38,7 +38,9 @@ public class GetMineTranscoding : IEndpoint
         }
 
         var track = await dbContext
-            .Tracks.Where(e => e.PrimaryArtistId == artist.Id && e.DataUri == null)
+            .Tracks.Where(e =>
+                e.PrimaryArtistId == artist.Id && e.DataUri == null
+            )
             .Select(e => new Response(
                 e.Title,
                 e.Genre,

@@ -19,7 +19,7 @@ public class SearchArtist : IEndpoint
         }
     }
 
-    private static async Task<
+    public static async Task<
         Results<Ok<ArtistResponse[]>, ValidationProblem, UnauthorizedHttpResult>
     > Handle(
         string name,

@@ -21,8 +21,4 @@
     <ProjectReference Include="..\DbEf\DbEf.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\Hangfire\" />
-  </ItemGroup>
-
 </Project>

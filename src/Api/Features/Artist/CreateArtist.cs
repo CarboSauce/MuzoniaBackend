@@ -11,7 +11,7 @@ public class CreateArtist : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapPost("/", Handle);
 
-    private static async Task<
+    public static async Task<
         Results<Ok<ArtistResponse>, BadRequest, ForbidHttpResult, NotFound>
     > Handle(
         ArtistService artistService,

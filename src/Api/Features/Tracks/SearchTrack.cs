@@ -24,7 +24,7 @@ public class SearchTrack : IEndpoint
 
     public record AlbumResponse(EntityId Id, string Title, Uri ImageUri);
 
-    private static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
+    public static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
         string name,
         ApiDbContext dbContext
     )

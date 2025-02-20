@@ -38,11 +38,6 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 }
             );
 
-            migrationBuilder.DropIndex(
-                name: "IX_PlaybackQueues_UserId",
-                table: "PlaybackQueues"
-            );
-
             migrationBuilder.CreateIndex(
                 name: "IX_CurrentQueues_QueueId",
                 table: "CurrentQueues",

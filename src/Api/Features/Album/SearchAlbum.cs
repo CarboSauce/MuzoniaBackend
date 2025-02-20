@@ -20,7 +20,7 @@ public class SearchAlbum : IEndpoint
         ArtistResponse[] Artists
     );
 
-    private static async Task<
+    public static async Task<
         Results<Ok<Response[]>, BadRequest, ForbidHttpResult>
     > Handle(string name, ApiDbContext dbContext, HttpContext context)
     {

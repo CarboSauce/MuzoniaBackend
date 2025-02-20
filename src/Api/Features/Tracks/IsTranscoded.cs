@@ -12,7 +12,7 @@ public class IsTranscoded : IEndpoint
 
     public record Response(bool IsFinished);
 
-    private static async Task<Results<Ok<Response>, BadRequest>> Handle(
+    public static async Task<Results<Ok<Response>, BadRequest>> Handle(
         EntityId id,
         ApiDbContext dbContext
     )

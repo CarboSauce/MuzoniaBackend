@@ -30,7 +30,7 @@ public class CreatePlaylist : IEndpoint
         Uri? ImageUri
     );
 
-    private static async Task<Results<Ok<Response>, BadRequest>> Handle(
+    public static async Task<Results<Ok<Response>, BadRequest>> Handle(
         [FromForm] Request req,
         ApiDbContext dbContext,
         IFileWriter fileWriter,

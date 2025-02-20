@@ -11,7 +11,7 @@ public class DeleteArtist : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapDelete("/{id}", Handle);
 
-    private static async Task<Results<NoContent, NotFound>> Handle(
+    public static async Task<Results<NoContent, NotFound>> Handle(
         EntityId id,
         ApiDbContext dbContext,
         UserService userService,

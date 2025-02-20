@@ -11,7 +11,7 @@ public class UpdateArtist : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapPatch("/{id}", Handle);
 
-    private static async Task<
+    public static async Task<
         Results<Ok<ArtistResponse>, BadRequest, ForbidHttpResult, NotFound>
     > Handle(
         Guid id,

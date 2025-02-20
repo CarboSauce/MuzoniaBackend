@@ -23,7 +23,7 @@ public class ResetPasswordRequest : IEndpoint
         }
     }
 
-    private static async Task<IResult> Handle(
+    public static async Task<IResult> Handle(
         Request req,
         UserManager<AppUser> userManager,
         IEmail email,

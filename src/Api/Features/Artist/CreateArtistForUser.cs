@@ -13,7 +13,7 @@ public class CreateArtistForUser : IEndpoint
         app.MapPost("/{userId}", Handle);
 
     [Authorize(Roles = "Admin")]
-    private static async Task<
+    public static async Task<
         Results<Ok<ArtistResponse>, BadRequest, ForbidHttpResult, NotFound>
     > Handle(
         ArtistService artistService,

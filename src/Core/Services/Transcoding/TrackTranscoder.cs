@@ -9,6 +9,12 @@ public interface ITrackTranscoder
     Task Transcode(EntityId trackId, EntityId fileId);
 }
 
+public class NoopTranscoder : ITrackTranscoder, IScoped
+{
+    public Task Transcode(EntityId trackId, EntityId fileId) =>
+        Task.CompletedTask;
+}
+
 public class TrackTranscoder(
     ITrackTranscoderEngine transcoderEngine,
     ApiDbContext dbContext

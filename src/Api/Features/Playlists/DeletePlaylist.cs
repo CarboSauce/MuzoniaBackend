@@ -12,7 +12,7 @@ public class DeletePlaylist : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapDelete("/{id}", Handle);
 
-    private static async Task<Results<NoContent, BadRequest>> Handle(
+    public static async Task<Results<NoContent, BadRequest>> Handle(
         EntityId id,
         ApiDbContext dbContext,
         UserService userService

@@ -11,7 +11,7 @@ public class DeleteUserById : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapDelete("/{id}", Handle);
 
-    private static async Task<
+    public static async Task<
         Results<NoContent, NotFound, ForbidHttpResult>
     > Handle(
         EntityId id,

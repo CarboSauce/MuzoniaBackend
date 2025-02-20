@@ -11,7 +11,7 @@ public class ResetPassword : IEndpoint
 
     public record Request(EntityId UserId, string Token, string NewPassword);
 
-    private static async Task<
+    public static async Task<
         Results<Ok, NotFound, BadRequest<IEnumerable<IdentityError>>>
     > Handle(Request req, UserManager<AppUser> userManager)
     {

@@ -28,7 +28,7 @@ public class GetQueueState : IEndpoint
 
     public record UserResponse(EntityId Id, string Username, Uri? Avatar);
 
-    private static async Task<Results<Ok<Response>, BadRequest>> Handle(
+    public static async Task<Results<Ok<Response>, BadRequest>> Handle(
         EntityId queueId,
         ApiDbContext dbContext,
         UserService userService

@@ -18,6 +18,15 @@ public interface ITranscodingService
     Task<TranscodingState> Poll(TranscodeId id);
 }
 
+public class NoopTranscodingService : ITranscodingService, ISingleton
+{
+    public Task<TranscodeId> Enqueue(EntityId trackId, EntityId fileId) =>
+        Task.FromResult(TranscodeId.Empty);
+
+    public Task<TranscodingState> Poll(TranscodeId id) =>
+        Task.FromResult(TranscodingState.Completed);
+}
+
 public class HangfireTranscoder(IBackgroundJobClient client)
     : ITranscodingService,
         ISingleton

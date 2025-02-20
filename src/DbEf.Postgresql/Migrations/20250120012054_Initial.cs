@@ -19,67 +19,162 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
+                    Name = table.Column<string>(
+                        type: "character varying(256)",
+                        maxLength: 256,
+                        nullable: true
+                    ),
+                    NormalizedName = table.Column<string>(
+                        type: "character varying(256)",
+                        maxLength: 256,
+                        nullable: true
+                    ),
+                    ConcurrencyStamp = table.Column<string>(
+                        type: "text",
+                        nullable: true
+                    )
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    AvatarUri = table.Column<string>(type: "text", nullable: true),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    PasswordHash = table.Column<string>(type: "text", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
+                    AvatarUri = table.Column<string>(
+                        type: "text",
+                        nullable: true
+                    ),
+                    CreationDate = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    ),
+                    UserName = table.Column<string>(
+                        type: "character varying(256)",
+                        maxLength: 256,
+                        nullable: true
+                    ),
+                    NormalizedUserName = table.Column<string>(
+                        type: "character varying(256)",
+                        maxLength: 256,
+                        nullable: true
+                    ),
+                    Email = table.Column<string>(
+                        type: "character varying(256)",
+                        maxLength: 256,
+                        nullable: true
+                    ),
+                    NormalizedEmail = table.Column<string>(
+                        type: "character varying(256)",
+                        maxLength: 256,
+                        nullable: true
+                    ),
+                    EmailConfirmed = table.Column<bool>(
+                        type: "boolean",
+                        nullable: false
+                    ),
+                    PasswordHash = table.Column<string>(
+                        type: "text",
+                        nullable: true
+                    ),
+                    SecurityStamp = table.Column<string>(
+                        type: "text",
+                        nullable: true
+                    ),
+                    ConcurrencyStamp = table.Column<string>(
+                        type: "text",
+                        nullable: true
+                    ),
+                    PhoneNumber = table.Column<string>(
+                        type: "text",
+                        nullable: true
+                    ),
+                    PhoneNumberConfirmed = table.Column<bool>(
+                        type: "boolean",
+                        nullable: false
+                    ),
+                    TwoFactorEnabled = table.Column<bool>(
+                        type: "boolean",
+                        nullable: false
+                    ),
+                    LockoutEnd = table.Column<DateTimeOffset>(
+                        type: "timestamp with time zone",
+                        nullable: true
+                    ),
+                    LockoutEnabled = table.Column<bool>(
+                        type: "boolean",
+                        nullable: false
+                    ),
+                    AccessFailedCount = table.Column<int>(
+                        type: "integer",
+                        nullable: false
+                    )
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "Files",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Data = table.Column<byte[]>(type: "bytea", maxLength: 31457280, nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Path = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    ContentType = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
+                    Data = table.Column<byte[]>(
+                        type: "bytea",
+                        maxLength: 31457280,
+                        nullable: false
+                    ),
+                    CreationDate = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    ),
+                    Name = table.Column<string>(
+                        type: "character varying(255)",
+                        maxLength: 255,
+                        nullable: false
+                    ),
+                    Path = table.Column<string>(
+                        type: "character varying(255)",
+                        maxLength: 255,
+                        nullable: false
+                    ),
+                    ContentType = table.Column<string>(
+                        type: "character varying(255)",
+                        maxLength: 255,
+                        nullable: false
+                    )
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Files", x => x.Id);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table
+                        .Column<int>(type: "integer", nullable: false)
+                        .Annotation(
+                            "Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
+                        ),
                     RoleId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ClaimType = table.Column<string>(type: "text", nullable: true),
-                    ClaimValue = table.Column<string>(type: "text", nullable: true)
+                    ClaimType = table.Column<string>(
+                        type: "text",
+                        nullable: true
+                    ),
+                    ClaimValue = table.Column<string>(
+                        type: "text",
+                        nullable: true
+                    )
                 },
                 constraints: table =>
                 {
@@ -89,19 +184,35 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "Artists",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    Description = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
-                    ImageUri = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(
+                        type: "character varying(256)",
+                        maxLength: 256,
+                        nullable: false
+                    ),
+                    Description = table.Column<string>(
+                        type: "character varying(512)",
+                        maxLength: 512,
+                        nullable: false
+                    ),
+                    ImageUri = table.Column<string>(
+                        type: "text",
+                        nullable: false
+                    ),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreationDate = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    )
                 },
                 constraints: table =>
                 {
@@ -111,18 +222,30 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table
+                        .Column<int>(type: "integer", nullable: false)
+                        .Annotation(
+                            "Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
+                        ),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ClaimType = table.Column<string>(type: "text", nullable: true),
-                    ClaimValue = table.Column<string>(type: "text", nullable: true)
+                    ClaimType = table.Column<string>(
+                        type: "text",
+                        nullable: true
+                    ),
+                    ClaimValue = table.Column<string>(
+                        type: "text",
+                        nullable: true
+                    )
                 },
                 constraints: table =>
                 {
@@ -132,28 +255,44 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "text", nullable: false),
-                    ProviderKey = table.Column<string>(type: "text", nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
+                    LoginProvider = table.Column<string>(
+                        type: "text",
+                        nullable: false
+                    ),
+                    ProviderKey = table.Column<string>(
+                        type: "text",
+                        nullable: false
+                    ),
+                    ProviderDisplayName = table.Column<string>(
+                        type: "text",
+                        nullable: true
+                    ),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    table.PrimaryKey(
+                        "PK_AspNetUserLogins",
+                        x => new { x.LoginProvider, x.ProviderKey }
+                    );
                     table.ForeignKey(
                         name: "FK_AspNetUserLogins_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserRoles",
@@ -164,40 +303,59 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
+                    table.PrimaryKey(
+                        "PK_AspNetUserRoles",
+                        x => new { x.UserId, x.RoleId }
+                    );
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade
+                    );
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    LoginProvider = table.Column<string>(
+                        type: "text",
+                        nullable: false
+                    ),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                    table.PrimaryKey(
+                        "PK_AspNetUserTokens",
+                        x => new
+                        {
+                            x.UserId,
+                            x.LoginProvider,
+                            x.Name
+                        }
+                    );
                     table.ForeignKey(
                         name: "FK_AspNetUserTokens_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "PlaybackQueues",
@@ -205,11 +363,26 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    RepeatMode = table.Column<int>(type: "integer", nullable: false),
-                    IsRandom = table.Column<bool>(type: "boolean", nullable: false),
-                    CurrentIndex = table.Column<long>(type: "bigint", nullable: false),
-                    Timestamp = table.Column<long>(type: "bigint", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    RepeatMode = table.Column<int>(
+                        type: "integer",
+                        nullable: false
+                    ),
+                    IsRandom = table.Column<bool>(
+                        type: "boolean",
+                        nullable: false
+                    ),
+                    CurrentIndex = table.Column<long>(
+                        type: "bigint",
+                        nullable: false
+                    ),
+                    Timestamp = table.Column<long>(
+                        type: "bigint",
+                        nullable: false
+                    ),
+                    CreationDate = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    )
                 },
                 constraints: table =>
                 {
@@ -219,22 +392,47 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "Playlists",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    Description = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    IsPublic = table.Column<bool>(type: "boolean", nullable: false),
-                    ImageUri = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(
+                        type: "character varying(256)",
+                        maxLength: 256,
+                        nullable: false
+                    ),
+                    Description = table.Column<string>(
+                        type: "character varying(256)",
+                        maxLength: 256,
+                        nullable: false
+                    ),
+                    IsPublic = table.Column<bool>(
+                        type: "boolean",
+                        nullable: false
+                    ),
+                    ImageUri = table.Column<string>(
+                        type: "text",
+                        nullable: true
+                    ),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TrackCount = table.Column<int>(type: "integer", nullable: false),
-                    AppUserId = table.Column<Guid>(type: "uuid", nullable: true),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    TrackCount = table.Column<int>(
+                        type: "integer",
+                        nullable: false
+                    ),
+                    AppUserId = table.Column<Guid>(
+                        type: "uuid",
+                        nullable: true
+                    ),
+                    CreationDate = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    )
                 },
                 constraints: table =>
                 {
@@ -243,24 +441,37 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         name: "FK_Playlists_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id"
+                    );
                     table.ForeignKey(
                         name: "FK_Playlists_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "Albums",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Title = table.Column<string>(
+                        type: "character varying(256)",
+                        maxLength: 256,
+                        nullable: false
+                    ),
                     OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ImageUri = table.Column<string>(type: "text", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    ImageUri = table.Column<string>(
+                        type: "text",
+                        nullable: false
+                    ),
+                    CreationDate = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    )
                 },
                 constraints: table =>
                 {
@@ -270,45 +481,76 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         column: x => x.OwnerId,
                         principalTable: "Artists",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "ArtistAlbums",
                 columns: table => new
                 {
-                    ArtistId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArtistId = table.Column<Guid>(
+                        type: "uuid",
+                        nullable: false
+                    ),
                     AlbumId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ArtistAlbums", x => new { x.AlbumId, x.ArtistId });
+                    table.PrimaryKey(
+                        "PK_ArtistAlbums",
+                        x => new { x.AlbumId, x.ArtistId }
+                    );
                     table.ForeignKey(
                         name: "FK_ArtistAlbums_Albums_AlbumId",
                         column: x => x.AlbumId,
                         principalTable: "Albums",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade
+                    );
                     table.ForeignKey(
                         name: "FK_ArtistAlbums_Artists_ArtistId",
                         column: x => x.ArtistId,
                         principalTable: "Artists",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "Tracks",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    DataUri = table.Column<string>(type: "text", nullable: true),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Title = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    Genre = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    Duration = table.Column<long>(type: "bigint", nullable: false),
+                    DataUri = table.Column<string>(
+                        type: "text",
+                        nullable: true
+                    ),
+                    CreationDate = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    ),
+                    Title = table.Column<string>(
+                        type: "character varying(128)",
+                        maxLength: 128,
+                        nullable: false
+                    ),
+                    Genre = table.Column<string>(
+                        type: "character varying(128)",
+                        maxLength: 128,
+                        nullable: false
+                    ),
+                    Duration = table.Column<long>(
+                        type: "bigint",
+                        nullable: false
+                    ),
                     AlbumId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PrimaryArtistId = table.Column<Guid>(type: "uuid", nullable: false)
+                    PrimaryArtistId = table.Column<Guid>(
+                        type: "uuid",
+                        nullable: false
+                    )
                 },
                 constraints: table =>
                 {
@@ -318,14 +560,17 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         column: x => x.AlbumId,
                         principalTable: "Albums",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade
+                    );
                     table.ForeignKey(
                         name: "FK_Tracks_Artists_PrimaryArtistId",
                         column: x => x.PrimaryArtistId,
                         principalTable: "Artists",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "History",
@@ -334,7 +579,10 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     SongId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreationDate = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    )
                 },
                 constraints: table =>
                 {
@@ -344,24 +592,33 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade
+                    );
                     table.ForeignKey(
                         name: "FK_History_Tracks_SongId",
                         column: x => x.SongId,
                         principalTable: "Tracks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "PlaylistTracks",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    PlaylistId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PlaylistId = table.Column<Guid>(
+                        type: "uuid",
+                        nullable: false
+                    ),
                     TrackId = table.Column<Guid>(type: "uuid", nullable: false),
                     Index = table.Column<int>(type: "integer", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreationDate = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    )
                 },
                 constraints: table =>
                 {
@@ -371,14 +628,17 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         column: x => x.PlaylistId,
                         principalTable: "Playlists",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade
+                    );
                     table.ForeignKey(
                         name: "FK_PlaylistTracks_Tracks_TrackId",
                         column: x => x.TrackId,
                         principalTable: "Tracks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "QueueEntries",
@@ -397,14 +657,17 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         column: x => x.QueueId,
                         principalTable: "PlaybackQueues",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade
+                    );
                     table.ForeignKey(
                         name: "FK_QueueEntries_Tracks_SongId",
                         column: x => x.SongId,
                         principalTable: "Tracks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "TrackArtists",
@@ -415,212 +678,235 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TrackArtists", x => new { x.ArtistId, x.TrackId });
+                    table.PrimaryKey(
+                        "PK_TrackArtists",
+                        x => new { x.ArtistId, x.TrackId }
+                    );
                     table.ForeignKey(
                         name: "FK_TrackArtists_Artists_ArtistId",
                         column: x => x.ArtistId,
                         principalTable: "Artists",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade
+                    );
                     table.ForeignKey(
                         name: "FK_TrackArtists_Tracks_TrackId",
                         column: x => x.TrackId,
                         principalTable: "Tracks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                columns: new[]
+                {
+                    "Id",
+                    "ConcurrencyStamp",
+                    "Name",
+                    "NormalizedName"
+                },
                 values: new object[,]
                 {
-                    { new Guid("85deccaa-119d-4d43-abbc-c92f76bc22be"), "1", "Admin", "ADMIN" },
-                    { new Guid("d4dd6c74-668f-4bd1-a74d-e6ad01175e76"), "2", "User", "USER" }
-                });
+                    {
+                        new Guid("85deccaa-119d-4d43-abbc-c92f76bc22be"),
+                        "1",
+                        "Admin",
+                        "ADMIN"
+                    },
+                    {
+                        new Guid("d4dd6c74-668f-4bd1-a74d-e6ad01175e76"),
+                        "2",
+                        "User",
+                        "USER"
+                    }
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Albums_OwnerId",
                 table: "Albums",
-                column: "OwnerId");
+                column: "OwnerId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_ArtistAlbums_ArtistId",
                 table: "ArtistAlbums",
-                column: "ArtistId");
+                column: "ArtistId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Artists_Name_UserId",
                 table: "Artists",
                 columns: new[] { "Name", "UserId" },
-                unique: true);
+                unique: true
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Artists_UserId",
                 table: "Artists",
                 column: "UserId",
-                unique: true);
+                unique: true
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
-                column: "RoleId");
+                column: "RoleId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
-                unique: true);
+                unique: true
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
                 table: "AspNetUserClaims",
-                column: "UserId");
+                column: "UserId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserLogins_UserId",
                 table: "AspNetUserLogins",
-                column: "UserId");
+                column: "UserId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserRoles_RoleId",
                 table: "AspNetUserRoles",
-                column: "RoleId");
+                column: "RoleId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
                 table: "AspNetUsers",
-                column: "NormalizedEmail");
+                column: "NormalizedEmail"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
-                unique: true);
+                unique: true
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Files_Path",
                 table: "Files",
                 column: "Path",
-                unique: true);
+                unique: true
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_History_SongId",
                 table: "History",
-                column: "SongId");
+                column: "SongId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_History_UserId",
                 table: "History",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PlaybackQueues_UserId",
-                table: "PlaybackQueues",
-                column: "UserId");
+                column: "UserId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Playlists_AppUserId",
                 table: "Playlists",
-                column: "AppUserId");
+                column: "AppUserId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Playlists_UserId",
                 table: "Playlists",
-                column: "UserId");
+                column: "UserId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_PlaylistTracks_PlaylistId",
                 table: "PlaylistTracks",
-                column: "PlaylistId");
+                column: "PlaylistId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_PlaylistTracks_TrackId",
                 table: "PlaylistTracks",
-                column: "TrackId");
+                column: "TrackId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_QueueEntries_QueueId",
                 table: "QueueEntries",
-                column: "QueueId");
+                column: "QueueId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_QueueEntries_SongId",
                 table: "QueueEntries",
-                column: "SongId");
+                column: "SongId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_TrackArtists_TrackId",
                 table: "TrackArtists",
-                column: "TrackId");
+                column: "TrackId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tracks_AlbumId",
                 table: "Tracks",
-                column: "AlbumId");
+                column: "AlbumId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tracks_PrimaryArtistId",
                 table: "Tracks",
-                column: "PrimaryArtistId");
+                column: "PrimaryArtistId"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "ArtistAlbums");
+            migrationBuilder.DropTable(name: "ArtistAlbums");
 
-            migrationBuilder.DropTable(
-                name: "AspNetRoleClaims");
+            migrationBuilder.DropTable(name: "AspNetRoleClaims");
 
-            migrationBuilder.DropTable(
-                name: "AspNetUserClaims");
+            migrationBuilder.DropTable(name: "AspNetUserClaims");
 
-            migrationBuilder.DropTable(
-                name: "AspNetUserLogins");
+            migrationBuilder.DropTable(name: "AspNetUserLogins");
 
-            migrationBuilder.DropTable(
-                name: "AspNetUserRoles");
+            migrationBuilder.DropTable(name: "AspNetUserRoles");
 
-            migrationBuilder.DropTable(
-                name: "AspNetUserTokens");
+            migrationBuilder.DropTable(name: "AspNetUserTokens");
 
-            migrationBuilder.DropTable(
-                name: "Files");
+            migrationBuilder.DropTable(name: "Files");
 
-            migrationBuilder.DropTable(
-                name: "History");
+            migrationBuilder.DropTable(name: "History");
 
-            migrationBuilder.DropTable(
-                name: "PlaylistTracks");
+            migrationBuilder.DropTable(name: "PlaylistTracks");
 
-            migrationBuilder.DropTable(
-                name: "QueueEntries");
+            migrationBuilder.DropTable(name: "QueueEntries");
 
-            migrationBuilder.DropTable(
-                name: "TrackArtists");
+            migrationBuilder.DropTable(name: "TrackArtists");
 
-            migrationBuilder.DropTable(
-                name: "AspNetRoles");
+            migrationBuilder.DropTable(name: "AspNetRoles");
 
-            migrationBuilder.DropTable(
-                name: "Playlists");
+            migrationBuilder.DropTable(name: "Playlists");
 
-            migrationBuilder.DropTable(
-                name: "PlaybackQueues");
+            migrationBuilder.DropTable(name: "PlaybackQueues");
 
-            migrationBuilder.DropTable(
-                name: "Tracks");
+            migrationBuilder.DropTable(name: "Tracks");
 
-            migrationBuilder.DropTable(
-                name: "Albums");
+            migrationBuilder.DropTable(name: "Albums");
 
-            migrationBuilder.DropTable(
-                name: "Artists");
+            migrationBuilder.DropTable(name: "Artists");
 
-            migrationBuilder.DropTable(
-                name: "AspNetUsers");
+            migrationBuilder.DropTable(name: "AspNetUsers");
         }
     }
 }

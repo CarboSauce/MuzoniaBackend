@@ -17,7 +17,7 @@ public class SyncPlayback : IEndpoint
         bool IsRandom
     );
 
-    private static async Task<Results<NoContent, BadRequest>> Handle(
+    public static async Task<Results<NoContent, BadRequest>> Handle(
         Request req,
         ApiDbContext dbContext,
         UserService userService

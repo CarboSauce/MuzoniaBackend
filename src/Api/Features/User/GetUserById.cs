@@ -20,7 +20,7 @@ public class GetUserById : IEndpoint
         bool IsAdmin
     );
 
-    private static async Task<
+    public static async Task<
         Results<Ok<Response>, ForbidHttpResult, NotFound>
     > Handle(EntityId id, HttpContext context, ApiDbContext dbContext)
     {

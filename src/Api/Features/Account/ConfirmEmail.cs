@@ -14,7 +14,7 @@ public class ConfirmEmail : IEndpoint
 
     public record Request(EntityId UserId, string Token);
 
-    private static async Task<
+    public static async Task<
         Results<Created, BadRequest<IEnumerable<IdentityError>>>
     > Handle(SignInManager<AppUser> signInManager, [FromBody] Request req)
     {

@@ -185,9 +185,7 @@ public static class WebHostExtensions
         var context = builder.Environment.EnvironmentName;
         cfg.Sources.Clear();
 
-        var curdir = Directory
-            .GetParent(Directory.GetCurrentDirectory())
-            ?.FullName;
+        var curdir = Directory.GetParent(AppContext.BaseDirectory)?.FullName;
         ArgumentNullException.ThrowIfNull(curdir);
 
         cfg.SetBasePath(curdir)

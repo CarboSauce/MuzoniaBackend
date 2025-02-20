@@ -8,7 +8,7 @@ public class DeleteUser : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapDelete("/", Handle);
 
-    private static async Task<Results<Ok, BadRequest>> Handle(
+    public static async Task<Results<Ok, BadRequest>> Handle(
         UserService userService
     )
     {

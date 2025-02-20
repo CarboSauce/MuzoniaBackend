@@ -10,7 +10,7 @@ public class GetArtistAlbums : IEndpoint
     public static void Map(IEndpointRouteBuilder app) =>
         app.MapGet("/{id}/albums", Handle);
 
-    private static async Task<
+    public static async Task<
         Results<Ok<AlbumResponse[]>, UnauthorizedHttpResult>
     > Handle(EntityId id, ApiDbContext dbContext, HttpContext context)
     {

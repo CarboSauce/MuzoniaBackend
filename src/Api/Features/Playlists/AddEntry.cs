@@ -17,7 +17,7 @@ public class AddEntry : IEndpoint
         int Index
     );
 
-    private static async Task<Results<Ok<Response>, BadRequest>> Handle(
+    public static async Task<Results<Ok<Response>, BadRequest>> Handle(
         EntityId id,
         EntityId trackId,
         ApiDbContext dbContext

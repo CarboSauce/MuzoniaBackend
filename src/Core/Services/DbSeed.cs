@@ -28,8 +28,8 @@ public class DbSeed(
         {
             await userManager.AddToRoleAsync(admin, "Admin");
         }
-
         await userManager.UpdateAsync(admin);
+        CreateQueueForUser(admin);
     }
 
     public async Task SeedBasicDataAsync()
@@ -74,6 +74,38 @@ public class DbSeed(
             new ArtistAlbum { ArtistId = artist.Id, AlbumId = album.Id, }
         );
 
+        CreateQueueForUser(user);
         await dbContext.SaveChangesAsync();
+    }
+
+    private void CreateQueueForUser(AppUser user)
+    {
+        var queue = new PlaybackQueue
+        {
+            OwnerId = user.Id,
+            IsRepeat = false,
+            IsPlaying = false,
+            IsRandom = false,
+            CurrentIndex = 0,
+            TrackCount = 0,
+            Timestamp = 0,
+            IsModifiable = false,
+            IsPublic = false,
+        };
+
+        dbContext.PlaybackQueues.Add(queue);
+
+        dbContext.QueueUsers.Add(
+            new QueueUser
+            {
+                UserId = user.Id,
+                QueueId = queue.Id,
+                IsBanned = false,
+            }
+        );
+
+        dbContext.CurrentQueues.Add(
+            new CurrentQueue { UserId = user.Id, QueueId = queue.Id, }
+        );
     }
 }

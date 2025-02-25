@@ -30,6 +30,7 @@ public class DbSeed(
         }
         await userManager.UpdateAsync(admin);
         CreateQueueForUser(admin);
+        await dbContext.SaveChangesAsync();
     }
 
     public async Task SeedBasicDataAsync()

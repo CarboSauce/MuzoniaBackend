@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EntityFramework.Exceptions.PostgreSQL;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Muzonia.Core.Common;
 using Muzonia.DbEf;
@@ -20,7 +21,7 @@ internal static class Database
         }
         else
         {
-            builder.Services.AddDbContext<ApiDbContext>(o =>
+            Action<DbContextOptionsBuilder> options = o =>
             {
                 var conn = builder.Configuration.GetConnectionString("apidb");
                 o.UseNpgsql(
@@ -31,6 +32,16 @@ internal static class Database
                         o.SetPostgresVersion(16, 0);
                     }
                 );
+                o.UseExceptionProcessor();
+            };
+
+            builder.Services.AddPooledDbContextFactory<ApiDbContext>(options);
+            builder.Services.AddScoped<ApiDbContext>(sp =>
+            {
+                var factory = sp.GetRequiredService<
+                    IDbContextFactory<ApiDbContext>
+                >();
+                return factory.CreateDbContext();
             });
         }
         return builder;

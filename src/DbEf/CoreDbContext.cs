@@ -58,13 +58,13 @@ public class ApiDbContext(DbContextOptions<ApiDbContext> options)
         builder.ApplyConfigurationsFromAssembly(typeof(ApiDbContext).Assembly);
     }
 
-    protected override void OnConfiguring(
-        DbContextOptionsBuilder optionsBuilder
-    )
-    {
-        base.OnConfiguring(optionsBuilder);
-        optionsBuilder.UseExceptionProcessor();
-    }
+    // protected override void OnConfiguring(
+    //     DbContextOptionsBuilder optionsBuilder
+    // )
+    // {
+    //     base.OnConfiguring(optionsBuilder);
+    //     optionsBuilder.UseExceptionProcessor();
+    // }
 
     // protected override void ConfigureConventions(
     //     ModelConfigurationBuilder configurationBuilder

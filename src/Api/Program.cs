@@ -50,6 +50,7 @@ app.UseOpenApi(app, app.Configuration, appEnv)
     .AddStaticFiles(apiConfig, appEnv)
     .AddHubs(app, appEnv);
 
+app.MapGraphQL();
 app.MapEndpoints();
 
 await app.RunAsync();
@@ -118,6 +119,7 @@ void ConfigureServices(
         .AddServices(apiConfig, config)
         .AddAuth(config, apiConfig, env)
         .AddOpenApiServices(config, env)
+        .AddGraphQLConfig(apiConfig, env)
         .AddFileWriter(apiConfig, env)
         .AddHangfireServices(config, apiConfig, env);
 

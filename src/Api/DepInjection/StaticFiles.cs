@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Muzonia.Core.Common;
+using Path = System.IO.Path;
 
 namespace Muzonia.Api.DepInjection;
 

@@ -30,7 +30,15 @@ public class DbSeed(
         }
         await userManager.UpdateAsync(admin);
         CreateQueueForUser(admin);
-        await dbContext.SaveChangesAsync();
+
+        try
+        {
+            await dbContext.SaveChangesAsync();
+        }
+        catch
+        {
+            // ignored
+        }
     }
 
     public async Task SeedBasicDataAsync()
@@ -76,7 +84,15 @@ public class DbSeed(
         );
 
         CreateQueueForUser(user);
-        await dbContext.SaveChangesAsync();
+
+        try
+        {
+            await dbContext.SaveChangesAsync();
+        }
+        catch
+        {
+            // ignored
+        }
     }
 
     private void CreateQueueForUser(AppUser user)

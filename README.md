@@ -9,8 +9,7 @@ Backend written in C# for Muzonia music streaming service
 - [x] Register
 - [x] Login
 - [x] Logout
-- [ ] Reset password
-- [ ] Change email
+- [x] Reset password
 - [x] Update Profile
 - [x] Delete Profile
 - [x] Get My Profile
@@ -48,12 +47,6 @@ Backend written in C# for Muzonia music streaming service
 - [x] Get Track By Artist
 - [x] Get Track By Album
 
-### History
-
-- [ ] Get My History
-- [ ] Clear history
-- [ ] Clear history entry by id
-
 ### Playlists
 
 - [x] Create Playlist
@@ -69,24 +62,24 @@ Backend written in C# for Muzonia music streaming service
 
 ### Queue
 
-- [ ] Add track to queue
-- [ ] Remove track from queue
-- [ ] Clear queue
-- [ ] Reorder queue
-- [ ] Get queue
+- [x] Add track to queue
+- [x] Remove track from queue
+- [x] Clear queue
+- [x] Reorder queue
+- [x] Get queue
 
 ### Playback
 
-- [ ] Play
-- [ ] Pause
-- [ ] Skip
-- [ ] Seek
-- [ ] Repeat
-- [ ] Shuffle
-- [ ] Volume
-- [ ] Get state
-- [ ] Get current track
-- [ ] Get current queue
+- [x] Play
+- [x] Pause
+- [x] Skip
+- [x] Seek
+- [x] Repeat
+- [x] Shuffle
+- [x] Volume
+- [x] Get state
+- [x] Get current track
+- [x] Get current queue
 
 ### Playback sessions
 
@@ -95,12 +88,12 @@ But the functionality needs to be probably replicated due to permission system t
 Unless playback is flexible enough to account for permission system, alternatively one can just make a playback service to reuse functionality but that adds burden to the frontend.
 
 
-- [ ] Create session
-- [ ] Update session
-- [ ] Join session
-- [ ] Leave session
-- [ ] Delete session
-- [ ] Get my sessions
-- [ ] Get session by id
+- [x] Create session
+- [x] Update session
+- [x] Join session
+- [x] Leave session
+- [x] Delete session
+- [x] Get my sessions
+- [x] Get session by id
 - [ ] Change permission
-- [ ] Get session members
+- [x] Get session members

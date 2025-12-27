@@ -1,9 +1,14 @@
-﻿namespace Muzonia.Api.GraphQL.Query;
+﻿using Muzonia.DbEf.Entities;
 
-public class TrackDto
+namespace Muzonia.Api.GraphQL.Query;
+
+public class TrackType : ObjectType<Track>
 {
-    public string Title { get; set; }
-    public string Genre { get; set; }
-    public Uri? DataUri { get; set; }
-    public long Duration { get; set; }
+    protected override void Configure(IObjectTypeDescriptor<Track> descriptor)
+    {
+        descriptor.BindFieldsExplicitly();
+
+        descriptor.Field(x => x.Id);
+        descriptor.Field(x => x.Duration);
+    }
 }

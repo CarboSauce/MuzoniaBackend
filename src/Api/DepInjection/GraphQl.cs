@@ -22,8 +22,9 @@ internal static class GraphQl
                 opt.ApplyCostDefaults = true;
             })
             .AddAuthorization()
-            .AddQueryType<Query>()
-            .AddMutationType<Mutation>()
+            .AddApiTypes()
+            .AddQueryType()
+            .AddMutationType()
             .MapGraphqlTypes()
             .AddPagingArguments()
             .AddQueryContext()

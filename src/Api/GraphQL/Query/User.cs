@@ -14,12 +14,13 @@ public class UserDto
     public required DateTime CreationDate { get; set; }
 }
 
-public partial class Query
+[QueryType]
+public static class UserQueries
 {
     [UseFirstOrDefault]
     [UseProjection]
     [Authorize]
-    public IQueryable<UserDto> GetUserById(
+    public static IQueryable<UserDto> GetUserById(
         EntityId id,
         [Service] ApiDbContext dbContext,
         HttpContext context
@@ -42,7 +43,7 @@ public partial class Query
     [UseFirstOrDefault]
     [UseProjection]
     [Authorize]
-    public IQueryable<UserDto> GetMe(
+    public static IQueryable<UserDto> GetMe(
         [Service] ApiDbContext dbContext,
         HttpContext context
     )

@@ -12,6 +12,8 @@ public class MeDto
     public DateTime CreationDate { get; set; }
 }
 
+
+
 // public partial class Query
 // {
 //     [UseFirstOrDefault]

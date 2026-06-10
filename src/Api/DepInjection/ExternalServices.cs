@@ -15,35 +15,34 @@ internal static class Database
         IWebHostEnvironment env
     )
     {
+        Action<DbContextOptionsBuilder> options = o =>
+        {
+            var conn = builder.Configuration.GetConnectionString("apidb");
+            o.UseNpgsql(
+                conn,
+                o =>
+                {
+                    o.MigrationsAssembly("DbEf.Postgresql");
+                    o.SetPostgresVersion(16, 0);
+                }
+            );
+            o.UseExceptionProcessor();
+        };
+
+        builder.Services.AddPooledDbContextFactory<ApiDbContext>(options);
+        builder.Services.AddScoped<ApiDbContext>(sp =>
+        {
+            var factory = sp.GetRequiredService<
+                IDbContextFactory<ApiDbContext>
+            >();
+            return factory.CreateDbContext();
+        });
+
         if (aspireConfig.UsePostgres)
         {
-            builder.AddNpgsqlDbContext<ApiDbContext>("apidb");
+            builder.EnrichNpgsqlDbContext<ApiDbContext>();
         }
-        else
-        {
-            Action<DbContextOptionsBuilder> options = o =>
-            {
-                var conn = builder.Configuration.GetConnectionString("apidb");
-                o.UseNpgsql(
-                    conn,
-                    o =>
-                    {
-                        o.MigrationsAssembly("DbEf.Postgresql");
-                        o.SetPostgresVersion(16, 0);
-                    }
-                );
-                o.UseExceptionProcessor();
-            };
 
-            builder.Services.AddPooledDbContextFactory<ApiDbContext>(options);
-            builder.Services.AddScoped<ApiDbContext>(sp =>
-            {
-                var factory = sp.GetRequiredService<
-                    IDbContextFactory<ApiDbContext>
-                >();
-                return factory.CreateDbContext();
-            });
-        }
         return builder;
     }
 }

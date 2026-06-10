@@ -1,7 +1,9 @@
 using System.Security.Claims;
+using System.Threading.RateLimiting;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using Muzonia.Api;
 using Muzonia.Api.DepInjection;
@@ -15,6 +17,7 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
 builder.AddConfig();
 
 builder.Host.UseSerilog(
@@ -66,6 +69,7 @@ static void ConfigureExternalServices(
 )
 {
     builder.AddDatabase(aspireConfig, builder.Environment);
+    builder.AddRedis(aspireConfig);
 }
 
 async Task RunServices(IServiceProvider services, IWebHostEnvironment env)
@@ -123,8 +127,36 @@ void ConfigureServices(
         .AddFileWriter(apiConfig, env)
         .AddHangfireServices(config, apiConfig, env);
 
-    services.AddSignalR();
+    services.AddSignalR().AddStackExchangeRedis("redis");
     services.AddRouting(o => o.LowercaseUrls = true);
+
+    services.AddRateLimiter(opt =>
+    {
+        opt.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+        opt.AddPolicy(
+            "fixed-by-ip",
+            httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    httpContext.Request.Headers["X-Forwarder-For"].ToString(),
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 10,
+                        Window = TimeSpan.FromMinutes(1)
+                    }
+                )
+        );
+
+        opt.AddTokenBucketLimiter(
+            "token",
+            options =>
+            {
+                options.TokenLimit = 100;
+                options.ReplenishmentPeriod = TimeSpan.FromSeconds(5);
+                options.TokensPerPeriod = 100;
+                options.AutoReplenishment = true;
+            }
+        );
+    });
 }
 
 public partial class Program { }

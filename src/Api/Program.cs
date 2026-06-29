@@ -127,7 +127,7 @@ void ConfigureServices(
         .AddFileWriter(apiConfig, env)
         .AddHangfireServices(config, apiConfig, env);
 
-    services.AddSignalR().AddStackExchangeRedis("redis");
+    services.AddSignalR();
     services.AddRouting(o => o.LowercaseUrls = true);
 
     services.AddRateLimiter(opt =>
@@ -141,7 +141,7 @@ void ConfigureServices(
                     factory: _ => new FixedWindowRateLimiterOptions
                     {
                         PermitLimit = 10,
-                        Window = TimeSpan.FromMinutes(1)
+                        Window = TimeSpan.FromMinutes(1),
                     }
                 )
         );

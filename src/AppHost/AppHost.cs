@@ -31,7 +31,7 @@ else
 
 var coreapi = builder
     .AddProject<Projects.Api>("coreapi")
-    .WithHttpEndpoint(port: 8081)
+    .WithHttpEndpoint(port: 8081, name: "API")
     .WithEnvironment("Aspire:UseAspire", "true")
     .WithEnvironment("Aspire:UsePostgres", useAspirePostgres.ToString())
     .WithEnvironment("Aspire:UseRedis", useAspireRedis.ToString());
@@ -65,7 +65,10 @@ else
     _ = coreapi.WithReference(con);
 }
 
-var frontend = builder.AddJavaScriptApp("frontend", "../Client").WithPnpm();
+var frontend = builder
+    .AddJavaScriptApp("frontend", "../../../Client")
+    .WithPnpm()
+    .WithExternalHttpEndpoints();
 
 frontend.WaitFor(coreapi);
 
@@ -80,8 +83,10 @@ var gateway = builder
             }
         )
     )
-    .WithHttpEndpoint();
+    .WithExternalHttpEndpoints();
 
-coreapi.WaitFor(gateway);
+gateway.WaitFor(coreapi);
+
+//coreapi.WaitFor(gateway);
 
 builder.Build().Run();

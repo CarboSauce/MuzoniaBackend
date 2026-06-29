@@ -50,6 +50,9 @@ internal static class OpenApi
         router.MapOpenApi();
         router.MapScalarApiReference(o =>
         {
+            var serverUrl =
+                $"{config["ApiProtocol"]}://{config["ApiDomain"]}:{config["ApiPort"]}";
+            o.AddServer(serverUrl);
             o.Title = "Muzonia Api";
         });
         var reroute = () => Results.Redirect("/scalar/v1");

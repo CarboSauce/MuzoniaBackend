@@ -36,9 +36,7 @@ public static class Hangfire
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
                 .UsePostgreSqlStorage(o =>
-                    o.UseNpgsqlConnection(
-                        config.GetConnectionString("hangfire")
-                    )
+                    o.UseNpgsqlConnection(config.GetConnectionString("apidb"))
                 );
         });
         services.AddHangfireServer(o =>

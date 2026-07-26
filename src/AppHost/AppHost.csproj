@@ -13,11 +13,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Aspire.Hosting.JavaScript" Version="13.2.1" />
       <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.2.1" />
       <PackageReference Include="Aspire.Hosting.Redis" Version="13.2.1" />
-      <PackageReference Include="Aspire.Hosting.Yarp" Version="13.2.1" />
-      <PackageReference Include="CommunityToolkit.Aspire.Hosting.JavaScript.Extensions" Version="13.1.1" />
     </ItemGroup>
 
 </Project>

@@ -31,7 +31,7 @@ else
 
 var coreapi = builder
     .AddProject<Projects.Api>("coreapi")
-    .WithHttpEndpoint(port: 8081, name: "API")
+    .WithHttpEndpoint(port: 7233, name: "API")
     .WithEnvironment("Aspire:UseAspire", "true")
     .WithEnvironment("Aspire:UsePostgres", useAspirePostgres.ToString())
     .WithEnvironment("Aspire:UseRedis", useAspireRedis.ToString());
@@ -60,33 +60,8 @@ if (useAspireRedis)
 }
 else
 {
-    //var redisConString = builder.Configuration.GetConnectionString("redis");
     var con = builder.AddConnectionString("redis");
     _ = coreapi.WithReference(con);
 }
-
-var frontend = builder
-    .AddJavaScriptApp("frontend", "../../../Client")
-    .WithPnpm()
-    .WithExternalHttpEndpoints();
-
-frontend.WaitFor(coreapi);
-
-var gateway = builder
-    .AddYarp("gateway")
-    .WithHostHttpsPort(7233)
-    .WithConfiguration(
-        (
-            yarp =>
-            {
-                yarp.AddRoute(coreapi);
-            }
-        )
-    )
-    .WithExternalHttpEndpoints();
-
-gateway.WaitFor(coreapi);
-
-//coreapi.WaitFor(gateway);
 
 builder.Build().Run();

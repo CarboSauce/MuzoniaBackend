@@ -19,7 +19,7 @@ public static class Endpoints
     {
         app.AddExceptionFilter();
 
-        var root = app.MapGroup("").DisableAntiforgery().WithOpenApi();
+        var root = app.MapGroup("").DisableAntiforgery();
 
         root.MapHub<PlayerHub>("/player");
         root.MapAccountEndpoints();

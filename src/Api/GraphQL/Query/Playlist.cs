@@ -57,10 +57,10 @@ public static class PlaylistUserNode
 [ExtendObjectType<Playlist>]
 public static class PlaylistNode
 {
+    [UsePaging]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    [UsePaging]
     [Authorize]
     public static IQueryable<PlaylistTrack> GetEntries(
         [Parent(requires: nameof(Playlist.Id))] Playlist playlist,

@@ -118,7 +118,7 @@ void ConfigureServices(
     );
 
     services
-        .AddValidatorsFromAssembly(typeof(Program).Assembly)
+        .AddValidatorsFromAssemblyContaining(typeof(Program))
         .AddCustomCors(config)
         .AddServices(apiConfig, config)
         .AddAuth(config, apiConfig, env)

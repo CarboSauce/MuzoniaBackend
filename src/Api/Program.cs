@@ -27,9 +27,9 @@ builder.Host.UseSerilog(
     }
 );
 
-var (apiConfig, _, aspireConfig, _) = CreateConfig(builder);
+var (apiConfig, _, _) = CreateConfig(builder);
 
-ConfigureExternalServices(aspireConfig, builder);
+ConfigureExternalServices(builder);
 ConfigureServices(builder.Services, builder.Environment, builder.Configuration);
 
 var app = builder.Build();
@@ -59,17 +59,14 @@ app.MapEndpoints();
 await app.RunAsync();
 return;
 
-(ApiConfig, AdminConfig, AspireConfig, EmailConfig) CreateConfig(
+(ApiConfig, AdminConfig, EmailConfig) CreateConfig(
     WebApplicationBuilder builder
 ) => builder.Services.AddConfig(builder.Configuration);
 
-static void ConfigureExternalServices(
-    AspireConfig aspireConfig,
-    WebApplicationBuilder builder
-)
+static void ConfigureExternalServices(WebApplicationBuilder builder)
 {
-    builder.AddDatabase(aspireConfig, builder.Environment);
-    builder.AddRedis(aspireConfig);
+    builder.AddDatabase(builder.Environment);
+    builder.AddRedis();
 }
 
 async Task RunServices(IServiceProvider services, IWebHostEnvironment env)
@@ -77,19 +74,6 @@ async Task RunServices(IServiceProvider services, IWebHostEnvironment env)
     await using var scope = services.CreateAsyncScope();
 
     await scope.ServiceProvider.ApplyMigrations();
-
-    var seed = new DbSeed(
-        scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>(),
-        scope.ServiceProvider.GetRequiredService<ApiDbContext>(),
-        scope.ServiceProvider.GetRequiredService<IOptions<AdminConfig>>().Value
-    );
-
-    await seed.SeedAdminAsync();
-
-    if (env.IsDevelopment())
-    {
-        await seed.SeedBasicDataAsync();
-    }
 }
 
 void ConfigureServices(

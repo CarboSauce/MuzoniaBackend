@@ -2,66 +2,29 @@ using Microsoft.Extensions.Configuration;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var useAspirePostgres = builder
-    .Configuration.GetSection("Aspire")
-    .GetSection("UsePostgres")
-    .Get<bool>();
-var useAspireRedis = builder
-    .Configuration.GetSection("Aspire")
-    .GetSection("UseRedis")
-    .Get<bool>();
+var postgres = builder
+    .AddPostgres("postgres")
+    .WithDataVolume()
+    .AddDatabase("apidb");
 
-if (useAspirePostgres)
-{
-    Console.WriteLine("Using Aspire Postgres");
-}
-else
-{
-    Console.WriteLine("Using Local Postgres");
-}
+var zitadel = builder.AddZitadel("zitadel").WithDatabase(postgres);
+zitadel.WaitFor(postgres);
 
-if (useAspireRedis)
-{
-    Console.WriteLine("Using Aspire Redis");
-}
-else
-{
-    Console.WriteLine("Using Local Redis");
-}
+var cache = builder.AddRedis("redis");
 
+var storage = builder
+    .AddAzureStorage("storage")
+    .RunAsEmulator(azurite =>
+    {
+        azurite.WithBlobPort(27000).WithQueuePort(27001).WithTablePort(27002);
+    });
 var coreapi = builder
     .AddProject<Projects.Api>("coreapi")
-    .WithHttpEndpoint(port: 7233, name: "API")
-    .WithEnvironment("Aspire:UseAspire", "true")
-    .WithEnvironment("Aspire:UsePostgres", useAspirePostgres.ToString())
-    .WithEnvironment("Aspire:UseRedis", useAspireRedis.ToString());
-
-if (useAspirePostgres)
-{
-    var postgres = builder
-        .AddPostgres("postgres")
-        .WithDataVolume(isReadOnly: false);
-
-    var db = postgres.AddDatabase("apidb");
-    _ = coreapi.WithReference(db);
-    coreapi.WaitFor(postgres);
-}
-else
-{
-    var con = builder.AddConnectionString("apidb");
-    _ = coreapi.WithReference(con);
-}
-
-if (useAspireRedis)
-{
-    var cache = builder.AddRedis("redis");
-    _ = coreapi.WithReference(cache);
-    coreapi.WaitFor(cache);
-}
-else
-{
-    var con = builder.AddConnectionString("redis");
-    _ = coreapi.WithReference(con);
-}
+    .WithReference(cache)
+    .WithReference(postgres)
+    .WaitFor(cache)
+    .WaitFor(storage)
+    .WaitFor(zitadel)
+    .WaitFor(postgres);
 
 builder.Build().Run();

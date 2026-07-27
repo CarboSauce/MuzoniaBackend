@@ -23,8 +23,6 @@ internal static class GraphQl
             })
             .AddAuthorization()
             .AddApiTypes()
-            .AddQueryType()
-            .AddMutationType()
             .MapGraphqlTypes()
             .AddPagingArguments()
             .AddQueryContext()

@@ -65,32 +65,6 @@ public class AdminConfig
     }
 }
 
-public class AspireConfig
-{
-    public bool UsePostgres { get; set; } = false;
-    public bool UseRedis { get; set; } = false;
-    public bool UseAspire { get; set; } = false;
-
-    public static AspireConfig? Configure(
-        IServiceCollection services,
-        IConfiguration config
-    )
-    {
-        var configurationSection = config.GetSection("Aspire");
-        var aspireConfig = configurationSection.Get<AspireConfig>();
-
-        if (aspireConfig is null)
-        {
-            return null;
-        }
-
-        services.Configure<AspireConfig>(configurationSection);
-        services.AddSingleton(aspireConfig);
-
-        return aspireConfig;
-    }
-}
-
 public class EmailConfig
 {
     public string ClientUrl { get; set; } = "http://localhost:3000";
@@ -120,27 +94,25 @@ public static class ConfigExt
     public static (
         ApiConfig? apiConfig,
         AdminConfig? adminConfig,
-        AspireConfig? aspireConfig,
         EmailConfig? emailConfig
     ) AddConfigNullable(this IServiceCollection services, IConfiguration config)
     {
         var apiConfig = ApiConfig.Configure(services, config);
         var adminConfig = AdminConfig.Configure(services, config);
-        var aspireConfig = AspireConfig.Configure(services, config);
         var emailConfig = EmailConfig.Configure(services, config);
 
-        return (apiConfig, adminConfig, aspireConfig, emailConfig);
+        return (apiConfig, adminConfig, emailConfig);
     }
 
     public static (
         ApiConfig apiConfig,
         AdminConfig adminConfig,
-        AspireConfig aspireConfig,
         EmailConfig emailConfig
     ) AddConfig(this IServiceCollection services, IConfiguration config)
     {
-        var (apiConfig, adminConfig, aspireConfig, emailConfig) =
-            services.AddConfigNullable(config);
+        var (apiConfig, adminConfig, emailConfig) = services.AddConfigNullable(
+            config
+        );
 
         if (apiConfig is null)
         {
@@ -154,12 +126,6 @@ public static class ConfigExt
                 "AdminConfig is missing, Creating default instance"
             );
         }
-        if (aspireConfig is null)
-        {
-            Console.WriteLine(
-                "AspireConfig is missing, Creating default instance"
-            );
-        }
 
         if (emailConfig is null)
         {
@@ -168,12 +134,7 @@ public static class ConfigExt
             );
         }
 
-        return (
-            apiConfig ?? new(),
-            adminConfig ?? new(),
-            aspireConfig ?? new(),
-            emailConfig ?? new()
-        );
+        return (apiConfig ?? new(), adminConfig ?? new(), emailConfig ?? new());
     }
 }
 

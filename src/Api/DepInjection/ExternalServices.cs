@@ -11,7 +11,6 @@ internal static class Database
 {
     public static WebApplicationBuilder AddDatabase(
         this WebApplicationBuilder builder,
-        AspireConfig aspireConfig,
         IWebHostEnvironment env
     )
     {
@@ -38,10 +37,7 @@ internal static class Database
             return factory.CreateDbContext();
         });
 
-        if (aspireConfig.UsePostgres)
-        {
-            builder.EnrichNpgsqlDbContext<ApiDbContext>();
-        }
+        builder.EnrichNpgsqlDbContext<ApiDbContext>();
 
         return builder;
     }
@@ -50,23 +46,10 @@ internal static class Database
 internal static class Redis
 {
     public static WebApplicationBuilder AddRedis(
-        this WebApplicationBuilder builder,
-        AspireConfig aspireConfig
+        this WebApplicationBuilder builder
     )
     {
-        if (aspireConfig.UseRedis)
-        {
-            builder.AddRedisClient("redis");
-        }
-        else
-        {
-            builder.Services.AddSingleton<IConnectionMultiplexer>(o =>
-            {
-                var redis = builder.Configuration.GetConnectionString("redis");
-                ArgumentNullException.ThrowIfNull(redis);
-                return ConnectionMultiplexer.Connect(redis);
-            });
-        }
+        builder.AddRedisClient("redis");
 
         builder.Services.AddStackExchangeRedisCache(_ => { });
         builder

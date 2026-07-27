@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Muzonia.Core.Common;
 using Muzonia.Core.Services;
@@ -26,8 +27,9 @@ public class RegisterUser : IEndpoint
     {
         public Validator()
         {
-            RuleFor(x => x.Username).Length(3, 64);
-            RuleFor(x => x.Email).EmailAddress();
+            RuleFor(x => x.Username).NotEmpty().Length(3, 64);
+            RuleFor(x => x.Email).NotEmpty().EmailAddress();
+            RuleFor(x => x.Password).NotEmpty().MinimumLength(8);
         }
     }
 
@@ -38,14 +40,16 @@ public class RegisterUser : IEndpoint
         UserManager<AppUser> userManager,
         ApiDbContext dbContext,
         IEmail email,
+        IHostEnvironment env,
         IOptions<EmailConfig> emailConfig
     )
     {
         var user = new AppUser
         {
             UserName = request.Username,
-            Email = request.Email
+            Email = request.Email,
         };
+        var hasUser = await userManager.Users.AnyAsync();
 
         var result = await dbContext.UseTransactionAsync(async () =>
         {
@@ -84,7 +88,7 @@ public class RegisterUser : IEndpoint
             );
 
             dbContext.CurrentQueues.Add(
-                new CurrentQueue { UserId = user.Id, QueueId = queue.Id, }
+                new CurrentQueue { UserId = user.Id, QueueId = queue.Id }
             );
 
             await dbContext.SaveChangesAsync();
@@ -95,6 +99,11 @@ public class RegisterUser : IEndpoint
         if (!result.Succeeded)
         {
             return TypedResults.BadRequest(result.Errors);
+        }
+
+        if (env.IsDevelopment() && !hasUser)
+        {
+            await userManager.AddToRoleAsync(user, "Admin");
         }
 
         // Generate Token and send email

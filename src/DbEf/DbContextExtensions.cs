@@ -75,18 +75,23 @@ public static class DbContextExtensions
     )
         where TDbContext : DbContext
     {
-        await using var transaction = await db.Database.BeginTransactionAsync();
-        try
+        var strategy = db.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async () =>
         {
-            var res = await action();
-            await transaction.CommitAsync();
-            return res;
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+            await using var transaction =
+                await db.Database.BeginTransactionAsync();
+            try
+            {
+                var res = await action();
+                await transaction.CommitAsync();
+                return res;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        });
     }
 
     public static async Task<TResult> UseTransactionAsync<
@@ -96,18 +101,23 @@ public static class DbContextExtensions
     >(this TDbContext db, T data, Func<TDbContext, T, Task<TResult>> action)
         where TDbContext : DbContext
     {
-        await using var transaction = await db.Database.BeginTransactionAsync();
-        try
+        var strategy = db.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async () =>
         {
-            var res = await action(db, data);
-            await transaction.CommitAsync();
-            return res;
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+            await using var transaction =
+                await db.Database.BeginTransactionAsync();
+            try
+            {
+                var res = await action(db, data);
+                await transaction.CommitAsync();
+                return res;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        });
     }
 
     public static async Task<T> UseTransactionAsync<TDbContext, T>(
@@ -116,17 +126,22 @@ public static class DbContextExtensions
     )
         where TDbContext : DbContext
     {
-        await using var transaction = await db.Database.BeginTransactionAsync();
-        try
+        var strategy = db.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async () =>
         {
-            var res = await action(db);
-            await transaction.CommitAsync();
-            return res;
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+            await using var transaction =
+                await db.Database.BeginTransactionAsync();
+            try
+            {
+                var res = await action(db);
+                await transaction.CommitAsync();
+                return res;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        });
     }
 }

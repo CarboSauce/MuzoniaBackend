@@ -33,7 +33,7 @@ public class UpdateTrack : IEndpoint
         string Title,
         string Genre,
         DateTime CreationDate,
-        EntityId AlbumId,
+        EntityId? AlbumId,
         EntityId PrimaryArtistId
     );
 

@@ -31,7 +31,7 @@ public class GetEntries : IEndpoint
 
     public record ArtistResponse(EntityId Id, string Name);
 
-    public record AlbumResponse(EntityId Id, string Title, Uri ImageUri);
+    public record AlbumResponse(EntityId? Id, string Title, Uri ImageUri);
 
     public static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
         EntityId id,
@@ -69,7 +69,7 @@ public class GetEntries : IEndpoint
                     e.Track.CreationDate,
                     new(
                         e.Track.AlbumId,
-                        e.Track.Album.Title,
+                        e.Track.Album!.Title,
                         e.Track.Album.ImageUri
                     ),
                     new(e.Track.PrimaryArtistId, e.Track.PrimaryArtist.Name),

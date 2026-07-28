@@ -17,7 +17,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.1")
+                .HasAnnotation("ProductVersion", "10.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -601,7 +601,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AlbumId")
+                    b.Property<Guid?>("AlbumId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreationDate")
@@ -878,9 +878,7 @@ namespace Muzonia.DbEf.Postgresql.Migrations
                 {
                     b.HasOne("Muzonia.DbEf.Entities.Album", "Album")
                         .WithMany("Tracks")
-                        .HasForeignKey("AlbumId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AlbumId");
 
                     b.HasOne("Muzonia.DbEf.Entities.Artist", "PrimaryArtist")
                         .WithMany("PrimaryTracks")

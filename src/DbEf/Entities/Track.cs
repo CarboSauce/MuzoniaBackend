@@ -11,8 +11,8 @@ public class Track
     public required string Title { get; set; }
     public required string Genre { get; set; }
     public long Duration { get; set; }
-    public required EntityId AlbumId { get; set; }
-    public Album Album { get; set; } = null!;
+    public required EntityId? AlbumId { get; set; }
+    public Album? Album { get; set; }
     public required EntityId PrimaryArtistId { get; set; }
     public Artist PrimaryArtist { get; set; } = null!;
     public virtual ICollection<Artist> Artists { get; } = null!;
@@ -44,7 +44,8 @@ public class SongConfig : IEntityTypeConfiguration<Track>
         builder
             .HasOne(e => e.Album)
             .WithMany(e => e.Tracks)
-            .HasForeignKey(e => e.AlbumId);
+            .HasForeignKey(e => e.AlbumId)
+            .IsRequired(false);
 
         builder.Property(e => e.Title).IsRequired();
         builder.Property(e => e.CreationDate).IsRequired();

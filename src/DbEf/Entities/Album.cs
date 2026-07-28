@@ -5,7 +5,7 @@ namespace Muzonia.DbEf.Entities;
 
 public class Album : Entity
 {
-    public virtual ICollection<Track> Tracks { get; } = null!;
+    public virtual ICollection<Track>? Tracks { get; }
     public required string Title { get; set; }
     public required EntityId OwnerId { get; set; }
     public Artist Owner { get; } = null!;
@@ -22,7 +22,7 @@ public class AlbumConfig : IEntityTypeConfiguration<Album>
             .HasMany(e => e.Tracks)
             .WithOne(e => e.Album)
             .HasForeignKey(e => e.AlbumId)
-            .IsRequired();
+            .IsRequired(false);
 
         builder.HasOne(e => e.Owner).WithMany(e => e.OwnedAlbums);
 

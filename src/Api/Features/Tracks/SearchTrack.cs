@@ -22,7 +22,7 @@ public class SearchTrack : IEndpoint
 
     public record ArtistResponse(EntityId Id, string Name);
 
-    public record AlbumResponse(EntityId Id, string Title, Uri ImageUri);
+    public record AlbumResponse(EntityId? Id, string Title, Uri ImageUri);
 
     public static async Task<Results<Ok<Response[]>, BadRequest>> Handle(
         string name,
@@ -33,7 +33,7 @@ public class SearchTrack : IEndpoint
         var track = await dbContext
             .Tracks.Where(e =>
                 EF.Functions.ILike(e.Title, searchName)
-                || EF.Functions.ILike(e.Album.Title, searchName)
+                || EF.Functions.ILike(e.Album!.Title, searchName)
                 || EF.Functions.ILike(e.Genre, searchName)
                 || e.Artists.Any(a => EF.Functions.ILike(a.Name, searchName))
             )
@@ -47,7 +47,7 @@ public class SearchTrack : IEndpoint
                 e.Duration,
                 e.Id,
                 e.CreationDate,
-                new(e.AlbumId, e.Album.Title, e.Album.ImageUri),
+                new(e.AlbumId, e.Album!.Title, e.Album.ImageUri),
                 new(e.PrimaryArtistId, e.PrimaryArtist.Name),
                 e.Artists.Select(a => new ArtistResponse(a.Id, a.Name))
                     .ToArray()

@@ -29,7 +29,7 @@ public class CreateTrack : IEndpoint
         string Genre,
         EntityId Id,
         DateTime CreationDate,
-        EntityId AlbumId,
+        EntityId? AlbumId,
         EntityId PrimaryArtistId,
         EntityId[] OtherArtistIds,
         string TranscodingId

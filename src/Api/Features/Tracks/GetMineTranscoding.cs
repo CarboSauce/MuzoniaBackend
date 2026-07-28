@@ -19,7 +19,7 @@ public class GetMineTranscoding : IEndpoint
         ArtistResponse[] OtherArtists
     );
 
-    public record AlbumResponse(EntityId Id, string Title);
+    public record AlbumResponse(EntityId? Id, string Title);
 
     public record ArtistResponse(EntityId Id, string Name);
 
@@ -46,7 +46,7 @@ public class GetMineTranscoding : IEndpoint
                 e.Genre,
                 e.Id,
                 e.CreationDate,
-                new(e.AlbumId, e.Album.Title),
+                new(e.AlbumId, e.Album!.Title),
                 new(e.PrimaryArtistId, e.PrimaryArtist.Name),
                 e.Artists.Select(a => new ArtistResponse(a.Id, a.Name))
                     .ToArray()

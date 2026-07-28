@@ -22,7 +22,7 @@ public class GetArtistTracks : IEndpoint
 
     public record ArtistResponse(EntityId Id, string Name);
 
-    public record AlbumResponse(EntityId Id, string Title, Uri ImageUri);
+    public record AlbumResponse(EntityId? Id, string Title, Uri ImageUri);
 
     public static async Task<Ok<Response[]>> Handle(
         EntityId id,
@@ -43,7 +43,7 @@ public class GetArtistTracks : IEndpoint
                 e.Track.CreationDate,
                 new(
                     e.Track.AlbumId,
-                    e.Track.Album.Title,
+                    e.Track.Album!.Title,
                     e.Track.Album.ImageUri
                 ),
                 new(e.Track.PrimaryArtistId, e.Track.PrimaryArtist.Name),

@@ -4,17 +4,28 @@ namespace Muzonia.Api.Common;
 
 public static class HttpContextUtilsExt
 {
-    public static bool IsLoggedIn(this HttpContext context)
+    extension(HttpContext context)
     {
-        return context.User.Identity?.IsAuthenticated ?? false;
+        public bool IsLoggedIn() =>
+            context.User.Identity?.IsAuthenticated ?? false;
+
+        public EntityId GetUserId() => context.User.UserId;
     }
 
-    public static EntityId GetUserId(this HttpContext context)
+    extension(ClaimsPrincipal principal)
     {
-        var stringId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (stringId is null)
-            throw new UnauthorizedAccessException();
+        public EntityId UserId
+        {
+            get
+            {
+                var stringId = principal.FindFirstValue(
+                    ClaimTypes.NameIdentifier
+                );
+                if (stringId is null)
+                    throw new UnauthorizedAccessException();
 
-        return EntityId.Parse(stringId);
+                return EntityId.Parse(stringId);
+            }
+        }
     }
 }

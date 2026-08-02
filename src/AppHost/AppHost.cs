@@ -2,16 +2,26 @@ using Microsoft.Extensions.Configuration;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
+#pragma warning disable ASPIREPERSISTENCE001
 var postgres = builder
     .AddPostgres("postgres")
     .WithDataVolume()
+    .WithPgAdmin()
+    .WithPersistentLifetime()
     .AddDatabase("apidb");
+#pragma warning restore ASPIREPERSISTENCE001
 
-var zitadel = builder.AddZitadel("zitadel").WithDatabase(postgres);
+#pragma warning disable ASPIREPERSISTENCE001
+var zitadel = builder
+    .AddZitadel("zitadel")
+    .WithDatabase(postgres)
+    .WithPersistentLifetime();
 zitadel.WaitFor(postgres);
 
-var cache = builder.AddRedis("redis");
+#pragma warning disable ASPIREPERSISTENCE001
+var cache = builder.AddRedis("redis").WithPersistentLifetime();
 
+#pragma warning disable ASPIREPERSISTENCE001
 var storage = builder
     .AddAzureStorage("storage")
     .RunAsEmulator(azurite =>
@@ -23,7 +33,6 @@ var coreapi = builder
     .WithReference(cache)
     .WithReference(postgres)
     .WaitFor(cache)
-    .WaitFor(storage)
     .WaitFor(zitadel)
     .WaitFor(postgres);
 

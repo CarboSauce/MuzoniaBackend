@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -7,7 +6,7 @@
     <UserSecretsId>0ebd6448-19be-49c7-a032-766e8e9b1c36</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <InternalsVisibleTo Include="Api.IntegrationTest" />
   </ItemGroup>
@@ -19,8 +18,10 @@
     <PackageReference Include="HotChocolate" Version="16.5.1" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="16.5.1" />
     <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="16.5.1" />
+    <PackageReference Include="HotChocolate.AspNetCore.CommandLine" Version="16.5.1" />
     <PackageReference Include="HotChocolate.Data" Version="16.5.1" />
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="16.5.1" />
+    <PackageReference Include="HotChocolate.Types" Version="16.5.1" />
     <PackageReference Include="HotChocolate.Types.Analyzers" Version="16.5.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="10.0.10" />
@@ -46,5 +47,4 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
 </Project>

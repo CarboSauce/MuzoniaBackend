@@ -1,6 +1,4 @@
-﻿using Muzonia.Api.GraphQL;
-using Muzonia.Api.GraphQL.Mutation;
-using Muzonia.Api.GraphQL.Query;
+﻿using Muzonia.Api.Middleware;
 using Muzonia.Core.Common;
 
 namespace Muzonia.Api.DepInjection;
@@ -15,20 +13,25 @@ internal static class GraphQl
     {
         services
             .AddGraphQLServer()
+            .AddGlobalObjectIdentification()
+            .AddMutationConventions()
             .AddMaxExecutionDepthRule(6)
             .ModifyCostOptions(opt =>
             {
                 opt.EnforceCostLimits = true;
                 opt.ApplyCostDefaults = true;
             })
+            .ModifyRequestOptions(opt =>
+                opt.IncludeExceptionDetails = env.IsDevelopment()
+            )
+            .UseField<ValidationMiddleware>()
             .AddAuthorization()
-            .AddApiTypes()
-            .MapGraphqlTypes()
             .AddPagingArguments()
             .AddQueryContext()
             .AddSorting()
             .AddFiltering()
-            .AddProjections();
+            .AddProjections()
+            .AddApiTypes();
 
         return services;
     }

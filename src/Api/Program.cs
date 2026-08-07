@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Threading.RateLimiting;
 using FluentValidation;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -27,6 +28,14 @@ builder.Host.UseSerilog(
     }
 );
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.All;
+
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var (apiConfig, _, _) = CreateConfig(builder);
 
 ConfigureExternalServices(builder);
@@ -46,22 +55,21 @@ if (appEnv.IsDevelopment())
 }
 
 app.UseOpenApi(app, app.Configuration, appEnv)
-    .UseHttpsRedirection()
+    .UseForwardedHeaders()
     .UseCors()
     .UseAuthorization()
     .UseHangfire(appEnv)
     .AddStaticFiles(apiConfig, appEnv)
     .AddHubs(app, appEnv);
 
-app.MapGraphQL();
+app.MapGraphQL("/api/graphql");
 app.MapEndpoints();
 
 await app.RunAsync();
 return;
 
-(ApiConfig, AdminConfig, EmailConfig) CreateConfig(
-    WebApplicationBuilder builder
-) => builder.Services.AddConfig(builder.Configuration);
+ConfigExt.ConfigTuple CreateConfig(WebApplicationBuilder builder) =>
+    builder.Services.AddConfig(builder.Configuration);
 
 static void ConfigureExternalServices(WebApplicationBuilder builder)
 {

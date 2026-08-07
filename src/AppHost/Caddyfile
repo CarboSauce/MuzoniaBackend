@@ -1,0 +1,14 @@
+﻿{
+    auto_https off
+}
+
+:80 {
+    handle /* {
+        reverse_proxy {$AUTH_HOST}:{$AUTH_PORT}
+    }
+
+    handle /api/graphql* {
+        reverse_proxy {$API_HOST}:{$API_PORT} 
+        
+    }
+}

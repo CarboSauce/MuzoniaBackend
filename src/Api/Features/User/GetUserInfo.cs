@@ -20,8 +20,7 @@ public class GetUserInfo : IEndpoint
         string Email,
         DateTime CreationDate,
         Uri? Avatar,
-        ArtistResponse? Artist,
-        bool IsAdmin
+        ArtistResponse? Artist
     );
 
     public static async Task<Results<Ok<Response>, NotFound>> Handle(
@@ -52,11 +51,7 @@ public class GetUserInfo : IEndpoint
                         u.Artist.ImageUri,
                         u.Artist.CreationDate
                     )
-                    : null,
-                dbContext.UserRoles.Any(ur =>
-                    ur.RoleId == ApiDbContext.AdminRoleId
-                    && ur.UserId == user.Id
-                )
+                    : null
             ))
             .FirstOrDefaultAsync();
 

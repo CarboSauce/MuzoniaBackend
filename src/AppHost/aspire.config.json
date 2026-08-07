@@ -1,5 +1,8 @@
 {
   "appHost": {
-    "path": "AspireHost.csproj"
+    "path": "AppHost.csproj"
+  },
+  "features": {
+    "defaultWatchEnabled": "true"
   }
 }

@@ -8,8 +8,7 @@ public record UserResponse(
     string Email,
     DateTime CreationDate,
     ArtistResponse? Artist,
-    bool IsAdmin,
-    Uri? Avatar
+    bool IsAdmin
 )
 {
     public static UserResponse From(
@@ -19,11 +18,10 @@ public record UserResponse(
     ) =>
         new(
             user.Id,
-            user.UserName!,
+            user.Name!,
             user.Email!,
             user.CreationDate,
             artist,
-            isAdmin,
-            user.AvatarUri
+            isAdmin
         );
 }

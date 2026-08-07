@@ -9,7 +9,7 @@ public class Artist : Entity
     public required string Description { get; set; }
     public required Uri ImageUri { get; set; }
     public required EntityId UserId { get; set; }
-    public AppUser User { get; set; } = null!;
+    public Profile User { get; set; } = null!;
     public virtual ICollection<Track> PrimaryTracks { get; } = null!;
     public virtual ICollection<Track> Tracks { get; } = null!;
     public virtual ICollection<Album> Albums { get; } = null!;

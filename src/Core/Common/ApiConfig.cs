@@ -8,6 +8,27 @@ using Microsoft.Extensions.Logging;
 
 namespace Muzonia.Core.Common;
 
+public static class ConfigUtils
+{
+    public static T? Configure<T>(
+        IServiceCollection services,
+        IConfiguration config,
+        string? ConfigSection = null
+    )
+        where T : class
+    {
+        var apiConfig = config.Get<T>();
+        if (apiConfig is null)
+        {
+            return null;
+        }
+        services.Configure<T>(config);
+        services.AddSingleton(apiConfig);
+
+        return apiConfig;
+    }
+}
+
 public class ApiConfig
 {
     public bool AllowLocalhost { get; set; } = false;
@@ -19,24 +40,6 @@ public class ApiConfig
     public string ApiDomain { get; set; }
     public string ApiPort { get; set; }
     public string ApiProtocol { get; set; }
-
-    public static ApiConfig? Configure(
-        IServiceCollection services,
-        IConfiguration config
-    )
-    {
-        var apiConfig = config.Get<ApiConfig>();
-
-        if (apiConfig is null)
-        {
-            return null;
-        }
-
-        services.Configure<ApiConfig>(config);
-        services.AddSingleton(apiConfig);
-
-        return apiConfig;
-    }
 }
 
 public class AdminConfig
@@ -44,25 +47,6 @@ public class AdminConfig
     public string UserName { get; set; } = "admin";
     public string Email { get; set; } = "admin@admin";
     public string Password { get; set; } = "admin";
-
-    public static AdminConfig? Configure(
-        IServiceCollection services,
-        IConfiguration config
-    )
-    {
-        var configurationSection = config.GetSection("AdminConfig");
-        var adminConfig = configurationSection.Get<AdminConfig>();
-
-        if (adminConfig is null)
-        {
-            return null;
-        }
-
-        services.Configure<AdminConfig>(configurationSection);
-        services.AddSingleton(adminConfig);
-
-        return adminConfig;
-    }
 }
 
 public class EmailConfig
@@ -70,45 +54,32 @@ public class EmailConfig
     public string ClientUrl { get; set; } = "http://localhost:3000";
     public string ConfirmEmailEndpoint { get; set; } = "confirmEmail";
     public string ForgotPasswordEndpoint { get; set; } = "forgotPassword";
-
-    public static EmailConfig? Configure(
-        IServiceCollection services,
-        IConfiguration config
-    )
-    {
-        var configurationSection = config.GetSection("EmailConfig");
-        var emailConfig = configurationSection.Get<EmailConfig>();
-
-        if (emailConfig is null)
-            return null;
-
-        services.Configure<EmailConfig>(configurationSection);
-        services.AddSingleton(emailConfig);
-
-        return emailConfig;
-    }
 }
 
 public static class ConfigExt
 {
-    public static (
+    public record struct ConfigTuple(
         ApiConfig? apiConfig,
         AdminConfig? adminConfig,
         EmailConfig? emailConfig
-    ) AddConfigNullable(this IServiceCollection services, IConfiguration config)
-    {
-        var apiConfig = ApiConfig.Configure(services, config);
-        var adminConfig = AdminConfig.Configure(services, config);
-        var emailConfig = EmailConfig.Configure(services, config);
+    );
 
-        return (apiConfig, adminConfig, emailConfig);
+    public static ConfigTuple AddConfigNullable(
+        this IServiceCollection services,
+        IConfiguration config
+    )
+    {
+        var apiConfig = ConfigUtils.Configure<ApiConfig>(services, config);
+        var adminConfig = ConfigUtils.Configure<AdminConfig>(services, config);
+        var emailConfig = ConfigUtils.Configure<EmailConfig>(services, config);
+
+        return new(apiConfig, adminConfig, emailConfig);
     }
 
-    public static (
-        ApiConfig apiConfig,
-        AdminConfig adminConfig,
-        EmailConfig emailConfig
-    ) AddConfig(this IServiceCollection services, IConfiguration config)
+    public static ConfigTuple AddConfig(
+        this IServiceCollection services,
+        IConfiguration config
+    )
     {
         var (apiConfig, adminConfig, emailConfig) = services.AddConfigNullable(
             config
@@ -134,7 +105,11 @@ public static class ConfigExt
             );
         }
 
-        return (apiConfig ?? new(), adminConfig ?? new(), emailConfig ?? new());
+        return new(
+            apiConfig ?? new(),
+            adminConfig ?? new(),
+            emailConfig ?? new()
+        );
     }
 }
 

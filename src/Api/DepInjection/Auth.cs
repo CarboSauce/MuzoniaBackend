@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Muzonia.Core.Common;
 using Muzonia.DbEf;
 using Muzonia.DbEf.Entities;
@@ -14,58 +18,38 @@ internal static class Auth
         IWebHostEnvironment env
     )
     {
-        services.AddAuthorization();
+        var data = services.AddAuthorization();
         services
-            .AddAuthentication(IdentityConstants.ApplicationScheme)
-            .AddCookie(
-                IdentityConstants.ApplicationScheme,
-                o =>
-                {
-                    o.Cookie.SameSite = SameSiteMode.None;
-                    o.Cookie.Name = "MuzoniaAuth";
-                    o.Events.OnRedirectToLogin = context =>
-                    {
-                        context.Response.StatusCode = 401;
-                        return Task.CompletedTask;
-                    };
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddExternalCookie();
 
-                    o.Events.OnRedirectToAccessDenied = context =>
-                    {
-                        context.Response.StatusCode = 403;
-                        return Task.CompletedTask;
-                    };
-                }
-            );
-
-        services
-            .AddIdentityCore<AppUser>(o =>
-            {
-                o.User.RequireUniqueEmail = true;
-
-                o.SignIn.RequireConfirmedEmail = !apiConfig.UseNoopEmail;
-
-                if (env.IsDevelopment())
-                {
-                    o.Password.RequireDigit = false;
-                    o.Password.RequireLowercase = false;
-                    o.Password.RequireUppercase = false;
-                    o.Password.RequireNonAlphanumeric = false;
-                    o.Password.RequiredLength = 0;
-                }
-                else
-                {
-                    o.Password.RequireDigit = true;
-                    o.Password.RequireLowercase = true;
-                    o.Password.RequireUppercase = true;
-                    o.Password.RequireNonAlphanumeric = true;
-                    o.Password.RequiredLength = 8;
-                    o.SignIn.RequireConfirmedEmail = true;
-                }
-            })
-            .AddRoles<IdentityRole<Guid>>()
-            .AddEntityFrameworkStores<ApiDbContext>()
-            .AddDefaultTokenProviders()
-            .AddSignInManager();
+        // services
+        //     .AddIdentityCore<AppUser>(o =>
+        //     {
+        //         o.User.RequireUniqueEmail = true;
+        //
+        //         o.SignIn.RequireConfirmedEmail = !apiConfig.UseNoopEmail;
+        //
+        //         if (env.IsDevelopment())
+        //         {
+        //             o.Password.RequireDigit = false;
+        //             o.Password.RequireLowercase = false;
+        //             o.Password.RequireUppercase = false;
+        //             o.Password.RequireNonAlphanumeric = false;
+        //             o.Password.RequiredLength = 0;
+        //         }
+        //         else
+        //         {
+        //             o.Password.RequireDigit = true;
+        //             o.Password.RequireLowercase = true;
+        //             o.Password.RequireUppercase = true;
+        //             o.Password.RequireNonAlphanumeric = true;
+        //             o.Password.RequiredLength = 8;
+        //             o.SignIn.RequireConfirmedEmail = true;
+        //         }
+        //     })
+        //     .AddDefaultTokenProviders()
+        //     .AddSignInManager();
 
         return services;
     }

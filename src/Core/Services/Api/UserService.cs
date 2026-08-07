@@ -74,17 +74,17 @@ public class UserService(
         if (request.Email is not null)
             user.Email = request.Email;
 
-        if (request.UserName is not null)
-            user.UserName = request.UserName;
-
-        if (request.File is not null)
-        {
-            user.AvatarUri = await fileWriter.WriteAsync(
-                request.File,
-                "images/",
-                Guid.NewGuid().ToString()
-            );
-        }
+        // if (request.UserName is not null)
+        //     user.UserName = request.UserName;
+        //
+        // if (request.File is not null)
+        // {
+        //     user.AvatarUri = await fileWriter.WriteAsync(
+        //         request.File,
+        //         "images/",
+        //         Guid.NewGuid().ToString()
+        //     );
+        // }
 
         var result = await userManager.UpdateAsync(user);
 

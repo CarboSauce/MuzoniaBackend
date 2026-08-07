@@ -16,8 +16,7 @@ public class GetUserById : IEndpoint
         string Username,
         DateTime CreationDate,
         Uri? Avatar,
-        ArtistResponse? Artist,
-        bool IsAdmin
+        ArtistResponse? Artist
     );
 
     public static async Task<
@@ -45,10 +44,7 @@ public class GetUserById : IEndpoint
                         u.Artist.ImageUri,
                         u.Artist.CreationDate
                     )
-                    : null,
-                dbContext.UserRoles.Any(ur =>
-                    ur.RoleId == ApiDbContext.AdminRoleId && ur.UserId == id
-                )
+                    : null
             ))
             .FirstOrDefaultAsync();
 

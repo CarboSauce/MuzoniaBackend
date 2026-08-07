@@ -9,18 +9,17 @@ using Muzonia.DbEf.Entities;
 
 namespace Muzonia.Api.GraphQL.Users;
 
-[ObjectType<AppUser>]
+[ObjectType<Profile>]
 public static partial class UserType
 {
-    static partial void Configure(IObjectTypeDescriptor<AppUser> descriptor)
+    static partial void Configure(IObjectTypeDescriptor<Profile> descriptor)
     {
         descriptor.Field(u => u.Artist).Ignore();
-        descriptor.Field(u => u.Id).ID<AppUser>();
-        descriptor.Field(u => u.PasswordHash).Ignore();
+        descriptor.Field(u => u.Id).ID<Profile>();
     }
 
     public static async Task<Artist> GetArtistAsync(
-        [Parent] AppUser user,
+        [Parent] Profile user,
         IArtistByUserIdDataLoader artistByUserIdDataLoader,
         ISelection selection,
         CancellationToken cancellationToken
@@ -31,9 +30,9 @@ public static partial class UserType
 
     [UsePaging]
     [UseSorting]
-    [BindMember(nameof(AppUser.Playlists), Replace = true)]
+    [BindMember(nameof(Profile.Playlists), Replace = true)]
     public static async Task<Page<Playlist>> GetPlaylistsAsync(
-        [Parent(requires: nameof(AppUser.Id))] AppUser user,
+        [Parent(requires: nameof(Profile.Id))] Profile user,
         IPlaylistsByUserIdDataLoader dataLoader,
         PagingArguments paging,
         QueryContext<Playlist> query,
@@ -47,10 +46,4 @@ public static partial class UserType
             .SetState("userId", curUserId)
             .LoadRequiredAsync(user.Id, ct);
     }
-
-    public static async Task<bool> GetIsAdmin(
-        [Parent(requires: nameof(AppUser.Id))] AppUser users,
-        IIsAdminByUserIdDataLoader isAdminByUserIdDataLoader,
-        CancellationToken ct
-    ) => await isAdminByUserIdDataLoader.LoadRequiredAsync(users.Id, ct);
 }

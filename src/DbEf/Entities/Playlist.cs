@@ -11,7 +11,7 @@ public class Playlist : Entity
     public required Uri? ImageUri { get; set; }
     public required EntityId UserId { get; set; }
     public required int TrackCount { get; set; }
-    public AppUser User { get; set; } = null!;
+    public Profile User { get; set; } = null!;
     public virtual ICollection<Track> Tracks { get; } = null!;
 }
 

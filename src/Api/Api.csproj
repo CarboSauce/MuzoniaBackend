@@ -23,6 +23,7 @@
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="16.5.1" />
     <PackageReference Include="HotChocolate.Types" Version="16.5.1" />
     <PackageReference Include="HotChocolate.Types.Analyzers" Version="16.5.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="10.0.10" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.16.16" />
@@ -46,5 +47,22 @@
       <Link>appsettings.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Remove="Features\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Features\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Features\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Features\**" />
   </ItemGroup>
 </Project>

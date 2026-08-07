@@ -13,7 +13,7 @@ public static class InjectApiServices
         IConfiguration config
     )
     {
-        services.Add<ArtistService>().Add<AlbumService>().Add<UserService>();
+        // services.Add<ArtistService>().Add<AlbumService>().Add<UserService>();
 
         if (apiConfig.UseNoopEmail)
         {

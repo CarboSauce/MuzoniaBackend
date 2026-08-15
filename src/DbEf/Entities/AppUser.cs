@@ -9,13 +9,10 @@ public sealed class AppUser : Entity
     public string Email { get; set; }
     public string Name { get; set; }
     public string Role { get; set; }
-    public Profile Profile { get; set; }
-
-    public AppUser()
-    {
-        CreationDate = DateTime.UtcNow;
-        Id = EntityId.NewGuid();
-    }
+    public string? ImageUri { get; set; }
+    public PlaybackQueue? Queue { get; set; }
+    public Artist? Artist { get; set; }
+    public ICollection<Playlist> Playlists { get; } = null!;
 }
 
 public class AppUserConfig : IEntityTypeConfiguration<AppUser>
@@ -26,5 +23,7 @@ public class AppUserConfig : IEntityTypeConfiguration<AppUser>
         builder.Property(e => e.Name).HasColumnName("name");
         builder.Property(e => e.Role).HasColumnName("role");
         builder.Property(e => e.Id).HasColumnName("id");
+        builder.Property(e => e.ImageUri).HasColumnName("image");
+        builder.Property(e => e.CreationDate).HasColumnName("created_at");
     }
 }

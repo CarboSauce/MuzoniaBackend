@@ -9,17 +9,17 @@ using Muzonia.DbEf.Entities;
 
 namespace Muzonia.Api.GraphQL.Users;
 
-[ObjectType<Profile>]
+[ObjectType<AppUser>]
 public static partial class UserType
 {
-    static partial void Configure(IObjectTypeDescriptor<Profile> descriptor)
+    static partial void Configure(IObjectTypeDescriptor<AppUser> descriptor)
     {
         descriptor.Field(u => u.Artist).Ignore();
-        descriptor.Field(u => u.Id).ID<Profile>();
+        descriptor.Field(u => u.Id).ID<AppUser>();
     }
 
     public static async Task<Artist> GetArtistAsync(
-        [Parent] Profile user,
+        [Parent] AppUser user,
         IArtistByUserIdDataLoader artistByUserIdDataLoader,
         ISelection selection,
         CancellationToken cancellationToken
@@ -30,9 +30,9 @@ public static partial class UserType
 
     [UsePaging]
     [UseSorting]
-    [BindMember(nameof(Profile.Playlists), Replace = true)]
+    [BindMember(nameof(AppUser.Playlists), Replace = true)]
     public static async Task<Page<Playlist>> GetPlaylistsAsync(
-        [Parent(requires: nameof(Profile.Id))] Profile user,
+        [Parent(requires: nameof(AppUser.Id))] AppUser user,
         IPlaylistsByUserIdDataLoader dataLoader,
         PagingArguments paging,
         QueryContext<Playlist> query,

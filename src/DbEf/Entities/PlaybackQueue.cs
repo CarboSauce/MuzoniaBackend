@@ -13,7 +13,7 @@ public enum RepeatMode
 public class PlaybackQueue : Entity
 {
     public required EntityId OwnerId { get; set; }
-    public Profile Owner { get; set; } = null!;
+    public AppUser Owner { get; set; } = null!;
     public required bool IsPublic { get; set; }
     public required bool IsModifiable { get; set; }
     public required bool IsRepeat { get; set; }

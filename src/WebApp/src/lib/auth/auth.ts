@@ -4,6 +4,7 @@ import { oauthProvider } from "@better-auth/oauth-provider";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { db } from "./database.js";
 import * as schema from "./auth-schema.js"
+import { sendMail } from "./mail.js"
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -22,16 +23,18 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url, token }, request) => {
-      console.log({
+      await sendMail({
+        from: "muzonia@muzonia.com",
         to: user.email,
-        subject: 'Verify your email address',
-        text: `Click the link to verify your email: ${url}`
+        subject: "Muzonia verification email",
+        text: `Verify your account by clicking this link ${url}`,
+        html: `<p>Verify your account by clicking this link <a href="${url}">Verify Email</a></p>`
       })
     }
   },
   logger: {
     disabled: false,
-    level: "debug",
+    level: "info",
     log: (level, message, ...args) => {
       // Custom logging implementation
       console.log(`[${level}] ${message}`, ...args);
@@ -44,15 +47,30 @@ export const auth = betterAuth({
     oauthProvider({
       loginPage: "/sign-in",
       consentPage: "/consent",
+      allowDynamicClientRegistration: true,
+      validAudiences: process.env.AUTH_AUDIENCE
+        ? [process.env.AUTH_AUDIENCE]
+        : undefined,
     }),
     jwt({
-      disableSettingJwtHeader: true,
+      jwks: {
+        // disablePrivateKeyEncryption: true,
+        // keyPairConfig: {
+        //   alg: "EdDSA",
+        // }
+      }
     }),
     openAPI(),
     admin(),
     emailOTP({
       async sendVerificationOTP({ email, otp, type }) {
-        console.log(`Sending ${type} OTP to ${email}: ${otp}`);
+        await sendMail({
+          from: "muzonia@muzonia.com",
+          to: email,
+          subject: "Muzonia verification email",
+          text: `Your verification OTP is: ${otp}`,
+          html: `<p>Your verification OTP is: <strong>${otp}</strong></p>`
+        });
       }
     })
   ],

@@ -10,6 +10,6 @@ public static class ArtistUtils
         EntityId userId
     )
     {
-        return dbset.Where(e => e.Id == userId).Select(e => e.Profile.Artist);
+        return dbset.Where(e => e.Id == userId).Select(e => e.Artist);
     }
 }

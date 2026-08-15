@@ -3,12 +3,16 @@
 }
 
 :80 {
+    log {
+        output stdout
+        level INFO
+    }
+
     handle /* {
         reverse_proxy {$AUTH_HOST}:{$AUTH_PORT}
     }
 
     handle /api/graphql* {
-        reverse_proxy {$API_HOST}:{$API_PORT} 
-        
+        reverse_proxy {$API_HOST}:{$API_PORT}
     }
 }

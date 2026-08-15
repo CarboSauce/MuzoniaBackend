@@ -23,10 +23,11 @@
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="16.5.1" />
     <PackageReference Include="HotChocolate.Types" Version="16.5.1" />
     <PackageReference Include="HotChocolate.Types.Analyzers" Version="16.5.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="10.0.10" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.16.16" />
+    <PackageReference Include="ScottBrady.IdentityModel" Version="4.1.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="9.1.0" />
   </ItemGroup>

@@ -12,7 +12,6 @@ public class ApiDbContext(DbContextOptions<ApiDbContext> options)
     : DbContext(options)
 {
     public DbSet<AppUser> Users { get; set; } = null!;
-    public DbSet<Profile> Profiles { get; set; } = null!;
     public DbSet<Album> Albums { get; set; } = null!;
     public DbSet<Artist> Artists { get; set; } = null!;
     public DbSet<Track> Tracks { get; set; } = null!;

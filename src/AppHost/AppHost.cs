@@ -1,6 +1,3 @@
-using System.Security.Cryptography;
-using Microsoft.Extensions.Configuration;
-
 var builder = DistributedApplication.CreateBuilder(args);
 
 #pragma warning disable ASPIREPERSISTENCE001
@@ -26,6 +23,8 @@ var storage = builder
     });
 
 var authProjectDirectory = "../WebApp";
+var clientId = builder.AddParameter("client-id");
+var clientSecret = builder.AddParameter("client-secret");
 
 var migrateAuthExec = builder
     .AddExecutable(
@@ -44,30 +43,34 @@ var migrateAuthExec = builder
             .UriExpression;
     });
 
+#pragma warning disable ASPIREPERSISTENCE001
+var mailpit = builder
+    .AddMailPit("mailpit")
+    .WithDataVolume("mailpit-data")
+    .WithPersistentLifetime();
+
 var webAppPort = 3003;
 var webAppSecret = builder.AddParameter("better-auth-secret", secret: true);
-
+var authAudience = builder.AddParameter("auth-audience", value: "muzonia-api");
 var authApi = builder
     .AddJavaScriptApp("auth", authProjectDirectory)
     .WithHttpEndpoint(port: webAppPort, env: "APP_PORT")
-    .WithPnpm(install: false)
     .WithEnvironment("BETTER_AUTH_SECRET", webAppSecret)
-    .WithEnvironment(context =>
-    {
-        context.EnvironmentVariables["POSTGRES_URI"] = postgres
-            .Resource
-            .UriExpression;
-        context.EnvironmentVariables["BETTER_AUTH_URL"] =
-            $"http://localhost:{webAppPort}";
-    })
-    .WaitForCompletion(migrateAuthExec);
+    .WithEnvironment("AUTH_AUDIENCE", authAudience)
+    .WithReference(mailpit)
+    .WaitForCompletion(migrateAuthExec)
+    .WithPnpm(install: false);
 
 var coreapi = builder
     .AddProject<Projects.Api>("coreapi")
     .WithReference(cache)
     .WithReference(postgres)
+    .WithEnvironment("Auth:Audience", authAudience)
+    .WithEnvironment("Auth:ClientId", clientId)
+    .WithEnvironment("Auth:ClientSecret", clientSecret)
     .WaitFor(cache)
     .WaitFor(postgres)
+    .WaitFor(authApi)
     .WaitForCompletion(migrateAuthExec);
 
 #pragma warning disable ASPIREDOCKERFILEBUILDER001
@@ -93,5 +96,24 @@ var caddy = builder
         coreapi.GetEndpoint("http").Property(EndpointProperty.Port)
     )
     .WithHttpEndpoint(port: 8080, targetPort: 80);
+
+authApi.WithEnvironment(context =>
+{
+    var port = caddy.GetEndpoint("http").Port;
+    var host = caddy.GetEndpoint("http").Host;
+    var scheme = caddy.GetEndpoint("http").Scheme;
+    var url = $"{scheme}://{host}:{port}";
+
+    context.EnvironmentVariables["POSTGRES_URI"] = postgres
+        .Resource
+        .UriExpression;
+    context.EnvironmentVariables["BETTER_AUTH_URL"] = url;
+    context.EnvironmentVariables["VITE_URL"] = url;
+});
+
+coreapi.WithEnvironment(
+    "Auth:Authority",
+    $"{caddy.GetEndpoint("http").Property(EndpointProperty.Scheme)}://{caddy.GetEndpoint("http").Property(EndpointProperty.Host)}:{caddy.GetEndpoint("http").Property(EndpointProperty.Port)}/api/auth"
+);
 
 builder.Build().Run();

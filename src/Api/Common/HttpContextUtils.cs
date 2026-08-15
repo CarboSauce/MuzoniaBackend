@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Muzonia.Api.Common;
 
@@ -18,9 +19,9 @@ public static class HttpContextUtilsExt
         {
             get
             {
-                var stringId = principal.FindFirstValue(
-                    ClaimTypes.NameIdentifier
-                );
+                var stringId =
+                    principal.FindFirstValue(JwtRegisteredClaimNames.Sub)
+                    ?? principal.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (stringId is null)
                     throw new UnauthorizedAccessException();
 

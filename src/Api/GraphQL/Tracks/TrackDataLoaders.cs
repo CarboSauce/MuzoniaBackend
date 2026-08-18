@@ -18,7 +18,7 @@ public static class TrackDataLoaders
     )
     {
         return await dbContext
-            .Tracks.Where(t => ids.Contains(t.Id))
+            .Tracks.Where(t => ids.Contains(t.Id) && t.DataUri != null)
             .OrderBy(t => t.Id)
             .Select(t => t.Id, selector)
             .ToDictionaryAsync(t => t.Id, ct);
@@ -37,7 +37,7 @@ public static class TrackDataLoaders
     {
         var rows = await dbContext
             .TrackArtists.AsNoTracking()
-            .Where(ta => ids.Contains(ta.ArtistId))
+            .Where(ta => ids.Contains(ta.ArtistId) && ta.Track.DataUri != null)
             .Select(ta => ta.Track)
             .OrderBy(t => t.Id)
             .With(queryContext)
@@ -65,6 +65,7 @@ public static class TrackDataLoaders
             .Albums.Where(a => ids.Contains(a.Id))
             .Select(a => a.Id, selector)
             .SelectMany(a => a.Tracks ?? Array.Empty<Track>())
+            .Where(t => t.DataUri != null)
             .With(query)
             .ToBatchPageAsync(
                 t => t.AlbumId!.Value,

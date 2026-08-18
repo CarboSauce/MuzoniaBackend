@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using GreenDonut.Data;
 using HotChocolate.Execution;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Muzonia.Api.Common;
 using Muzonia.DbEf.Entities;
@@ -28,5 +29,16 @@ public static partial class UserQueries
     )
     {
         return dbContext.Users.Where(u => u.Id == id);
+    }
+
+    public static async Task<IEnumerable<AppUser>> SearchUsersAsync(
+        string name,
+        ApiDbContext dbContext,
+        CancellationToken ct
+    )
+    {
+        return await dbContext
+            .Users.Where(u => EF.Functions.ToTsVector(u.Name).Matches(name))
+            .ToListAsync(ct);
     }
 }

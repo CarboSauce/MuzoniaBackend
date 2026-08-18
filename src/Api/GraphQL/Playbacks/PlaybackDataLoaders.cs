@@ -12,19 +12,19 @@ public static class PlaybackDataLoaders
     > QueueEntriesByPlaybackIdAsync(
         IReadOnlyList<EntityId> playbackIds,
         ApiDbContext dbContext,
-        DataLoaderFetchContext<QueueEntry> fetchContext,
         PagingArguments pagingArguments,
+        [DataLoaderState("userId")] EntityId userId,
         QueryContext<QueueEntry> query,
         CancellationToken ct
     )
     {
-        var userId = fetchContext.GetRequiredState<EntityId>("userId");
         return await dbContext
             .PlaybackQueues.AsNoTracking()
             .Where(p => playbackIds.Contains(p.Id))
-            .Where(p => p.OwnerId == userId || p.IsPublic == true) //)
+            .Where(p => p.OwnerId == userId || p.IsPublic == true)
             .SelectMany(p => p.Entries)
             .With(query)
+            .OrderBy(p => p.Id)
             .ToBatchPageAsync(p => p.QueueId, pagingArguments, ct);
     }
 }

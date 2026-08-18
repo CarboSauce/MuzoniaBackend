@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Muzonia.DbEf;
-using Muzonia.DbEf.Entities;
+﻿using Muzonia.DbEf;
 
 namespace Muzonia.Core.Services.Transcoding;
 
@@ -22,33 +20,14 @@ public class TrackTranscoder(
 {
     public async Task Transcode(EntityId trackId, EntityId fileId)
     {
-        var file = await dbContext.Files.FindAsync(fileId);
+        var track = await dbContext.Tracks.FindAsync(trackId)
+            ?? throw new FileNotFoundException($"Track not found: {trackId}");
 
-        if (file is null)
-        {
-            throw new FileNotFoundException();
-        }
-
-        TrackReturn result;
-        using (var stream = new MemoryStream(file.Data, 0, file.Length))
-        {
-            result = await transcoderEngine.Transcode(
-                file.Name,
-                trackId,
-                stream
-            );
-        }
-
-        var track = await dbContext.Tracks.FindAsync(trackId);
-        if (track is null)
-        {
-            throw new FileNotFoundException();
-        }
+        var result = await transcoderEngine.Transcode(trackId);
 
         track.DataUri = result.MasterPlaylist;
         track.Duration = (long)Math.Round(result.Duration.TotalSeconds);
 
-        // dbContext.Files.Remove(file);
         await dbContext.SaveChangesAsync();
     }
 }

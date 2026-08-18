@@ -9,7 +9,7 @@ public class Album : Entity
     public required string Title { get; set; }
     public required EntityId OwnerId { get; set; }
     public Artist Owner { get; } = null!;
-    public required Uri ImageUri { get; set; }
+    public required Uri? ImageUri { get; set; }
     public virtual ICollection<Artist> Artists { get; } = null!;
 }
 

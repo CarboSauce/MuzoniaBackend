@@ -76,6 +76,7 @@ static void ConfigureExternalServices(WebApplicationBuilder builder)
 {
     builder.AddDatabase(builder.Environment);
     builder.AddRedis();
+    builder.AddAzure(builder.Environment);
 }
 
 async Task RunServices(IServiceProvider services, IWebHostEnvironment env)

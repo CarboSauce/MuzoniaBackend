@@ -15,7 +15,7 @@ internal static class GraphQl
             .AddGraphQLServer()
             .AddGlobalObjectIdentification()
             .AddMutationConventions()
-            .AddMaxExecutionDepthRule(6)
+            .AddMaxExecutionDepthRule(20)
             .ModifyCostOptions(opt =>
             {
                 opt.EnforceCostLimits = true;

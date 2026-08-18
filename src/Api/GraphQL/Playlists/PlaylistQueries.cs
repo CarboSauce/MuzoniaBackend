@@ -26,6 +26,22 @@ public static partial class PlaylistQueries
             .OrderBy(a => a.Id);
     }
 
+    public static async Task<IEnumerable<Playlist>> SearchPlaylistsAsync(
+        ApiDbContext dbContext,
+        ClaimsPrincipal claims,
+        string name,
+        CancellationToken ct
+    )
+    {
+        var userId = claims.UserId;
+        return await dbContext
+            .Playlists.Where(p =>
+                (p.IsPublic || p.UserId == userId)
+                && EF.Functions.ToTsVector(p.Name).Matches(name)
+            )
+            .ToListAsync(ct);
+    }
+
     [NodeResolver]
     public static Task<Playlist?> GetPlaylistByIdAsync(
         EntityId id,
@@ -40,21 +56,5 @@ public static partial class PlaylistQueries
             .SetState("userId", userId)
             .Select(selection)
             .LoadAsync(id, ct);
-    }
-
-    [UsePaging]
-    [UseSorting]
-    public static async Task<Page<PlaylistTrack>> GetEntriesAsync(
-        [Parent(requires: nameof(Playlist.Id))] Playlist playlist,
-        PagingArguments pagingArguments,
-        QueryContext<PlaylistTrack> queryContext,
-        IPlaylistTracksByPlaylistIdDataLoader dataLoader,
-        ClaimsPrincipal claims,
-        CancellationToken ct
-    )
-    {
-        return await dataLoader
-            .With(pagingArguments, queryContext)
-            .LoadRequiredAsync(playlist.Id, ct);
     }
 }

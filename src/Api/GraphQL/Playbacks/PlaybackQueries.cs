@@ -10,7 +10,7 @@ namespace Muzonia.Api.GraphQL.Playbacks;
 [QueryType]
 public static partial class PlaybackQueries
 {
-    public static async Task<PlaybackQueue> GetPlaybackQueue(
+    public static async Task<PlaybackQueue?> GetPlaybackQueue(
         ApiDbContext db,
         QueryContext<PlaybackQueue>? query,
         ClaimsPrincipal user,
@@ -22,6 +22,6 @@ public static partial class PlaybackQueries
         return await db
             .PlaybackQueues.Where(pq => pq.OwnerId == userId)
             .With(query)
-            .SingleAsync(ct);
+            .SingleOrDefaultAsync(ct);
     }
 }

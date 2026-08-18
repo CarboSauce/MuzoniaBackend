@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceDefaults", "src\Serv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppHost", "src\AppHost\AppHost.csproj", "{37D3B818-5FC7-4425-9118-C09982B1D63E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiFunctions", "src\ApiFunctions\ApiFunctions.csproj", "{04946222-E913-4749-B02E-C556A6128AF7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{37D3B818-5FC7-4425-9118-C09982B1D63E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37D3B818-5FC7-4425-9118-C09982B1D63E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37D3B818-5FC7-4425-9118-C09982B1D63E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04946222-E913-4749-B02E-C556A6128AF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04946222-E913-4749-B02E-C556A6128AF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04946222-E913-4749-B02E-C556A6128AF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04946222-E913-4749-B02E-C556A6128AF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

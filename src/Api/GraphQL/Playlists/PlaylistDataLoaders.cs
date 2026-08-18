@@ -12,18 +12,18 @@ public static class PlaylistDataLoaders
     > PlaylistsByUserIdAsync(
         IReadOnlyList<EntityId> ids,
         ApiDbContext dbContext,
-        DataLoaderFetchContext<Playlist> fetchContext,
+        [DataLoaderState("userId")] EntityId userId,
         PagingArguments pagingArguments,
         QueryContext<Playlist> query,
         CancellationToken ct
     )
     {
-        var userId = fetchContext.GetRequiredState<EntityId>("userId");
         return await dbContext
             .Playlists.AsNoTracking()
             .Where(p => ids.Contains(p.UserId))
             .Where(p => p.IsPublic || p.UserId == userId)
             .With(query)
+            .OrderBy(p => p.Id)
             .ToBatchPageAsync(p => p.UserId, pagingArguments, ct);
     }
 
@@ -33,19 +33,19 @@ public static class PlaylistDataLoaders
     > PlaylistsByIdAsync(
         IReadOnlyList<EntityId> ids,
         ApiDbContext dbContext,
-        DataLoaderFetchContext<Playlist> fetchContext,
+        [DataLoaderState("userId")] EntityId userId,
         PagingArguments pagingArguments,
         QueryContext<Playlist> query,
         CancellationToken ct
     )
     {
-        var userId = fetchContext.GetRequiredState<EntityId>("userId");
         return await dbContext
             .Playlists.AsNoTracking()
             .Where(p =>
                 ids.Contains(p.Id) && (p.IsPublic || p.UserId == userId)
             )
             .With(query)
+            .OrderBy(p => p.Id)
             .ToBatchPageAsync(p => p.Id, pagingArguments, ct);
     }
 
@@ -55,18 +55,18 @@ public static class PlaylistDataLoaders
     > PlaylistByIdAsync(
         IReadOnlyList<EntityId> ids,
         ApiDbContext dbContext,
-        DataLoaderFetchContext<Playlist> fetchContext,
+        [DataLoaderState("userId")] EntityId userId,
         QueryContext<Playlist> query,
         CancellationToken ct
     )
     {
-        var userId = fetchContext.GetRequiredState<EntityId>("userId");
         return await dbContext
             .Playlists.AsNoTracking()
             .Where(p =>
                 ids.Contains(p.Id) && (p.IsPublic || p.UserId == userId)
             )
             .With(query)
+            .OrderBy(p => p.Id)
             .ToDictionaryAsync(p => p.Id, ct);
     }
 
@@ -85,6 +85,7 @@ public static class PlaylistDataLoaders
             .PlaylistTracks.AsNoTracking()
             .Where(p => ids.Contains(p.PlaylistId))
             .With(query)
+            .OrderBy(p => p.Id)
             .ToBatchPageAsync(p => p.PlaylistId, pagingArguments, ct);
     }
 
@@ -103,6 +104,7 @@ public static class PlaylistDataLoaders
             .PlaylistTracks.AsNoTracking()
             .Where(p => ids.Contains(p.Id))
             .With(query)
+            .OrderBy(p => p.Id)
             .ToBatchPageAsync(p => p.Id, pagingArguments, ct);
     }
 }

@@ -19,8 +19,11 @@ var storage = builder
     .AddAzureStorage("storage")
     .RunAsEmulator(azurite =>
     {
-        azurite.WithBlobPort(27000).WithQueuePort(27001).WithTablePort(27002);
+        azurite.WithBlobPort(10000).WithQueuePort(10001).WithTablePort(10002);
+        azurite.WithDataVolume();
     });
+var blobs = storage.AddBlobs("blobs");
+var queue = storage.AddQueue("queue");
 
 var authProjectDirectory = "../WebApp";
 var clientId = builder.AddParameter("client-id");
@@ -63,6 +66,7 @@ var authApi = builder
 
 var coreapi = builder
     .AddProject<Projects.Api>("coreapi")
+    .WithReference(blobs)
     .WithReference(cache)
     .WithReference(postgres)
     .WithEnvironment("Auth:Audience", authAudience)
@@ -115,5 +119,19 @@ coreapi.WithEnvironment(
     "Auth:Authority",
     $"{caddy.GetEndpoint("http").Property(EndpointProperty.Scheme)}://{caddy.GetEndpoint("http").Property(EndpointProperty.Host)}:{caddy.GetEndpoint("http").Property(EndpointProperty.Port)}/api/auth"
 );
+
+var functions = builder
+    .AddAzureFunctionsProject(
+        "functions",
+        "../ApiFunctions/ApiFunctions.csproj"
+    )
+    .WithExternalHttpEndpoints()
+    .WithReference(postgres)
+    .WaitFor(storage)
+    .WithHostStorage(storage)
+    .WithReference(queue)
+    .WithReference(blobs);
+
+coreapi.WithReference(functions).WaitFor(functions);
 
 builder.Build().Run();

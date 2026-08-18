@@ -36,6 +36,51 @@ public static class PlaybackMutations
         return queue;
     }
 
+    static async Task<PlaybackQueue> CreateQueueAsync(
+        ApiDbContext dbContext,
+        ClaimsPrincipal claims,
+        CancellationToken ct
+    )
+    {
+        var userId = claims.UserId;
+
+        if (dbContext.PlaybackQueues.Any(q => q.Id == userId))
+        {
+            throw new GraphQLException("User already has a queue");
+        }
+
+        var queue = new PlaybackQueue()
+        {
+            IsPublic = false,
+            CurrentIndex = 0,
+            IsModifiable = false,
+            IsPlaying = false,
+            TrackCount = 0,
+            OwnerId = userId,
+            IsRepeat = false,
+            IsRandom = false,
+            Timestamp = 0,
+        };
+        dbContext.PlaybackQueues.Add(queue);
+
+        dbContext.QueueUsers.Add(
+            new QueueUser
+            {
+                UserId = userId,
+                QueueId = queue.Id,
+                IsBanned = false,
+            }
+        );
+
+        dbContext.CurrentQueues.Add(
+            new CurrentQueue { UserId = userId, QueueId = queue.Id }
+        );
+
+        await dbContext.SaveChangesAsync(ct);
+
+        return queue;
+    }
+
     static async Task<QueueEntry> AddQueueEntryAsync(
         AddQueueEntryInput input,
         ApiDbContext dbContext,

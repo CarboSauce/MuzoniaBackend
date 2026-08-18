@@ -19,15 +19,6 @@ internal static class Auth
     {
         services.AddAuthorization();
 
-        var authority =
-            config["Auth:Authority"]
-            ?? throw new InvalidOperationException(
-                "Auth:Authority is required"
-            );
-        var audience =
-            config["Auth:Audience"]
-            ?? throw new InvalidOperationException("Auth:Audience is required");
-
         services
             .AddAuthentication(o =>
             {
@@ -38,6 +29,16 @@ internal static class Auth
                 JwtBearerDefaults.AuthenticationScheme,
                 options =>
                 {
+                    var authority =
+                        config["Auth:Authority"]
+                        ?? throw new InvalidOperationException(
+                            "Auth:Authority is required"
+                        );
+                    var audience =
+                        config["Auth:Audience"]
+                        ?? throw new InvalidOperationException(
+                            "Auth:Audience is required"
+                        );
                     options.Authority = authority;
                     options.Audience = audience;
                     options.RequireHttpsMetadata = false;

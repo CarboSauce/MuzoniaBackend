@@ -7,7 +7,7 @@ public class Artist : Entity
 {
     public required string Name { get; set; }
     public required string Description { get; set; }
-    public required Uri ImageUri { get; set; }
+    public required Uri? ImageUri { get; set; }
     public required EntityId UserId { get; set; }
     public AppUser User { get; set; } = null!;
     public virtual ICollection<Track> PrimaryTracks { get; } = null!;

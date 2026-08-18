@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using FluentValidation;
 using HotChocolate.AspNetCore;
 using HotChocolate.Execution;
 using HotChocolate.Resolvers;
@@ -7,7 +8,10 @@ namespace Muzonia.Api.Middleware;
 
 public class ValidationMiddleware(FieldDelegate next)
 {
-    public async Task InvokeAsync(IMiddlewareContext context)
+    public async Task InvokeAsync(
+        IMiddlewareContext context,
+        IServiceProvider serviceProvider
+    )
     {
         foreach (var arg in context.Selection.Field.Arguments)
         {
@@ -18,34 +22,35 @@ public class ValidationMiddleware(FieldDelegate next)
                 continue;
             }
 
-            var validationContext = new ValidationContext(value);
-
-            var results = new List<ValidationResult>();
+            var validatorType = typeof(IValidator<>).MakeGenericType(
+                value.GetType()
+            );
 
             if (
-                !Validator.TryValidateObject(
-                    value,
-                    validationContext,
-                    results,
-                    true
-                )
+                serviceProvider.GetService(validatorType)
+                is not IValidator validator
             )
+                continue;
+
+            var validationContext = new ValidationContext<object>(value);
+
+            var result = await validator.ValidateAsync(
+                validationContext,
+                context.RequestAborted
+            );
+
+            if (!result.IsValid)
             {
-                throw new GraphQLException(
+                var errors = result.Errors.Select(error =>
                     ErrorBuilder
                         .New()
-                        .SetMessage("Validation failed.")
+                        .SetMessage(error.ErrorMessage)
                         .SetCode("VALIDATION_ERROR")
-                        .SetExtension(
-                            "errors",
-                            results.Select(r => new
-                            {
-                                r.ErrorMessage,
-                                Members = r.MemberNames,
-                            })
-                        )
+                        .SetPath(context.Path)
                         .Build()
                 );
+
+                throw new GraphQLException(errors);
             }
         }
 

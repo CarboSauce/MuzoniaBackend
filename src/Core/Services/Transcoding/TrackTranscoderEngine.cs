@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Options;
 using Muzonia.Core.Common;
 
@@ -19,51 +21,55 @@ internal static partial class DurationRegex
 
 public interface ITrackTranscoderEngine
 {
-    Task<TrackReturn> Transcode(
-        string filename,
-        EntityId trackId,
-        Stream stream
-    );
+    Task<TrackReturn> Transcode(EntityId trackId);
 }
 
 internal class TrackTranscoderEngineFfmpeg(
     IOptions<ApiConfig> config,
-    IFileWriter fileWriter
+    BlobServiceClient blobServiceClient
 ) : ITrackTranscoderEngine, IScoped
 {
     private readonly ApiConfig config = config.Value;
+    private const string ContainerName = "tracks";
+    private const string ContainerNameOut = "music";
 
-    public async Task<TrackReturn> Transcode(
-        string filename,
-        EntityId trackId,
-        Stream stream
-    )
+    public async Task<TrackReturn> Transcode(EntityId trackId)
     {
-        string systemTmpDir = Path.GetTempPath();
-        string tmpGuid = Guid.NewGuid().ToString();
-        string tmpDir = Path.Combine(systemTmpDir, "muzonia", tmpGuid);
+        var container = blobServiceClient.GetBlobContainerClient("tracks");
+        await container.CreateIfNotExistsAsync();
 
-        Directory.CreateDirectory(tmpDir);
+        var sourceBlob = container.GetBlobClient($"tracks/{trackId}");
 
-        // Write file from database to a file
-        async Task<string> CreateInputFile()
+        if (!await sourceBlob.ExistsAsync())
         {
-            using var file = File.Create(Path.Combine(tmpDir, "input_file"));
-            await stream.CopyToAsync(file);
-            await stream.FlushAsync();
-            await file.FlushAsync();
-            return file.Name;
+            throw new FileNotFoundException(
+                $"Source blob not found: tracks/{trackId}"
+            );
         }
-        var fileName = await CreateInputFile();
+
+        var tmpDir = Path.Combine(
+            Path.GetTempPath(),
+            "muzonia",
+            Guid.NewGuid().ToString()
+        );
+        Directory.CreateDirectory(tmpDir);
+        var inputFile = Path.Combine(tmpDir, "input_file");
+
+        await using (var inputStream = File.Create(inputFile))
+        {
+            await sourceBlob.DownloadToAsync(inputStream);
+        }
+
         // csharpier-ignore
         string ffmpegParams =
-           $" -i \"{fileName}\" -c:a aac -map a:0 -b:a:0 64k -f hls -hls_time 10 -hls_playlist_type vod"
-          + " -map a:0 -b:a:1 128k -f hls -hls_time 10 -hls_playlist_type vod"
-          + " -map a:0 -b:a:2 192k -f hls -hls_time 10 -hls_playlist_type vod"
-          + " -var_stream_map \"a:0,name:64k a:1,name:128k a:2,name:192k\""
-          + " -hls_segment_filename \"stream_%v_%03d.aac\""
-          + " -master_pl_name \"master.m3u8\""
-          + " \"stream_%v.m3u8\"";
+           $" -i \"{inputFile}\" -c:a aac -map a:0 -b:a:0 64k -f hls -hls_time 10 -hls_playlist_type vod"
+         + " -map a:0 -b:a:1 128k -f hls -hls_time 10 -hls_playlist_type vod"
+         + " -map a:0 -b:a:2 192k -f hls -hls_time 10 -hls_playlist_type vod"
+         + " -var_stream_map \"a:0,name:64k a:1,name:128k a:2,name:192k\""
+         + " -hls_segment_filename \"stream_%v_%03d.aac\""
+         + " -master_pl_name \"master.m3u8\""
+         + " \"stream_%v.m3u8\"";
+
         using var process = new Process();
         process.StartInfo = new ProcessStartInfo
         {
@@ -74,12 +80,11 @@ internal class TrackTranscoderEngineFfmpeg(
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true,
-            WorkingDirectory = tmpDir
+            WorkingDirectory = tmpDir,
         };
 
         process.Start();
 
-        // read line of stdout and check for regex match
         TimeSpan? duration = null;
         while (await process.StandardError.ReadLineAsync() is { } line)
         {
@@ -98,11 +103,11 @@ internal class TrackTranscoderEngineFfmpeg(
 
         await process.WaitForExitAsync();
 
-        var statusCode = process.ExitCode;
-
-        if (statusCode != 0)
+        if (process.ExitCode != 0)
         {
-            throw new Exception($"ffmpeg exited with status code {statusCode}");
+            throw new Exception(
+                $"ffmpeg exited with status code {process.ExitCode}"
+            );
         }
 
         if (duration is null)
@@ -110,57 +115,61 @@ internal class TrackTranscoderEngineFfmpeg(
             throw new Exception("ffmpeg did not output duration");
         }
 
-        var uri = await UploadAllFiles(tmpDir, filename, trackId);
+        var masterUri = await UploadAllFiles(tmpDir, trackId);
+
+        try
+        {
+            Directory.Delete(tmpDir, recursive: true);
+        }
+        catch
+        {
+            // best-effort cleanup
+        }
 
         return new TrackReturn
         {
-            MasterPlaylist = uri,
+            MasterPlaylist = masterUri,
             Duration = duration.Value,
         };
     }
 
-    private async Task<Uri> UploadAllFiles(
-        string tmpDir,
-        string filename,
-        EntityId trackId
-    )
+    private async Task<Uri> UploadAllFiles(string tmpDir, EntityId trackId)
     {
-        var files = Directory.EnumerateFiles(
-            tmpDir,
-            "*",
-            SearchOption.TopDirectoryOnly
+        var container = blobServiceClient.GetBlobContainerClient(
+            ContainerNameOut
         );
+        await container.CreateIfNotExistsAsync();
+        await container.SetAccessPolicyAsync(PublicAccessType.Blob);
+        Uri? masterUri = null;
+        var trackPrefix = $"{trackId}/";
 
-        await fileWriter.CreateDirectory("tracks/", trackId.ToString());
-
-        var trackUrlPrefix = $"tracks/{trackId.ToString()}/";
-
-        Uri masterUri = null!;
-        foreach (var file in files)
+        foreach (
+            var file in Directory.EnumerateFiles(
+                tmpDir,
+                "*",
+                SearchOption.TopDirectoryOnly
+            )
+        )
         {
             var relativePath = Path.GetRelativePath(tmpDir, file);
 
-            // Skip file called input_file and delete it later
             if (relativePath == "input_file")
             {
                 continue;
             }
-            await using var stream = File.OpenRead(file);
 
-            var uri = await fileWriter.WriteAsync(
-                stream,
-                relativePath,
-                trackUrlPrefix,
-                ""
-            );
+            var blobName = $"{trackPrefix}{relativePath}";
+            var blob = container.GetBlobClient(blobName);
+
+            await using var stream = File.OpenRead(file);
+            await blob.UploadAsync(stream, overwrite: true);
 
             if (relativePath == "master.m3u8")
             {
-                masterUri =
-                    uri ?? throw new Exception("master.m3u8 upload failed");
+                masterUri = blob.Uri;
             }
         }
 
-        return masterUri;
+        return masterUri ?? throw new Exception("master.m3u8 upload failed");
     }
 }

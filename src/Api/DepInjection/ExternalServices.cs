@@ -1,6 +1,7 @@
 ﻿using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
+using Muzonia.Api.Services;
 using Muzonia.Core.Common;
 using Muzonia.DbEf;
 using StackExchange.Redis;
@@ -38,6 +39,24 @@ internal static class Database
         });
 
         builder.EnrichNpgsqlDbContext<ApiDbContext>();
+
+        return builder;
+    }
+}
+
+internal static class Data
+{
+    public static WebApplicationBuilder AddAzure(
+        this WebApplicationBuilder builder,
+        IWebHostEnvironment env
+    )
+    {
+        builder.AddAzureBlobServiceClient("blobs");
+
+        builder.Services.AddHttpClient<FunctionsClient>(static client =>
+        {
+            client.BaseAddress = new("https+http://functions");
+        });
 
         return builder;
     }

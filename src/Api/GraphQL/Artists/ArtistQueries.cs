@@ -31,4 +31,21 @@ public static partial class ArtistQueries
         ISelection selection,
         CancellationToken ct
     ) => await dataLoader.Select(selection).LoadRequiredAsync(ids, ct);
+
+    public static async Task<IEnumerable<Artist>> SearchArtistsAsync(
+        ApiDbContext dbContext,
+        ClaimsPrincipal claims,
+        QueryContext<Artist> queryContext,
+        string text,
+        CancellationToken ct
+    )
+    {
+        return await dbContext
+            .Artists.Where(a =>
+                EF.Functions.ToTsVector("english", a.Description + " " + a.Name)
+                    .Matches(text)
+            )
+            .With(queryContext)
+            .ToListAsync(ct);
+    }
 }

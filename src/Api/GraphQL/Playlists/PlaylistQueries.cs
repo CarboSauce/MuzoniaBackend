@@ -29,7 +29,8 @@ public static partial class PlaylistQueries
     public static async Task<IEnumerable<Playlist>> SearchPlaylistsAsync(
         ApiDbContext dbContext,
         ClaimsPrincipal claims,
-        string name,
+        string text,
+        QueryContext<Playlist> queryContext,
         CancellationToken ct
     )
     {
@@ -37,8 +38,13 @@ public static partial class PlaylistQueries
         return await dbContext
             .Playlists.Where(p =>
                 (p.IsPublic || p.UserId == userId)
-                && EF.Functions.ToTsVector(p.Name).Matches(name)
+                && EF.Functions.ToTsVector(
+                        "english",
+                        p.Description + " " + p.Name
+                    )
+                    .Matches(text)
             )
+            .With(queryContext)
             .ToListAsync(ct);
     }
 

@@ -1,0 +1,14 @@
+{
+  "data": {
+    "createTrack": {
+      "track": {
+        "primaryArtist": {
+          "name": "TEST ARTIST",
+          "description": "TEST ARTIST"
+        },
+        "genre": "Pop",
+        "title": "Test track"
+      }
+    }
+  }
+}

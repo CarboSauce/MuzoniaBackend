@@ -39,18 +39,19 @@ internal static class Auth
                         ?? throw new InvalidOperationException(
                             "Auth:Audience is required"
                         );
-                    options.Authority = authority;
+                    var authAudience = $"{authority}/api/auth";
+                    options.Authority = authAudience;
                     options.Audience = audience;
                     options.RequireHttpsMetadata = false;
                     options.IncludeErrorDetails = true;
                     options.MapInboundClaims = false;
-                    var jwks = RetrieveJwks(authority).ToArray();
+                    var jwks = RetrieveJwks(authAudience).ToArray();
                     options.TokenValidationParameters =
                         new TokenValidationParameters
                         {
                             ValidateIssuer = true,
-                            ValidIssuer = authority,
-                            ValidateAudience = true,
+                            ValidIssuers = [authority, authAudience],
+                            ValidateAudience = false,
                             ValidAudience = audience,
                             ValidateLifetime = true,
                             IssuerSigningKeys = jwks,

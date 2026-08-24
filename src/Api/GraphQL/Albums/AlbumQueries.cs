@@ -35,13 +35,17 @@ public static partial class AlbumQueries
     ) => await dataLoader.Select(selection).LoadRequiredAsync(ids, ct);
 
     public static async Task<IEnumerable<Album>> SearchAlbumsAsync(
-        string title,
+        string text,
         ApiDbContext dbContext,
+        QueryContext<Album> queryContext,
         CancellationToken ct
     )
     {
         return await dbContext
-            .Albums.Where(a => EF.Functions.ToTsVector(a.Title).Matches(title))
+            .Albums.Where(a =>
+                EF.Functions.ToTsVector("english", a.Title).Matches(text)
+            )
+            .With(queryContext)
             .ToListAsync(ct);
     }
 }

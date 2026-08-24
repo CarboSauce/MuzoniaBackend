@@ -153,4 +153,7 @@ void ConfigureServices(
     });
 }
 
-public partial class Program { }
+namespace Muzonia
+{
+    public partial class Program { }
+}

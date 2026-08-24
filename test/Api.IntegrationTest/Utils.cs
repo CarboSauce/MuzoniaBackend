@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Diagnostics.CodeAnalysis;
+using HotChocolate.Execution;
+using HotChocolate.Transport.Http;
+using OperationRequest = HotChocolate.Transport.OperationRequest;
 
 namespace Muzonia.Api.IntegrationTest;
 
@@ -6,21 +9,14 @@ public static class Utils
 {
     public static bool IsGuid(this string value) => Guid.TryParse(value, out _);
 
-    public static FormFile DummyFormFile()
+    extension(GraphQLHttpClient client)
     {
-        var content = "dummy";
-        var fileName = "dummy";
-        var ms = new MemoryStream();
-        var writer = new StreamWriter(ms);
-        writer.Write(content);
-        writer.Flush();
-        ms.Position = 0;
-        var formFile = new FormFile(ms, 0, ms.Length, "dummy", fileName)
+        public Task<GraphQLHttpResponse> ExecuteAsync(
+            [StringSyntax("graphql")] string body,
+            CancellationToken ct = default
+        )
         {
-            Headers = new HeaderDictionary(),
-            ContentType = "image/jpeg",
-        };
-
-        return formFile;
+            return client.PostAsync(new OperationRequest(body), ct);
+        }
     }
 }

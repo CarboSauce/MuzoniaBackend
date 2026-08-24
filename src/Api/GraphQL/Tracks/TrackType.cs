@@ -1,5 +1,8 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
+using GreenDonut.Data;
+using Microsoft.EntityFrameworkCore;
+using Muzonia.Api.GraphQL.Artists;
 using Muzonia.DbEf.Entities;
 
 namespace Muzonia.Api.GraphQL.Tracks;
@@ -10,6 +13,7 @@ public static partial class TrackType
     static partial void Configure(IObjectTypeDescriptor<Track> descriptor)
     {
         descriptor.Field(t => t.DataUri).Ignore();
+        descriptor.Field(t => t.PrimaryArtist).Ignore();
     }
 
     public static async Task<Uri?> GetDataUri(
@@ -43,5 +47,15 @@ public static partial class TrackType
         }.Uri;
 
         return blobUri;
+    }
+
+    public static async Task<Artist> GetPrimaryArtistAsync(
+        [Parent(requires: nameof(Track.Id))] Track track,
+        QueryContext<Artist>? query,
+        IArtistByTrackIdDataLoader dataLoader,
+        CancellationToken ct
+    )
+    {
+        return await dataLoader.With(query).LoadRequiredAsync(track.Id, ct);
     }
 }

@@ -1,26 +1,35 @@
+using Azure.Provisioning;
+using Azure.Provisioning.Storage;
+using Microsoft.Extensions.Configuration;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
-#pragma warning disable ASPIREPERSISTENCE001
-var postgres = builder
-    .AddPostgres("postgres")
-    .WithPgWeb()
-    .WithDataVolume()
-    .WithPersistentLifetime()
-    .AddDatabase("apidb");
-#pragma warning restore ASPIREPERSISTENCE001
+var testing = builder.Configuration.GetValue("Testing", false);
 
-#pragma warning disable ASPIREPERSISTENCE001
+var postgresServer = builder.AddPostgres("postgres").WithPgWeb();
+if (!testing)
+{
+    postgresServer
+        .WithDataVolume()
+        .WithLifetime(
+            testing ? ContainerLifetime.Session : ContainerLifetime.Persistent
+        );
+}
+var postgres = postgresServer.AddDatabase("apidb");
 
-#pragma warning disable ASPIREPERSISTENCE001
-var cache = builder.AddRedis("redis").WithPersistentLifetime();
+var cache = builder
+    .AddRedis("redis")
+    .WithLifetime(
+        testing ? ContainerLifetime.Session : ContainerLifetime.Persistent
+    );
 
-#pragma warning disable ASPIREPERSISTENCE001
 var storage = builder
     .AddAzureStorage("storage")
     .RunAsEmulator(azurite =>
     {
         azurite.WithBlobPort(10000).WithQueuePort(10001).WithTablePort(10002);
-        azurite.WithDataVolume();
+        if (!testing)
+            azurite.WithDataVolume();
     });
 var blobs = storage.AddBlobs("blobs");
 var queue = storage.AddQueue("queue");
@@ -46,17 +55,20 @@ var migrateAuthExec = builder
             .UriExpression;
     });
 
-#pragma warning disable ASPIREPERSISTENCE001
-var mailpit = builder
-    .AddMailPit("mailpit")
-    .WithDataVolume("mailpit-data")
-    .WithPersistentLifetime();
+var mailpit = builder.AddMailPit("mailpit");
+
+if (!testing)
+    mailpit
+        .WithDataVolume("mailpit-data")
+        .WithLifetime(
+            testing ? ContainerLifetime.Session : ContainerLifetime.Persistent
+        );
 
 var webAppPort = 3003;
 var webAppSecret = builder.AddParameter("better-auth-secret", secret: true);
 var authAudience = builder.AddParameter("auth-audience", value: "muzonia-api");
 var authApi = builder
-    .AddJavaScriptApp("auth", authProjectDirectory)
+    .AddJavaScriptApp("webapp", authProjectDirectory)
     .WithHttpEndpoint(port: webAppPort, env: "APP_PORT")
     .WithEnvironment("BETTER_AUTH_SECRET", webAppSecret)
     .WithEnvironment("AUTH_AUDIENCE", authAudience)
@@ -117,7 +129,7 @@ authApi.WithEnvironment(context =>
 
 coreapi.WithEnvironment(
     "Auth:Authority",
-    $"{caddy.GetEndpoint("http").Property(EndpointProperty.Scheme)}://{caddy.GetEndpoint("http").Property(EndpointProperty.Host)}:{caddy.GetEndpoint("http").Property(EndpointProperty.Port)}/api/auth"
+    $"{caddy.GetEndpoint("http").Property(EndpointProperty.Scheme)}://{caddy.GetEndpoint("http").Property(EndpointProperty.Host)}:{caddy.GetEndpoint("http").Property(EndpointProperty.Port)}"
 );
 
 var functions = builder

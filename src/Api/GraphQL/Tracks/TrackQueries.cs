@@ -16,8 +16,13 @@ public static partial class TrackQueries
     [UseSorting]
     public static IQueryable<Track> GetTracks(
         ApiDbContext dbContext,
-        ClaimsPrincipal claims
-    ) => dbContext.Tracks.AsNoTracking().OrderBy(a => a.Id);
+        QueryContext<Track> context
+    ) =>
+        dbContext
+            .Tracks.AsNoTracking()
+            .With(context)
+            .Where(t => t.DataUri != null)
+            .OrderBy(a => a.Id);
 
     [NodeResolver]
     public static Task<Track?> GetTrackByIdAsync(
@@ -37,14 +42,16 @@ public static partial class TrackQueries
     public static async Task<IEnumerable<Track>> SearchTracksAsync(
         string title,
         ApiDbContext dbContext,
+        QueryContext<Track> context,
         CancellationToken ct
     )
     {
         return await dbContext
             .Tracks.Where(t =>
                 t.DataUri != null
-                && EF.Functions.ToTsVector(t.Title).Matches(title)
+                && EF.Functions.ToTsVector("english", t.Title).Matches(title)
             )
+            .With(context)
             .ToListAsync(ct);
     }
 

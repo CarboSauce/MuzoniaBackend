@@ -36,5 +36,10 @@ public class PlaylistConfig : IEntityTypeConfiguration<Playlist>
                         .WithMany()
                         .HasForeignKey(ps => ps.PlaylistId)
             );
+
+        builder
+            .HasIndex(p => new { p.Description, p.Name })
+            .HasMethod("GIN")
+            .IsTsVectorExpressionIndex("english");
     }
 }

@@ -15,11 +15,11 @@ internal static class GraphQl
             .AddGraphQLServer()
             .AddGlobalObjectIdentification()
             .AddMutationConventions()
-            .AddMaxExecutionDepthRule(20)
+            .ModifyPagingOptions(po => po.MaxPageSize = 100)
             .ModifyCostOptions(opt =>
             {
-                opt.EnforceCostLimits = true;
-                opt.ApplyCostDefaults = true;
+                opt.EnforceCostLimits = false;
+                opt.ApplyCostDefaults = false;
             })
             .ModifyRequestOptions(opt =>
                 opt.IncludeExceptionDetails = env.IsDevelopment()

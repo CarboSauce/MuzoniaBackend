@@ -1,0 +1,9 @@
+{
+  "data": {
+    "createArtist": {
+      "artist": {
+        "name": "TEST ARTIST"
+      }
+    }
+  }
+}

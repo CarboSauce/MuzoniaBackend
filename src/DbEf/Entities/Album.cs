@@ -32,5 +32,10 @@ public class AlbumConfig : IEntityTypeConfiguration<Album>
             .UsingEntity<ArtistAlbum>();
         builder.Property(e => e.Title).HasMaxLength(256);
         builder.Property(e => e.ImageUri).IsRequired();
+
+        builder
+            .HasIndex(a => new { a.Title })
+            .HasMethod("GIN")
+            .IsTsVectorExpressionIndex("english");
     }
 }

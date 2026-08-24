@@ -49,5 +49,10 @@ public class SongConfig : IEntityTypeConfiguration<Track>
 
         builder.Property(e => e.Title).IsRequired();
         builder.Property(e => e.CreationDate).IsRequired();
+
+        builder
+            .HasIndex(b => b.Title)
+            .HasMethod("GIN")
+            .IsTsVectorExpressionIndex("english");
     }
 }

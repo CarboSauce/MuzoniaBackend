@@ -35,5 +35,10 @@ public class ArtistConfig : IEntityTypeConfiguration<Artist>
             .HasMany(e => e.Albums)
             .WithMany(e => e.Artists)
             .UsingEntity<ArtistAlbum>();
+
+        builder
+            .HasIndex(a => new { a.Description, a.Name })
+            .HasMethod("GIN")
+            .IsTsVectorExpressionIndex("english");
     }
 }

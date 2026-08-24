@@ -37,4 +37,32 @@ public static class ArtistDataLoaders
             .Select(a => a.Id, selector)
             .ToDictionaryAsync(s => s.Id, ct);
     }
+
+    [DataLoader]
+    public static async Task<
+        IReadOnlyDictionary<EntityId, Artist>
+    > ArtistByTrackIdAsync(
+        IReadOnlyList<EntityId> ids,
+        ApiDbContext dbContext,
+        ISelectorBuilder selector,
+        CancellationToken ct
+    )
+    {
+        // var artists = await dbContext
+        //     .Tracks.Where(t => ids.Contains(t.Id))
+        //     .Select(t => new { Id = t.Id, Artist = t.PrimaryArtist })
+        //     .ToDictionaryAsync(t => t.Id, t => t.Artist, ct);
+
+        var artists = await dbContext
+            .Tracks.AsNoTracking()
+            .Where(a => ids.Contains(a.Id))
+            .Select(
+                t => t.Id,
+                t => t.Artists.Where(a => a.Id == t.PrimaryArtistId),
+                selector
+            )
+            .ToDictionaryAsync(t => t.Key, t => t.Value.First(), ct);
+
+        return artists;
+    }
 }

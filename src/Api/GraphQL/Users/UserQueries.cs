@@ -32,13 +32,17 @@ public static partial class UserQueries
     }
 
     public static async Task<IEnumerable<AppUser>> SearchUsersAsync(
-        string name,
+        string text,
         ApiDbContext dbContext,
+        QueryContext<AppUser> queryContext,
         CancellationToken ct
     )
     {
         return await dbContext
-            .Users.Where(u => EF.Functions.ToTsVector(u.Name).Matches(name))
+            .Users.Where(u =>
+                EF.Functions.ToTsVector("english", u.Name).Matches(text)
+            )
+            .With(queryContext)
             .ToListAsync(ct);
     }
 }

@@ -19,6 +19,7 @@ public static class TrackDataLoaders
     {
         return await dbContext
             .Tracks.Where(t => ids.Contains(t.Id) && t.DataUri != null)
+            .Include(t => t.Artists)
             .OrderBy(t => t.Id)
             .Select(t => t.Id, selector)
             .ToDictionaryAsync(t => t.Id, ct);

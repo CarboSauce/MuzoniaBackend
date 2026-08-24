@@ -25,5 +25,10 @@ public class AppUserConfig : IEntityTypeConfiguration<AppUser>
         builder.Property(e => e.Id).HasColumnName("id");
         builder.Property(e => e.ImageUri).HasColumnName("image");
         builder.Property(e => e.CreationDate).HasColumnName("created_at");
+
+        builder
+            .HasIndex(u => new { u.Name })
+            .HasMethod("GIN")
+            .IsTsVectorExpressionIndex("english");
     }
 }
